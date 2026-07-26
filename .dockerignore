@@ -1,0 +1,16 @@
+**/__pycache__/
+**/*.pyc
+.git
+.gitignore
+.claude/
+frontend/node_modules
+frontend/dist
+frontend/coverage
+*.log
+logs/
+.venv
+venv/
+cove/tests
+videoModules/data
+videoModules/uploaded_videos
+videoModules/static

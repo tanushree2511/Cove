@@ -2,7 +2,7 @@ import streamlit as st
 import requests, os, time
 from datetime import datetime, timezone
 
-API_URL = "http://127.0.0.1:8000"
+API_URL = os.getenv("VIDEO_API_URL", "http://127.0.0.1:8000")
 st.set_page_config(layout="wide", page_title="VisionArchive AI", page_icon="🖼️")
 
 # --- THEME MANAGEMENT ---
