@@ -1,0 +1,168 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 225 15% 8%;
+    --foreground: 220 15% 93%;
+
+    --card: 225 14% 11%;
+    --card-foreground: 220 15% 93%;
+
+    --popover: 225 14% 11%;
+    --popover-foreground: 220 15% 93%;
+
+    --primary: 215 95% 58%;
+    --primary-foreground: 225 15% 4%;
+
+    --secondary: 225 14% 15%;
+    --secondary-foreground: 220 15% 80%;
+
+    --muted: 225 12% 14%;
+    --muted-foreground: 220 10% 48%;
+
+    --accent: 260 85% 65%;
+    --accent-foreground: 220 15% 95%;
+
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 220 15% 95%;
+
+    --border: 225 12% 16%;
+    --input: 225 12% 16%;
+    --ring: 215 95% 58%;
+
+    --radius: 0.5rem;
+
+    /* Extended palette */
+    --surface: 225 14% 10%;
+    --surface-hover: 225 14% 13%;
+    --surface-active: 225 14% 16%;
+    --glow-primary: 215 95% 58%;
+    --glow-accent: 260 85% 65%;
+    --glass: 225 14% 12%;
+    --glass-border: 225 12% 20%;
+    --success: 152 60% 48%;
+    --warning: 38 92% 55%;
+    --info: 200 80% 55%;
+
+    --sidebar-background: 225 16% 6%;
+    --sidebar-foreground: 220 10% 58%;
+    --sidebar-primary: 215 95% 58%;
+    --sidebar-primary-foreground: 225 15% 4%;
+    --sidebar-accent: 225 14% 12%;
+    --sidebar-accent-foreground: 220 15% 90%;
+    --sidebar-border: 225 12% 12%;
+    --sidebar-ring: 215 95% 58%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+    overflow: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Refined scrollbar */
+  ::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: hsl(var(--border));
+    border-radius: 10px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--muted-foreground) / 0.4);
+  }
+  ::-webkit-scrollbar-corner {
+    background: transparent;
+  }
+}
+
+@layer utilities {
+  .glass-panel {
+    background: hsl(var(--glass) / 0.85);
+    backdrop-filter: blur(24px) saturate(1.5);
+    -webkit-backdrop-filter: blur(24px) saturate(1.5);
+    border: 1px solid hsl(var(--glass-border) / 0.4);
+  }
+
+  .glow-primary {
+    box-shadow: 0 0 24px -6px hsl(var(--glow-primary) / 0.35),
+                0 0 8px -2px hsl(var(--glow-primary) / 0.15);
+  }
+
+  .glow-accent {
+    box-shadow: 0 0 24px -6px hsl(var(--glow-accent) / 0.35);
+  }
+
+  .shimmer {
+    background: linear-gradient(
+      110deg,
+      hsl(var(--muted) / 0.4) 30%,
+      hsl(var(--muted) / 0.8) 50%,
+      hsl(var(--muted) / 0.4) 70%
+    );
+    background-size: 250% 100%;
+    animation: shimmer 1.8s ease-in-out infinite;
+  }
+
+  .text-gradient {
+    background: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--accent)));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .text-gradient-subtle {
+    background: linear-gradient(135deg, hsl(var(--foreground)), hsl(var(--muted-foreground)));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .elevated {
+    box-shadow: 0 1px 2px hsl(0 0% 0% / 0.15),
+                0 4px 12px hsl(0 0% 0% / 0.12),
+                0 8px 24px hsl(0 0% 0% / 0.08);
+  }
+
+  .elevated-lg {
+    box-shadow: 0 2px 4px hsl(0 0% 0% / 0.2),
+                0 8px 24px hsl(0 0% 0% / 0.15),
+                0 16px 48px hsl(0 0% 0% / 0.1);
+  }
+
+  .mono {
+    font-family: 'JetBrains Mono', monospace;
+  }
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-4px); }
+}
+
+@keyframes glow-pulse {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
