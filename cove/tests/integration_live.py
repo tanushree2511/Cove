@@ -28,9 +28,9 @@ def run_integration_test():
     processes = []
     try:
         # 1. Start Server
-        print("[TEST] Starting Server (server.py)...")
+        print("[TEST] Starting Server (api/server.py)...")
         server_process = subprocess.Popen(
-            [sys.executable, "server.py"],
+            [sys.executable, "api/server.py"],
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             text=True
@@ -59,15 +59,9 @@ def run_integration_test():
             return
 
         # 2. Start Watcher
-        print("[TEST] Starting Watcher (watcher.py)...")
-        # Watcher needs to know which directory to watch. 
-        # Looking at watcher.py, it likely takes an arg or has a default.
-        # Let's assume we pass the dir as an arg based on standard practice, 
-        # OR we check how it's implemented. 
-        # Wait, I didn't verify if watcher.py takes an ARG.
-        # checking watcher.py...
+        print("[TEST] Starting Watcher (pipeline/watcher.py)...")
         watcher_process = subprocess.Popen(
-            [sys.executable, "watcher.py", WATCH_DIR],
+            [sys.executable, "pipeline/watcher.py", WATCH_DIR],
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             text=True

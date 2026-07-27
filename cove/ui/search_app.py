@@ -1,7 +1,13 @@
 import os
 import numpy as np
-from search_engine import SearchEngine
-from vector_storage import VectorStorage
+import sys
+import os
+_project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if _project_root not in sys.path:
+    sys.path.insert(0, _project_root)
+
+from engines.search_engine import SearchEngine
+from engines.vector_storage import VectorStorage
 
 def main():
     # 1. Initialize
@@ -9,7 +15,7 @@ def main():
     storage = VectorStorage()
 
     if storage.index.ntotal == 0:
-        print("❌ No images indexed. Run 'python reindex_search.py' first.")
+        print("❌ No images indexed. Run 'python pipeline/reindex_search.py' first.")
         return
 
     print(f"✅ Loaded {storage.index.ntotal} image vectors.")

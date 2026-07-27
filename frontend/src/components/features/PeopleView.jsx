@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Users, Loader2 } from 'lucide-react';
 import { useAppStore } from '@/store/useAppStore';
-import { fetchClusters } from '@/lib/mockApi';
+import { fetchClusters } from '@/lib/coveApi';
 import { toast } from 'sonner';
 
 export function PeopleView() {

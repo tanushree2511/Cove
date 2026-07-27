@@ -6,9 +6,14 @@ from __future__ import annotations
 
 import argparse
 import os
+import sys
 from typing import Iterable
 
-from vision_config import CONFIG
+_COVE_ROOT = os.path.dirname(os.path.abspath(__file__))
+if _COVE_ROOT not in sys.path:
+    sys.path.insert(0, _COVE_ROOT)
+
+from config.vision_config import CONFIG
 
 
 def _print_section(title: str, lines: Iterable[str]) -> None:
@@ -25,27 +30,27 @@ def show_commands() -> None:
     print()
 
     _print_section("SETUP:", [
-        "    python download_models.py      Download CLIP models (~500MB)",
-        "    python prepare_lfw.py          Copy LFW dataset to test_images/",
+        "    python pipeline/download_models.py      Download CLIP models (~500MB)",
+        "    python pipeline/prepare_lfw.py          Copy LFW dataset to test_images/",
     ])
 
     _print_section("PROCESSING:", [
-        "    python production_pipeline.py  Extract face embeddings (fast)",
-        "    python tune_clustering.py      Cluster faces & tune parameters",
-        "    python reindex_search.py       Build semantic search index",
+        "    python pipeline/production_pipeline.py  Extract face embeddings (fast)",
+        "    python pipeline/tune_clustering.py      Cluster faces & tune parameters",
+        "    python pipeline/reindex_search.py       Build semantic search index",
     ])
 
     _print_section("INTERFACES:", [
-        "    streamlit run app.py           Launch Streamlit Web UI",
-        "    python gallery.py              Generate & serve HTML gallery",
-        "    python search_app.py           CLI text-to-image search",
-        "    python server.py               Start FastAPI server",
+        "    streamlit run ui/app.py        Launch Streamlit Web UI",
+        "    python ui/gallery.py           Generate & serve HTML gallery",
+        "    python ui/search_app.py        CLI text-to-image search",
+        "    python api/server.py           Start FastAPI server",
     ])
 
     _print_section("UTILITIES:", [
-        "    python rename_person.py ID Name  Rename a person in DB",
-        "    python watcher.py [dir]        Watch folder for new images",
-        "    python align_database.py       Repair vector database",
+        "    python pipeline/rename_person.py ID Name  Rename a person in DB",
+        "    python pipeline/watcher.py [dir]        Watch folder for new images",
+        "    python pipeline/align_database.py       Repair vector database",
     ])
 
 

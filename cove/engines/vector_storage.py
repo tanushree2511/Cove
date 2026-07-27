@@ -5,7 +5,7 @@ import os
 import faiss
 import numpy as np
 
-from vision_config import CONFIG, get_logger
+from config.vision_config import CONFIG, get_logger
 
 logger = get_logger(__name__)
 

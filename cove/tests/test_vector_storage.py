@@ -1,5 +1,5 @@
 import numpy as np
-from vector_storage import VectorStorage
+from engines.vector_storage import VectorStorage
 
 
 def test_vector_storage_round_trip(tmp_path):

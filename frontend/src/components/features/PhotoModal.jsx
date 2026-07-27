@@ -2,21 +2,32 @@
  * Photo Lightbox Modal — High-quality image lightbox with metadata,
  * keyboard navigation (← → Esc), download, and EXIF details sidebar.
  */
-import { useEffect, useCallback } from 'react';
+import { useEffect, useCallback, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, ChevronLeft, ChevronRight, Download, Camera, MapPin, Tag, Calendar, Info } from 'lucide-react';
+import { X, ChevronLeft, ChevronRight, Download, Camera, MapPin, Tag, Calendar, Info, Trash2, AlertTriangle } from 'lucide-react';
 import { useAppStore } from '@/store/useAppStore';
 import { toast } from 'sonner';
+import { deleteImages, fetchClusters, fetchImages } from '@/lib/coveApi';
 
 export function PhotoModal() {
   const activeMediaModal = useAppStore((s) => s.activeMediaModal);
   const closeMediaModal  = useAppStore((s) => s.closeMediaModal);
   const openMediaModal   = useAppStore((s) => s.openMediaModal);
   const images           = useAppStore((s) => s.images);
+  const setImages        = useAppStore((s) => s.setImages);
+  const setClusters      = useAppStore((s) => s.setClusters);
+
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   const isPhotoModal = activeMediaModal?.type === 'photo';
   const photo        = activeMediaModal?.item;
   const currentIndex = images.findIndex((img) => img.id === photo?.id);
+
+  // Reset confirm state whenever the viewed photo changes
+  useEffect(() => {
+    setConfirmDelete(false);
+  }, [photo?.id]);
 
   const handlePrev = useCallback(() => {
     if (currentIndex > 0) openMediaModal('photo', images[currentIndex - 1]);
@@ -40,6 +51,30 @@ export function PhotoModal() {
 
   const handleDownload = () => {
     toast.success(`Downloading ${photo?.title || 'photo'}…`);
+  };
+
+  const handleDeleteClick = async () => {
+    if (!photo?.path) return;
+
+    if (!confirmDelete) {
+      setConfirmDelete(true);
+      setTimeout(() => setConfirmDelete(false), 3000);
+      return;
+    }
+
+    setConfirmDelete(false);
+    setDeleting(true);
+    try {
+      await deleteImages([photo.path]);
+      toast.success('Photo deleted');
+      closeMediaModal();
+      fetchImages(0, 1000).then(setImages);
+      fetchClusters().then(setClusters);
+    } catch {
+      toast.error('Delete failed');
+    } finally {
+      setDeleting(false);
+    }
   };
 
   return (
@@ -116,6 +151,26 @@ export function PhotoModal() {
                     <Download size={16} />
                   </button>
                   <button
+                    onClick={handleDeleteClick}
+                    disabled={deleting}
+                    title={confirmDelete ? 'Click again to confirm' : 'Delete photo'}
+                    aria-label={confirmDelete ? 'Click again to confirm delete' : 'Delete photo'}
+                    className={`flex items-center gap-1 rounded-lg p-1.5 text-[11px] font-medium transition-colors disabled:opacity-50 ${
+                      confirmDelete
+                        ? 'bg-destructive text-destructive-foreground px-2'
+                        : 'text-muted-foreground hover:text-destructive hover:bg-destructive/10'
+                    }`}
+                  >
+                    {confirmDelete ? (
+                      <>
+                        <AlertTriangle size={16} />
+                        <span>Confirm?</span>
+                      </>
+                    ) : (
+                      <Trash2 size={16} />
+                    )}
+                  </button>
+                  <button
                     onClick={closeMediaModal}
                     title="Close"
                     aria-label="Close photo viewer"
@@ -133,18 +188,26 @@ export function PhotoModal() {
                   <p className="text-[10px] text-muted-foreground">Captured date</p>
                 </MetaRow>
 
-                <MetaRow icon={<Camera size={15} className="text-muted-foreground mt-0.5" />}>
-                  <p className="font-medium text-foreground">{photo.camera || 'Sony α7 IV'}</p>
-                  <p className="text-[10px] text-muted-foreground">{photo.lens || '24-70mm f/2.8 GM II'}</p>
-                  <p className="text-[10px] mono text-primary/80 mt-0.5">
-                    {photo.aperture || 'f/2.8'} · {photo.shutter || '1/250s'} · ISO {photo.iso || 200}
-                  </p>
-                </MetaRow>
+                {photo.camera && (
+                  <MetaRow icon={<Camera size={15} className="text-muted-foreground mt-0.5" />}>
+                    <p className="font-medium text-foreground">{photo.camera}</p>
+                    {photo.lens && <p className="text-[10px] text-muted-foreground">{photo.lens}</p>}
+                    {(photo.aperture || photo.shutter || photo.iso) && (
+                      <p className="text-[10px] mono text-primary/80 mt-0.5">
+                        {[photo.aperture, photo.shutter, photo.iso && `ISO ${photo.iso}`]
+                          .filter(Boolean)
+                          .join(' · ')}
+                      </p>
+                    )}
+                  </MetaRow>
+                )}
 
-                <MetaRow icon={<MapPin size={15} className="text-muted-foreground mt-0.5" />}>
-                  <p className="font-medium text-foreground">{photo.location || 'Kyoto, Japan'}</p>
-                  <p className="text-[10px] text-muted-foreground">Geotagged location</p>
-                </MetaRow>
+                {photo.location && (
+                  <MetaRow icon={<MapPin size={15} className="text-muted-foreground mt-0.5" />}>
+                    <p className="font-medium text-foreground">{photo.location}</p>
+                    <p className="text-[10px] text-muted-foreground">Geotagged location</p>
+                  </MetaRow>
+                )}
 
                 {photo.tags?.length > 0 && (
                   <MetaRow icon={<Tag size={15} className="text-muted-foreground mt-0.5" />}>
@@ -162,10 +225,19 @@ export function PhotoModal() {
                   </MetaRow>
                 )}
 
-                <div className="pt-2 border-t border-border/60 flex items-center justify-between text-muted-foreground text-[11px] mono">
-                  <span>Dimensions</span>
-                  <span>{photo.width || 1920} × {photo.height || 1080}</span>
-                </div>
+                {photo.path && (
+                  <MetaRow icon={<Info size={15} className="text-muted-foreground mt-0.5" />}>
+                    <p className="text-[10px] text-muted-foreground break-all">{photo.path}</p>
+                    <p className="text-[10px] text-muted-foreground">Library path</p>
+                  </MetaRow>
+                )}
+
+                {photo.width && photo.height && (
+                  <div className="pt-2 border-t border-border/60 flex items-center justify-between text-muted-foreground text-[11px] mono">
+                    <span>Dimensions</span>
+                    <span>{photo.width} × {photo.height}</span>
+                  </div>
+                )}
               </div>
             </div>
           </motion.div>

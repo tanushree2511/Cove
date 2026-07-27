@@ -7,14 +7,18 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Download, Trash2, CheckSquare, X, AlertTriangle } from 'lucide-react';
 import { useAppStore } from '@/store/useAppStore';
 import { toast } from 'sonner';
+import { deleteImages, fetchClusters, fetchImages } from '@/lib/coveApi';
 
 export function SelectionBar() {
   const selectedImages    = useAppStore((s) => s.selectedImages);
   const clearSelection    = useAppStore((s) => s.clearSelection);
   const selectAllImages   = useAppStore((s) => s.selectAllImages);
   const deleteSelectedImages = useAppStore((s) => s.deleteSelectedImages);
+  const setImages         = useAppStore((s) => s.setImages);
+  const setClusters       = useAppStore((s) => s.setClusters);
 
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   const count = selectedImages.size;
   if (count === 0) return null;
@@ -23,15 +27,27 @@ export function SelectionBar() {
     toast.success(`Exporting ${count} selected item${count > 1 ? 's' : ''}…`);
   };
 
-  const handleDeleteClick = () => {
-    if (confirmDelete) {
-      deleteSelectedImages();
-      toast.success(`Deleted ${count} item${count > 1 ? 's' : ''}`);
-      setConfirmDelete(false);
-    } else {
+  const handleDeleteClick = async () => {
+    if (!confirmDelete) {
       setConfirmDelete(true);
       // Auto-cancel after 3 seconds
       setTimeout(() => setConfirmDelete(false), 3000);
+      return;
+    }
+
+    setConfirmDelete(false);
+    setDeleting(true);
+    try {
+      const paths = Array.from(selectedImages);
+      const result = await deleteImages(paths);
+      deleteSelectedImages();
+      toast.success(`Deleted ${result.count} item${result.count !== 1 ? 's' : ''}`);
+      fetchImages(0, 1000).then(setImages);
+      fetchClusters().then(setClusters);
+    } catch {
+      toast.error('Delete failed');
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -76,14 +92,17 @@ export function SelectionBar() {
 
           <button
             onClick={handleDeleteClick}
+            disabled={deleting}
             title={confirmDelete ? 'Click again to confirm' : 'Delete selected'}
-            className={`flex items-center gap-1.5 rounded-full px-3 py-1 text-[11px] font-medium transition-all duration-200 ${
+            className={`flex items-center gap-1.5 rounded-full px-3 py-1 text-[11px] font-medium transition-all duration-200 disabled:opacity-50 ${
               confirmDelete
                 ? 'bg-destructive text-destructive-foreground'
                 : 'bg-destructive/10 hover:bg-destructive/20 text-destructive'
             }`}
           >
-            {confirmDelete ? (
+            {deleting ? (
+              <span>Deleting…</span>
+            ) : confirmDelete ? (
               <>
                 <AlertTriangle size={13} />
                 <span>Confirm?</span>

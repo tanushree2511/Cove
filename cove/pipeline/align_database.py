@@ -2,7 +2,13 @@ import numpy as np
 import json
 import os
 
-from vision_config import CONFIG
+import sys
+import os
+_project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if _project_root not in sys.path:
+    sys.path.insert(0, _project_root)
+
+from config.vision_config import CONFIG
 
 def fix_database():
     print("🔧 VISION ARCHIVE: Database Repair Tool")
@@ -51,7 +57,7 @@ def fix_database():
     with open(CONFIG.image_cache, "w") as f:
         json.dump(data_map, f)
 
-    print("✅ DONE! You can now run 'streamlit run app.py'")
+    print("✅ DONE! You can now run 'streamlit run ui/app.py'")
 
 if __name__ == "__main__":
     fix_database()

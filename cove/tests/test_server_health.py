@@ -3,8 +3,8 @@ from unittest.mock import patch
 
 from fastapi.testclient import TestClient
 
-from server import app
-from vision_config import CONFIG
+from api.server import app
+from config.vision_config import CONFIG
 
 
 def test_health_endpoint_degraded():

@@ -2,7 +2,7 @@ import json
 import os
 from typing import Optional
 
-from vision_config import CONFIG
+from config.vision_config import CONFIG
 
 
 class PersonManager:
@@ -51,3 +51,25 @@ class PersonManager:
             with open(self.db_path, 'w') as f:
                 json.dump(self.people, f, indent=4)
             print(f"👤 {person_id} is now known as {new_name}")
+
+    def remove_photos(self, paths_to_remove):
+        """Remove specific photo paths from every person; drops people left with zero photos."""
+        paths_to_remove = set(paths_to_remove)
+        changed = False
+
+        for person_id in list(self.people.keys()):
+            photos = self.people[person_id].get("photos", [])
+            remaining = [p for p in photos if p not in paths_to_remove]
+            if len(remaining) != len(photos):
+                changed = True
+                if remaining:
+                    self.people[person_id]["photos"] = remaining
+                else:
+                    del self.people[person_id]
+
+        if changed:
+            os.makedirs(os.path.dirname(self.db_path), exist_ok=True)
+            with open(self.db_path, 'w') as f:
+                json.dump(self.people, f, indent=4)
+
+        return changed

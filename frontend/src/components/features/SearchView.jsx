@@ -6,7 +6,7 @@ import { useEffect, useCallback, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search, Sparkles, Loader2, X } from 'lucide-react';
 import { useAppStore } from '@/store/useAppStore';
-import { searchImages } from '@/lib/mockApi';
+import { searchImages } from '@/lib/coveApi';
 import { PhotoCard } from './PhotoCard';
 
 const SUGGESTIONS = [
@@ -45,6 +45,9 @@ export function SearchView() {
       searchImages(searchQuery)
         .then((results) => {
           setSearchResults(results);
+        })
+        .catch(() => {
+          setSearchResults([]);
         })
         .finally(() => {
           setLoading(false);

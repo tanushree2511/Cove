@@ -1,47 +1,46 @@
 /**
- * Settings view — hardware monitoring, theme controls, library paths, and app info.
+ * Settings view — real system stats, theme controls, library info, and app info.
  */
 import { motion } from 'framer-motion';
 import { useAppStore } from '@/store/useAppStore';
-import { Cpu, Zap, HardDrive, Folder, Info, RefreshCw, Sun, Moon } from 'lucide-react';
+import { Images, Users, Zap, HardDrive, Folder, Info, RefreshCw, Sun, Moon } from 'lucide-react';
 import { toast } from 'sonner';
+import { getSystemStats } from '@/lib/coveApi';
 
 export function SettingsView() {
-  const hardwareInfo    = useAppStore((s) => s.hardwareInfo);
-  const setHardwareInfo = useAppStore((s) => s.setHardwareInfo);
-  const theme           = useAppStore((s) => s.theme);
-  const setTheme        = useAppStore((s) => s.setTheme);
+  const systemStats  = useAppStore((s) => s.systemStats);
+  const setSystemStats = useAppStore((s) => s.setSystemStats);
+  const theme        = useAppStore((s) => s.theme);
+  const setTheme     = useAppStore((s) => s.setTheme);
 
   const cards = [
     {
-      label: 'CPU Usage',
-      value: `${hardwareInfo.cpuUsage}%`,
-      icon:  Cpu,
+      label: 'Photos Indexed',
+      value: systemStats.totalImages.toLocaleString(),
+      icon:  Images,
       color: 'text-primary',
-      bar:   hardwareInfo.cpuUsage,
     },
     {
-      label: 'GPU Usage',
-      value: hardwareInfo.gpuAvailable ? `${hardwareInfo.gpuUsage}%` : 'N/A',
-      icon:  Zap,
+      label: 'People Detected',
+      value: systemStats.totalPeople.toLocaleString(),
+      icon:  Users,
       color: 'text-accent',
-      bar:   hardwareInfo.gpuAvailable ? hardwareInfo.gpuUsage : 0,
     },
     {
-      label: 'GPU Accel.',
-      value: hardwareInfo.gpuAvailable ? 'Active' : 'Disabled',
-      icon:  HardDrive,
-      color: hardwareInfo.gpuAvailable ? 'text-success' : 'text-muted-foreground',
-      bar:   hardwareInfo.gpuAvailable ? 100 : 0,
+      label: 'Acceleration',
+      value: systemStats.gpuAvailable ? 'GPU' : 'CPU only',
+      icon:  systemStats.gpuAvailable ? Zap : HardDrive,
+      color: systemStats.gpuAvailable ? 'text-success' : 'text-muted-foreground',
     },
   ];
 
-  const refreshHardware = () => {
-    setHardwareInfo({
-      cpuUsage: Math.floor(20 + Math.random() * 30),
-      gpuUsage: Math.floor(40 + Math.random() * 50),
-    });
-    toast.success('Hardware diagnostics refreshed');
+  const refreshStats = () => {
+    getSystemStats()
+      .then((stats) => {
+        setSystemStats(stats);
+        toast.success('System stats refreshed');
+      })
+      .catch(() => toast.error('Failed to refresh system stats'));
   };
 
   return (
@@ -53,19 +52,19 @@ export function SettingsView() {
           <p className="text-[12px] text-muted-foreground">Configure VisionArchive AI preferences</p>
         </div>
         <button
-          onClick={refreshHardware}
-          aria-label="Refresh hardware diagnostics"
+          onClick={refreshStats}
+          aria-label="Refresh system stats"
           className="p-2 rounded-lg bg-card border border-border text-muted-foreground hover:text-foreground transition-colors"
-          title="Refresh Hardware Specs"
+          title="Refresh System Stats"
         >
           <RefreshCw size={14} />
         </button>
       </div>
 
-      {/* Hardware cards */}
-      <section className="mb-8" aria-labelledby="hardware-heading">
-        <p id="hardware-heading" className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground/60 mb-3">
-          Hardware Acceleration
+      {/* System stat cards */}
+      <section className="mb-8" aria-labelledby="stats-heading">
+        <p id="stats-heading" className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground/60 mb-3">
+          Library &amp; Acceleration
         </p>
         <div className="grid grid-cols-3 gap-3">
           {cards.map((card, i) => (
@@ -79,15 +78,6 @@ export function SettingsView() {
               <card.icon size={16} className={`mx-auto mb-2 ${card.color}`} />
               <p className="text-[18px] font-semibold text-foreground mono">{card.value}</p>
               <p className="text-[10px] text-muted-foreground mt-0.5">{card.label}</p>
-              {/* Usage bar */}
-              <div className="mt-2 h-[2px] rounded-full bg-muted overflow-hidden">
-                <motion.div
-                  className={`h-full rounded-full ${card.color.replace('text-', 'bg-')}/60`}
-                  initial={{ width: 0 }}
-                  animate={{ width: `${card.bar}%` }}
-                  transition={{ delay: i * 0.06 + 0.2, duration: 0.5 }}
-                />
-              </div>
             </motion.div>
           ))}
         </div>
@@ -141,14 +131,14 @@ export function SettingsView() {
               <Folder size={14} className="text-muted-foreground" />
               Photo Library Directory
             </div>
-            <span className="text-[11px] mono text-muted-foreground">~/Pictures/VisionArchive</span>
+            <span className="text-[11px] mono text-muted-foreground">test_images/ (on the cove backend)</span>
           </div>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2 text-[13px] text-foreground">
               <HardDrive size={14} className="text-muted-foreground" />
               Vector Index Storage
             </div>
-            <span className="text-[11px] mono text-muted-foreground">~/.visionarchive/index.faiss</span>
+            <span className="text-[11px] mono text-muted-foreground">Managed automatically (FAISS)</span>
           </div>
         </div>
       </section>

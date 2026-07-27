@@ -2,11 +2,17 @@ import streamlit as st
 import os
 import json
 import numpy as np
-from search_engine import SearchEngine
-from vector_storage import VectorStorage
-from person_manager import PersonManager
+import sys
+import os
+_project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if _project_root not in sys.path:
+    sys.path.insert(0, _project_root)
+
+from engines.search_engine import SearchEngine
+from engines.vector_storage import VectorStorage
+from engines.person_manager import PersonManager
 from PIL import Image
-from vision_config import CONFIG
+from config.vision_config import CONFIG
 
 # --- PAGE CONFIG ---
 st.set_page_config(page_title="Vision Archive AI", layout="wide", page_icon="👁️")
@@ -43,7 +49,7 @@ if not pm.people:
     st.warning("Person Database is empty. Load or cluster images to enable the person-specific views.")
 
 if search_storage.vector_matrix is None:
-    st.warning(f"Semantic index missing vector cache. Run 'python reindex_search.py' to populate {CONFIG.vector_path}")
+    st.warning(f"Semantic index missing vector cache. Run 'python pipeline/reindex_search.py' to populate {CONFIG.vector_path}")
 
 # --- SIDEBAR ---
 st.sidebar.title("👁️ Vision Archive")

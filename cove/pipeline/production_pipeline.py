@@ -8,10 +8,16 @@ import cv2
 import numpy as np
 from tqdm import tqdm
 
-from ai_engine import AIEnginePool
-from prepare_lfw import ensure_test_images
-from vector_storage import VectorStorage
-from vision_config import CONFIG, get_logger, setup_logging
+import sys
+import os
+_project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if _project_root not in sys.path:
+    sys.path.insert(0, _project_root)
+
+from engines.ai_engine import AIEnginePool
+from pipeline.prepare_lfw import ensure_test_images
+from engines.vector_storage import VectorStorage
+from config.vision_config import CONFIG, get_logger, setup_logging
 
 setup_logging()
 logger = get_logger(__name__)

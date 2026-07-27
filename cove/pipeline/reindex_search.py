@@ -4,9 +4,15 @@ import json
 import time
 import concurrent.futures
 from tqdm import tqdm
-from search_engine import SearchEngine
-from vector_storage import VectorStorage
-from vision_config import CONFIG
+import sys
+import os
+_project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if _project_root not in sys.path:
+    sys.path.insert(0, _project_root)
+
+from engines.search_engine import SearchEngine
+from engines.vector_storage import VectorStorage
+from config.vision_config import CONFIG
 
 def main():
     print("🧠 SEMANTIC RE-INDEXING (Teaching AI to 'Read' your photos)...")

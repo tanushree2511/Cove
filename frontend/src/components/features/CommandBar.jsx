@@ -7,6 +7,7 @@ import { motion } from 'framer-motion';
 import { Search, FolderOpen, Cpu, Zap, Sun, Moon, X } from 'lucide-react';
 import { useAppStore } from '@/store/useAppStore';
 import { toast } from 'sonner';
+import { fetchImages, uploadImages } from '@/lib/coveApi';
 
 export function CommandBar() {
   const [focused, setFocused] = useState(false);
@@ -17,10 +18,10 @@ export function CommandBar() {
   const setActiveView   = useAppStore((s) => s.setActiveView);
   const activeView      = useAppStore((s) => s.activeView);
   const indexingStatus  = useAppStore((s) => s.indexingStatus);
-  const hardwareInfo    = useAppStore((s) => s.hardwareInfo);
+  const systemStats     = useAppStore((s) => s.systemStats);
+  const setImages       = useAppStore((s) => s.setImages);
   const theme           = useAppStore((s) => s.theme);
   const toggleTheme     = useAppStore((s) => s.toggleTheme);
-  const importFiles     = useAppStore((s) => s.importFiles);
 
   // Auto-focus when navigating to search view
   useEffect(() => {
@@ -45,11 +46,19 @@ export function CommandBar() {
     const input = document.createElement('input');
     input.type = 'file';
     input.multiple = true;
-    input.accept = 'image/*,video/*';
-    input.onchange = (e) => {
-      if (e.target.files?.length) {
-        const count = importFiles(e.target.files);
-        toast.success(`Imported ${count} file${count > 1 ? 's' : ''}`);
+    input.accept = 'image/jpeg,image/png';
+    input.onchange = async (e) => {
+      if (!e.target.files?.length) return;
+      try {
+        const result = await uploadImages(e.target.files);
+        toast.success(
+          `Uploaded ${result.count} image${result.count !== 1 ? 's' : ''}` +
+            (result.indexing_started ? ' — indexing started' : '')
+        );
+        fetchImages(0, 1000).then(setImages);
+        if (result.indexing_started) setActiveView('indexing');
+      } catch {
+        toast.error('Upload failed');
       }
     };
     input.click();
@@ -123,20 +132,16 @@ export function CommandBar() {
           </button>
         )}
 
-        {/* Hardware info */}
+        {/* System info */}
         <div
           className="hidden md:flex items-center gap-1 rounded-full bg-muted/40 border border-border/40 px-2.5 py-1"
-          title={`CPU: ${hardwareInfo.cpuUsage}%${hardwareInfo.gpuAvailable ? ` · GPU: ${hardwareInfo.gpuUsage}%` : ''}`}
+          title={`${systemStats.totalImages.toLocaleString()} photos · ${systemStats.poolSize} workers · ${systemStats.gpuAvailable ? 'GPU accelerated' : 'CPU only'}`}
         >
           <Cpu size={11} className="text-muted-foreground" />
-          <span className="text-[10px] mono text-muted-foreground">{hardwareInfo.cpuUsage}%</span>
-          {hardwareInfo.gpuAvailable && (
-            <>
-              <span className="text-muted-foreground/30 mx-0.5">·</span>
-              <Zap size={11} className="text-primary" />
-              <span className="text-[10px] mono text-muted-foreground">{hardwareInfo.gpuUsage}%</span>
-            </>
-          )}
+          <span className="text-[10px] mono text-muted-foreground">{systemStats.poolSize}w</span>
+          <span className="text-muted-foreground/30 mx-0.5">·</span>
+          <Zap size={11} className={systemStats.gpuAvailable ? 'text-primary' : 'text-muted-foreground/50'} />
+          <span className="text-[10px] mono text-muted-foreground">{systemStats.gpuAvailable ? 'GPU' : 'CPU'}</span>
         </div>
 
         {/* Theme Toggle */}

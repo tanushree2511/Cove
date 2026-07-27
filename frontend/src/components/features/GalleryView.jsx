@@ -8,7 +8,7 @@ import { useVirtualizer } from '@tanstack/react-virtual';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Images, FolderOpen, Loader2, X } from 'lucide-react';
 import { useAppStore } from '@/store/useAppStore';
-import { fetchImages } from '@/lib/mockApi';
+import { fetchImages, uploadImages } from '@/lib/coveApi';
 import { PhotoCard } from './PhotoCard';
 import { toast } from 'sonner';
 
@@ -43,12 +43,13 @@ function useColumns(containerRef) {
 export function GalleryView() {
   const images               = useAppStore((s) => s.images);
   const setImages            = useAppStore((s) => s.setImages);
+  const clusters             = useAppStore((s) => s.clusters);
   const selectedImages       = useAppStore((s) => s.selectedImages);
   const selectImage          = useAppStore((s) => s.selectImage);
   const toggleImageSelection = useAppStore((s) => s.toggleImageSelection);
   const selectedPersonFilter = useAppStore((s) => s.selectedPersonFilter);
   const setPersonFilter      = useAppStore((s) => s.setPersonFilter);
-  const importFiles          = useAppStore((s) => s.importFiles);
+  const setActiveView        = useAppStore((s) => s.setActiveView);
 
   const parentRef = useRef(null);
   const [loading, setLoading] = useState(false);
@@ -67,9 +68,11 @@ export function GalleryView() {
   // Filter images if person filter is active
   const filteredImages = useMemo(() => {
     if (!selectedPersonFilter) return images;
-    // Demo filter: in production this would check face cluster membership
-    return images.filter((_, idx) => idx % 3 === 0);
-  }, [images, selectedPersonFilter]);
+    const person = clusters.find((c) => c.id === selectedPersonFilter.id);
+    if (!person?.photos) return images;
+    const photoSet = new Set(person.photos);
+    return images.filter((img) => photoSet.has(img.id));
+  }, [images, selectedPersonFilter, clusters]);
 
   // Group images by date, chunk into virtualizer rows
   const { rows } = useMemo(() => {
@@ -113,11 +116,19 @@ export function GalleryView() {
     const input = document.createElement('input');
     input.type = 'file';
     input.multiple = true;
-    input.accept = 'image/*,video/*';
-    input.onchange = (e) => {
-      if (e.target.files?.length) {
-        const count = importFiles(e.target.files);
-        toast.success(`Successfully imported ${count} item${count > 1 ? 's' : ''}`);
+    input.accept = 'image/jpeg,image/png';
+    input.onchange = async (e) => {
+      if (!e.target.files?.length) return;
+      try {
+        const result = await uploadImages(e.target.files);
+        toast.success(
+          `Uploaded ${result.count} image${result.count !== 1 ? 's' : ''}` +
+            (result.indexing_started ? ' — indexing started' : '')
+        );
+        fetchImages(0, 1000).then(setImages);
+        if (result.indexing_started) setActiveView('indexing');
+      } catch {
+        toast.error('Upload failed');
       }
     };
     input.click();
@@ -203,18 +214,28 @@ export function GalleryView() {
           </AnimatePresence>
         </div>
 
-        <AnimatePresence>
-          {selectedImages.size > 0 && (
-            <motion.span
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.9 }}
-              className="text-[11px] text-primary font-medium bg-primary/10 rounded-full px-2.5 py-0.5 border border-primary/20"
-            >
-              {selectedImages.size} selected
-            </motion.span>
-          )}
-        </AnimatePresence>
+        <div className="flex items-center gap-2">
+          <AnimatePresence>
+            {selectedImages.size > 0 && (
+              <motion.span
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9 }}
+                className="text-[11px] text-primary font-medium bg-primary/10 rounded-full px-2.5 py-0.5 border border-primary/20"
+              >
+                {selectedImages.size} selected
+              </motion.span>
+            )}
+          </AnimatePresence>
+          <button
+            onClick={handleImportClick}
+            aria-label="Import photos into library"
+            className="flex items-center gap-1.5 rounded-lg bg-primary/10 hover:bg-primary/20 border border-primary/20 px-3 py-1.5 text-[12px] font-medium text-primary transition-colors"
+          >
+            <FolderOpen size={13} />
+            Import
+          </button>
+        </div>
       </div>
 
       {/* Virtualized grid */}

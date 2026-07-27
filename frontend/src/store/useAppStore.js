@@ -23,10 +23,11 @@ export const useAppStore = create((set, get) => ({
     processed: 0,
     total: 0,
   },
-  hardwareInfo: {
-    cpuUsage: 34,
-    gpuUsage: 67,
-    gpuAvailable: true,
+  systemStats: {
+    gpuAvailable: false,
+    poolSize: 0,
+    totalImages: 0,
+    totalPeople: 0,
   },
 
   // --- Core Actions ---
@@ -111,10 +112,10 @@ export const useAppStore = create((set, get) => ({
     get().setTheme(nextTheme);
   },
 
-  // --- Indexing & Hardware Status ---
+  // --- Indexing & System Status ---
   // Accepts a plain object (partial update). Do NOT pass a function here.
   setIndexingStatus: (partialStatus) =>
     set((s) => ({ indexingStatus: { ...s.indexingStatus, ...partialStatus } })),
-  setHardwareInfo: (partialInfo) =>
-    set((s) => ({ hardwareInfo: { ...s.hardwareInfo, ...partialInfo } })),
+  setSystemStats: (partialStats) =>
+    set((s) => ({ systemStats: { ...s.systemStats, ...partialStats } })),
 }));

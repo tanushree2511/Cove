@@ -1,12 +1,13 @@
 /**
  * Indexing pipeline status — clean, stage-based progress display.
- * Uses a ref snapshot to avoid stale-closure issues in the interval timer.
+ * Reads real cove indexing job status (polled app-wide by pages/Index.jsx)
+ * and can trigger a new run.
  */
-import { useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { ScanLine, Eye, Brain, Network, CheckCircle2 } from 'lucide-react';
+import { toast } from 'sonner';
 import { useAppStore } from '@/store/useAppStore';
-import { getIndexingStatus } from '@/lib/mockApi';
+import { startIndexing } from '@/lib/coveApi';
 
 const STAGES = [
   { id: 'scanning',   label: 'Scanning Files',        desc: 'Discovering images in your library',    icon: ScanLine },
@@ -17,44 +18,29 @@ const STAGES = [
 
 export function IndexingPanel() {
   const indexingStatus = useAppStore((s) => s.indexingStatus);
-  const setIndexingStatus = useAppStore((s) => s.setIndexingStatus);
 
-  // Use a ref so the interval callback always reads the latest status
-  // without needing to re-register the interval on every status change.
-  const statusRef = useRef(indexingStatus);
-  useEffect(() => {
-    statusRef.current = indexingStatus;
-  }, [indexingStatus]);
+  const handleStartIndexing = () => {
+    startIndexing().then((r) => toast.info(r.message || 'Started'));
+  };
 
-  useEffect(() => {
-    let isMounted = true;
-
-    getIndexingStatus().then((status) => {
-      if (isMounted) setIndexingStatus(status);
-    });
-
-    const interval = setInterval(() => {
-      const current = statusRef.current;
-      setIndexingStatus({
-        progress:  Math.min(100, current.progress + Math.random() * 1.5),
-        processed: Math.min(current.total || 100000, current.processed + Math.floor(Math.random() * 400)),
-      });
-    }, 2500);
-
-    return () => {
-      isMounted = false;
-      clearInterval(interval);
-    };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [setIndexingStatus]);
-
-  const currentStageIdx = STAGES.findIndex((s) => s.id === indexingStatus.stage);
+  const currentStageIdx = indexingStatus.status === 'completed'
+    ? STAGES.length
+    : STAGES.findIndex((s) => s.id === indexingStatus.stage);
 
   return (
     <div className="h-full overflow-auto p-6 max-w-xl mx-auto">
-      <div className="mb-8">
-        <h1 className="text-[15px] font-semibold text-foreground mb-0.5">Indexing Status</h1>
-        <p className="text-[12px] text-muted-foreground">Processing your photo library with AI</p>
+      <div className="mb-8 flex items-center justify-between">
+        <div>
+          <h1 className="text-[15px] font-semibold text-foreground mb-0.5">Indexing Status</h1>
+          <p className="text-[12px] text-muted-foreground">Processing your photo library with AI</p>
+        </div>
+        <button
+          onClick={handleStartIndexing}
+          disabled={indexingStatus.isIndexing}
+          className="rounded-lg bg-primary px-4 py-2 text-[13px] font-medium text-primary-foreground hover:bg-primary/90 transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {indexingStatus.isIndexing ? 'Indexing…' : 'Start Indexing'}
+        </button>
       </div>
 
       {/* Main progress card */}

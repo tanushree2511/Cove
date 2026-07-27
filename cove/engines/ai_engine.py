@@ -1,10 +1,11 @@
 import queue
 import threading
 from contextlib import contextmanager
+from typing import Optional
 
 from insightface.app import FaceAnalysis
 
-from vision_config import CONFIG, VisionConfig, get_logger
+from config.vision_config import CONFIG, VisionConfig, get_logger
 
 logger = get_logger(__name__)
 
@@ -32,6 +33,7 @@ class AIEngine:
         # Default was 320x320 (very small for RTX 3050).
         # Dynamic scaler: 640x640 is good balance.
         # Pushing to 800x800 to force the GPU to work harder per image
+        
         det_size = (800, 800) if self.config.use_gpu else self.config.det_size
         self.app.prepare(ctx_id=self.config.ctx_id, det_size=det_size)
 
@@ -56,7 +58,8 @@ class AIEngine:
 
 
 class AIEnginePool:
-    def __init__(self, pool_size: int = None, config: VisionConfig = CONFIG):
+    def __init__(self, pool_size: Optional[int] = None, config: VisionConfig = CONFIG):
+
         self.config = config
         # Use ai_engine_pool_size which dynamically scales based on VRAM/RAM limits
         self.pool_size = pool_size or self.config.ai_engine_pool_size

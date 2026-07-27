@@ -71,3 +71,8 @@ Thumbs.db
 .vscode/
 .idea/
 *.swp
+MajorProject/
+
+cove/test_images/
+cove/test_images_full_backup/
+test_images/

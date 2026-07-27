@@ -1,16 +1,12 @@
 # tests/test_engine.py
-import sys
-import os
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-
 import pytest
 import numpy as np
 from unittest.mock import MagicMock, patch
 
 # Mock the expensive ONNX Runtime so we don't need a GPU for logic tests
-@patch('ai_engine.FaceAnalysis') 
+@patch('engines.ai_engine.FaceAnalysis')
 def test_face_detection_logic(mock_face_analysis):
-    from ai_engine import AIEngine
+    from engines.ai_engine import AIEngine
     
     # Setup Mock
     mock_app = MagicMock()

@@ -110,7 +110,7 @@ def main():
         return
 
     print(f"\n✅ Done! {count} images are available in '{dest_dir}'.")
-    print("You can now run 'python production_pipeline.py' to build the embeddings.")
+    print("You can now run 'python pipeline/production_pipeline.py' to build the embeddings.")
 
 if __name__ == "__main__":
     main()

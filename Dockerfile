@@ -16,7 +16,8 @@ EXPOSE 80
 FROM python:3.11-slim AS backend
 
 ENV DEBIAN_FRONTEND=noninteractive \
-    PYTHONUNBUFFERED=1
+    PYTHONUNBUFFERED=1 \
+    PYTHONPATH=/app/cove
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libgl1 \

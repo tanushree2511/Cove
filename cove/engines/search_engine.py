@@ -5,7 +5,7 @@ from PIL import Image
 import onnxruntime as ort
 from tokenizers import Tokenizer
 
-from vision_config import CONFIG, VisionConfig, get_logger
+from config.vision_config import CONFIG, VisionConfig, get_logger
 
 logger = get_logger(__name__)
 

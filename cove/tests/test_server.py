@@ -1,28 +1,23 @@
-import os
-import sys
 import pytest
 from fastapi.testclient import TestClient
 from unittest.mock import MagicMock, patch
 import numpy as np
 
-# Ensure we can import from parent directory
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-
 # Patch the engines BEFORE importing server to avoid startup load
-with patch('server.AIEnginePool'), \
-    patch('server.SearchEngine'), \
-    patch('server.VectorStorage'):
-    from server import app
+with patch('api.server.AIEnginePool'), \
+    patch('api.server.SearchEngine'), \
+    patch('api.server.VectorStorage'):
+    from api.server import app
 
 client = TestClient(app)
 
 @pytest.fixture
 def mock_engines():
     """Mocks the global engines in server.py"""
-    with patch('server.ai_pool') as mock_pool, \
-         patch('server.search_engine') as mock_search, \
-         patch('server.storage') as mock_storage, \
-         patch('server.search_storage') as mock_search_storage:
+    with patch('api.server.ai_pool') as mock_pool, \
+         patch('api.server.search_engine') as mock_search, \
+         patch('api.server.storage') as mock_storage, \
+         patch('api.server.search_storage') as mock_search_storage:
         
         # Configure AI Engine Mock
         mock_face = MagicMock()
@@ -45,9 +40,9 @@ def mock_engines():
 
 def test_startup():
     """Test that startup event initializes engines (mocked)"""
-    with patch('server.AIEnginePool') as MockAI, \
-         patch('server.SearchEngine') as MockSearch, \
-         patch('server.VectorStorage') as MockStorage:
+    with patch('api.server.AIEnginePool') as MockAI, \
+         patch('api.server.SearchEngine') as MockSearch, \
+         patch('api.server.VectorStorage') as MockStorage:
         
         with TestClient(app) as c:
             # Trigger startup
