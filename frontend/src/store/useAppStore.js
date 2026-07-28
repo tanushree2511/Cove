@@ -6,6 +6,7 @@ import { create } from 'zustand';
 
 export const useAppStore = create((set, get) => ({
   images: [],
+  videos: [],
   clusters: [],
   searchResults: [],
   searchQuery: '',
@@ -32,6 +33,7 @@ export const useAppStore = create((set, get) => ({
 
   // --- Core Actions ---
   setImages: (images) => set({ images }),
+  setVideos: (videos) => set({ videos }),
   setClusters: (clusters) => set({ clusters }),
   setSearchResults: (results) => set({ searchResults: results }),
   setSearchQuery: (query) => set({ searchQuery: query }),
@@ -77,26 +79,6 @@ export const useAppStore = create((set, get) => ({
 
   // --- Person Filter ---
   setPersonFilter: (person) => set({ selectedPersonFilter: person, activeView: 'library' }),
-
-  // --- File Import ---
-  importFiles: (fileList) => {
-    const newImages = Array.from(fileList).map((file, idx) => {
-      const seed = Date.now() + idx;
-      return {
-        id: `imported-${seed}`,
-        src: URL.createObjectURL(file),
-        thumbnail: URL.createObjectURL(file),
-        width: 1920,
-        height: 1080,
-        date: new Date().toISOString().split('T')[0],
-        tags: ['imported', file.type.startsWith('video') ? 'video' : 'photo'],
-        title: file.name,
-        size: `${(file.size / (1024 * 1024)).toFixed(1)} MB`,
-      };
-    });
-    set((s) => ({ images: [...newImages, ...s.images] }));
-    return newImages.length;
-  },
 
   // --- Theme Management ---
   setTheme: (theme) => {

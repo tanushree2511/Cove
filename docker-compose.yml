@@ -78,6 +78,7 @@ services:
       - "8080:80"
     depends_on:
       - cove-api
+      - video-api
     restart: unless-stopped
 
 volumes:
