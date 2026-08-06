@@ -1,3 +1,4 @@
+import faiss
 import numpy as np
 from engines.vector_storage import VectorStorage
 
@@ -22,4 +23,10 @@ def test_vector_storage_round_trip(tmp_path):
     assert first_vector is not None
     assert second_vector is not None
     assert first_vector.shape == (512,)
-    assert np.allclose(first_vector, data[0], atol=1e-6)
+
+    # add() L2-normalizes vectors before storing (IndexFlatIP needs unit-norm
+    # vectors for its inner product to behave as cosine similarity), so the
+    # round-tripped vector should match the normalized input, not the raw one.
+    expected = data.copy()
+    faiss.normalize_L2(expected)
+    assert np.allclose(first_vector, expected[0], atol=1e-6)

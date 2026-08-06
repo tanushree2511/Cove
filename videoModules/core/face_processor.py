@@ -28,11 +28,11 @@ def get_face_app():
         print(f"DEBUG: Initializing FaceAnalysis with providers: {providers}")
         try:
             _face_app = FaceAnalysis(name='buffalo_l', providers=providers)
-            _face_app.prepare(ctx_id=0, det_size=(320, 320))
+            _face_app.prepare(ctx_id=0, det_size=(640, 640))
         except Exception as e:
             print(f"DEBUG: CUDA failed, falling back to CPU. Error: {e}")
             _face_app = FaceAnalysis(name='buffalo_l', providers=['CPUExecutionProvider'])
-            _face_app.prepare(ctx_id=-1, det_size=(320, 320))
+            _face_app.prepare(ctx_id=-1, det_size=(640, 640))
             
     return _face_app
 
@@ -50,43 +50,78 @@ def process_and_link_faces(frames, video_id):
     if not frames: return
     face_app = get_face_app()
     known_people = get_known_people()
-    
-    # Critical optimization: Only scan 1 frame (middle) for faces during bulk
-    frame = frames[len(frames)//2]
-    print(f"DEBUG: Detecting faces in 1 representative frame...")
-    
-    try:
-        faces = face_app.get(frame)
-        for face in faces:
-            new_emb = face.normed_embedding
-            matched_person_id = None
-            for p_id, p_emb in known_people:
-                score = cosine(new_emb, p_emb)
-                if score < 0.45:
-                    matched_person_id = p_id
-                    break
-            
-            bbox = face.bbox.astype(int)
-            y1, y2, x1, x2 = max(0, bbox[1]), bbox[3], max(0, bbox[0]), bbox[2]
-            face_img = frame[y1:y2, x1:x2]
-            thumb_name = f"{uuid.uuid4()}.jpg"
-            if face_img.size > 0:
+
+    print(f"DEBUG: Detecting faces in all {len(frames)} representative frames...")
+
+    # Track people already matched / added in this current video processing run
+    # to avoid creating multiple face records/thumbnails for the same person in the same video
+    detected_person_ids = set()
+
+    for f_idx, frame in enumerate(frames):
+        try:
+            faces = face_app.get(frame)
+            for face in faces:
+                # 1. Skip low-confidence false positives
+                if hasattr(face, 'det_score') and face.det_score < 0.35:
+                    continue
+
+                # 2. Skip extreme side-view / back-of-head angles
+                pose_yaw = float(face.pose[1]) if hasattr(face, 'pose') and face.pose is not None else None
+                if pose_yaw is not None and abs(pose_yaw) > 65.0:
+                    continue
+
+                bbox = face.bbox.astype(int)
+                y1, y2, x1, x2 = max(0, bbox[1]), max(0, bbox[3]), max(0, bbox[0]), max(0, bbox[2])
+                face_w, face_h = (x2 - x1), (y2 - y1)
+
+                # 3. Skip tiny distant faces (< 35x35 px)
+                if face_w * face_h < 1200:
+                    continue
+
+                face_img = frame[y1:y2, x1:x2]
+                if face_img.size == 0:
+                    continue
+
+                # 4. Skip blurry faces using Laplacian variance
+                gray_face = cv2.cvtColor(face_img, cv2.COLOR_BGR2GRAY)
+                blur_var = cv2.Laplacian(gray_face, cv2.CV_64F).var()
+                if blur_var < 25.0:  # Blurry image threshold
+                    continue
+
+                new_emb = face.normed_embedding
+                matched_person_id = None
+
+                # Check against known people database
+                for p_id, p_emb in known_people:
+                    score = cosine(new_emb, p_emb)
+                    if score < 0.45:
+                        matched_person_id = p_id
+                        break
+
+                # If we've already registered/linked this person in *this* video processing run,
+                # we don't need to link them again, keeping database and UI clean of duplicates
+                if matched_person_id is not None and matched_person_id in detected_person_ids:
+                    continue
+
+                thumb_name = f"{uuid.uuid4()}.jpg"
                 cv2.imwrite(os.path.join(FACES_DIR, thumb_name), face_img)
-            
-            if matched_person_id is None:
-                conn = sqlite3.connect(DB_PATH)
-                cur = conn.cursor()
-                cur.execute("INSERT INTO persons (name, thumbnail) VALUES (?, ?)", (None, thumb_name))
-                matched_person_id = cur.lastrowid
-                conn.commit()
-                conn.close()
-                known_people.append((matched_person_id, new_emb))
-            
-            from core.database import link_face_to_person
-            confidence = float(face.det_score) if hasattr(face, 'det_score') else 0.0
-            link_face_to_person(video_id, matched_person_id, new_emb.tolist(), thumb_name, confidence)
-    except Exception as e:
-        print(f"DEBUG: Error in face detection: {e}")
+
+                if matched_person_id is None:
+                    conn = sqlite3.connect(DB_PATH)
+                    cur = conn.cursor()
+                    cur.execute("INSERT INTO persons (name, thumbnail) VALUES (?, ?)", (None, thumb_name))
+                    matched_person_id = cur.lastrowid
+                    conn.commit()
+                    conn.close()
+                    known_people.append((matched_person_id, new_emb))
+
+                detected_person_ids.add(matched_person_id)
+
+                from core.database import link_face_to_person
+                confidence = float(face.det_score) if hasattr(face, 'det_score') else 0.0
+                link_face_to_person(video_id, matched_person_id, new_emb.tolist(), thumb_name, confidence, pose_yaw)
+        except Exception as e:
+            print(f"DEBUG: Error in face detection on frame {f_idx}: {e}")
 
 def cluster_all_faces():
     global clustering_progress

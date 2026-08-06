@@ -71,13 +71,13 @@ docker compose exec cove-api sh -c "cd /app/cove && python3 pipeline/download_mo
 
 This fetches the CLIP ONNX models (~600 MB) into the shared `cove_models`
 volume. The InsightFace face-detection model (`buffalo_s`, ~130 MB) downloads
-automatically the first time `cove-api` actually runs a face-detection request.
+automatically into the same volume at `cove-api` startup.
 
 `video-api` downloads its own models (InsightFace `buffalo_l` + a CLIP model
 via HuggingFace `transformers`) automatically on first use — no manual step,
 but expect the *first* video indexing request to be slow while it fetches
-them, and note they aren't cached in a named volume, so they'll re-download
-if that container is ever recreated.
+them. They're cached in the `video_hf_cache`/`video_insightface_cache`
+volumes, so recreating the container won't force a re-download.
 
 ### Add photos to the library
 

@@ -23,8 +23,26 @@ def init_db():
             embedding TEXT,
             thumbnail_path TEXT,
             confidence REAL DEFAULT 0.0,
+            pose_yaw REAL DEFAULT NULL,
             FOREIGN KEY(video_id) REFERENCES videos(id),
             FOREIGN KEY(person_id) REFERENCES persons(id)
+        )
+    """)
+    # Migration: add pose_yaw column if it doesn't exist yet
+    try:
+        cursor.execute("ALTER TABLE faces ADD COLUMN pose_yaw REAL DEFAULT NULL")
+    except Exception:
+        pass  # Column already exists
+
+    # User Feedback Table for few-shot exemplar learning
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS user_feedback (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            video_id INTEGER,
+            corrected_label TEXT,
+            embedding TEXT,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY(video_id) REFERENCES videos(id)
         )
     """)
     conn.commit()
@@ -47,17 +65,52 @@ def get_video_by_index(index_id):
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
     # OFFSET matches the 0-indexed FAISS position perfectly
-    cursor.execute("SELECT path, label FROM videos ORDER BY id ASC LIMIT 1 OFFSET ?", (int(index_id),))
+    cursor.execute("SELECT id, path, label FROM videos ORDER BY id ASC LIMIT 1 OFFSET ?", (int(index_id),))
     result = cursor.fetchone()
     conn.close()
     return result
 
-def link_face_to_person(video_id, person_id, embedding, thumb, confidence=0.0):
+def link_face_to_person(video_id, person_id, embedding, thumb, confidence=0.0, pose_yaw=None):
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
     cursor.execute(
-        "INSERT INTO faces (video_id, person_id, embedding, thumbnail_path, confidence) VALUES (?, ?, ?, ?, ?)",
-        (video_id, person_id, json.dumps(embedding), thumb, confidence)
+        "INSERT INTO faces (video_id, person_id, embedding, thumbnail_path, confidence, pose_yaw) VALUES (?, ?, ?, ?, ?, ?)",
+        (video_id, person_id, json.dumps(embedding), thumb, confidence, pose_yaw)
     )
     conn.commit()
     conn.close()
+
+def save_user_feedback(video_id, corrected_label):
+    """
+    Saves a user label correction to database.
+    Updates the main video label and stores the embedding as a training exemplar.
+    """
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+
+    # 1. Retrieve the video's embedding
+    cursor.execute("SELECT embedding FROM videos WHERE id = ?", (video_id,))
+    row = cursor.fetchone()
+
+    if row and row[0]:
+        embedding_str = row[0]
+        # 2. Insert feedback record
+        cursor.execute("INSERT INTO user_feedback (video_id, corrected_label, embedding) VALUES (?, ?, ?)",
+                       (video_id, corrected_label, embedding_str))
+
+    # 3. Update the primary video label
+    cursor.execute("UPDATE videos SET label = ? WHERE id = ?", (corrected_label, video_id))
+
+    conn.commit()
+    conn.close()
+
+def get_all_feedback():
+    """
+    Retrieves all user correction exemplars for active adaptation.
+    """
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    cursor.execute("SELECT corrected_label, embedding FROM user_feedback WHERE embedding IS NOT NULL")
+    rows = cursor.fetchall()
+    conn.close()
+    return rows

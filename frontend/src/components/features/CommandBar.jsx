@@ -157,7 +157,7 @@ export function CommandBar() {
         {/* Import Button */}
         <button
           onClick={handleImportClick}
-          aria-label="Import photos or videos"
+          aria-label="Import photos"
           className="flex items-center gap-1.5 rounded-lg bg-primary/10 hover:bg-primary/20 border border-primary/20 px-3 py-[6px] text-[12px] font-medium text-primary transition-colors"
         >
           <FolderOpen size={13} />

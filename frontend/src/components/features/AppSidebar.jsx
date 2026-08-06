@@ -5,24 +5,18 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Images, Users, Search, Activity, Settings,
-  ChevronsLeft, ChevronsRight, Sparkles, Film, ExternalLink,
+  ChevronsLeft, ChevronsRight, Sparkles, Film,
 } from 'lucide-react';
 import { useAppStore } from '@/store/useAppStore';
 
 const NAV_ITEMS = [
   { id: 'library',  label: 'Library',  icon: Images   },
   { id: 'people',   label: 'People',   icon: Users    },
-  { id: 'video',    label: 'Videos',   icon: Film, external: true },
+  { id: 'video',    label: 'Videos',   icon: Film     },
   { id: 'search',   label: 'Search',   icon: Search   },
   { id: 'indexing', label: 'Indexing', icon: Activity },
   { id: 'settings', label: 'Settings', icon: Settings },
 ];
-
-/** The videoModules Streamlit UI runs as its own service (video-ui) on port 8502. */
-function openVideoModulesScreen() {
-  const url = `${window.location.protocol}//${window.location.hostname}:8502`;
-  window.open(url, '_blank', 'noopener,noreferrer');
-}
 
 export function AppSidebar() {
   const collapsed      = useAppStore((s) => s.sidebarCollapsed);
@@ -71,14 +65,14 @@ export function AppSidebar() {
         </AnimatePresence>
 
         {NAV_ITEMS.map((item) => {
-          const isActive = !item.external && activeView === item.id;
+          const isActive = activeView === item.id;
           return (
             <motion.button
               key={item.id}
-              onClick={() => (item.external ? openVideoModulesScreen() : setActiveView(item.id))}
-              aria-label={item.external ? `${item.label} (opens in new tab)` : item.label}
+              onClick={() => setActiveView(item.id)}
+              aria-label={item.label}
               aria-current={isActive ? 'page' : undefined}
-              title={collapsed ? item.label : (item.external ? `${item.label} (opens in new tab)` : undefined)}
+              title={collapsed ? item.label : undefined}
               className={`
                 relative flex w-full items-center gap-2.5 rounded-md px-2.5 py-[7px] text-[13px]
                 transition-colors duration-100
@@ -122,7 +116,6 @@ export function AppSidebar() {
                     className="relative z-10 flex-1 flex items-center gap-1.5 truncate whitespace-nowrap"
                   >
                     {item.label}
-                    {item.external && <ExternalLink size={11} className="text-muted-foreground/60 flex-shrink-0" />}
                   </motion.span>
                 )}
               </AnimatePresence>

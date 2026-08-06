@@ -19,6 +19,5 @@ scipy
 torch
 torchvision
 transformers
-moviepy
 imageio-ffmpeg
 scenedetect[opencv]

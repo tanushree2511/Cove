@@ -98,8 +98,18 @@ def _resolve_assets_dir(package_dir: str) -> str:
         if candidate and _has_required_assets(candidate):
             return os.path.abspath(candidate)
 
-    default_base = getattr(sys, "_MEIPASS", package_dir)
-    return os.path.join(default_base, "models")
+    # No candidate has the full asset set yet (e.g. first run, or CLIP models
+    # downloaded but buffalo_s not fetched yet since it lazy-loads on first
+    # face-detection request) — default to the same location candidate
+    # resolution would have picked first (cwd/models), NOT package_dir/models.
+    # In Docker this is the persistent cove_models volume mount point; in local
+    # dev it's the conventional cove/models/ directory. Falling back to
+    # package_dir/models here would silently write fresh downloads outside
+    # that volume, forcing a full re-download on every container recreation.
+    meipass = getattr(sys, "_MEIPASS", None)
+    if meipass:
+        return os.path.join(meipass, "models")
+    return os.path.join(os.getcwd(), "models")
 
 
 def _migrate_asset_file(source_dir: str, target: str, filename: str) -> None:

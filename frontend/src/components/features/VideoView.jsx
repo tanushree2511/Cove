@@ -4,10 +4,20 @@
  */
 import { useEffect, useMemo, useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Film, Plus, Play, Loader2 } from 'lucide-react';
+import { Film, Plus, Play, Loader2, ExternalLink } from 'lucide-react';
 import { useAppStore } from '@/store/useAppStore';
 import { fetchVideos, uploadVideos } from '@/lib/videoApi';
 import { toast } from 'sonner';
+
+/**
+ * The videoModules Streamlit UI (video-ui, port 8502) still owns a few features
+ * not yet built natively here: bulk folder import, face clustering/identities,
+ * and label correction. Link out to it rather than silently dropping them.
+ */
+function openAdvancedTools() {
+  const url = `${window.location.protocol}//${window.location.hostname}:8502`;
+  window.open(url, '_blank', 'noopener,noreferrer');
+}
 
 export function VideoView() {
   const videos    = useAppStore((s) => s.videos);
@@ -86,15 +96,26 @@ export function VideoView() {
               <span className="font-medium text-foreground">{videos.length}</span> videos
             </p>
           </div>
-          <button
-            onClick={handleImport}
-            disabled={importing}
-            aria-label="Import videos"
-            className="flex items-center gap-1.5 rounded-md bg-primary/10 hover:bg-primary/20 text-primary px-3 py-1.5 text-[12px] font-medium transition-colors border border-primary/20 disabled:opacity-50"
-          >
-            {importing ? <Loader2 size={13} className="animate-spin" /> : <Plus size={13} />}
-            {importing ? 'Indexing…' : 'Import Videos'}
-          </button>
+          <div className="flex items-center gap-1.5">
+            <button
+              onClick={openAdvancedTools}
+              aria-label="Open advanced tools (bulk import, identities, label correction — opens in new tab)"
+              title="Bulk import, identities, and label correction"
+              className="flex items-center gap-1.5 rounded-md bg-muted hover:bg-muted/70 text-muted-foreground hover:text-foreground px-3 py-1.5 text-[12px] font-medium transition-colors border border-border"
+            >
+              <ExternalLink size={13} />
+              Advanced Tools
+            </button>
+            <button
+              onClick={handleImport}
+              disabled={importing}
+              aria-label="Import videos"
+              className="flex items-center gap-1.5 rounded-md bg-primary/10 hover:bg-primary/20 text-primary px-3 py-1.5 text-[12px] font-medium transition-colors border border-primary/20 disabled:opacity-50"
+            >
+              {importing ? <Loader2 size={13} className="animate-spin" /> : <Plus size={13} />}
+              {importing ? 'Indexing…' : 'Import Videos'}
+            </button>
+          </div>
         </div>
 
         {/* Filter chips */}

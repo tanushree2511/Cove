@@ -1,3 +1,5 @@
+docker-compose.override.yml
+
 # --- Python (cove/, videoModules/) ---
 __pycache__/
 *.py[cod]
@@ -77,4 +79,8 @@ cove/test_images/
 cove/test_images_full_backup/
 test_images/
 
+videoModules/bulk_import/*
+!videoModules/bulk_import/.gitkeep
+
 cove2/*
+.claude/

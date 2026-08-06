@@ -12,7 +12,7 @@ function streamUrl(path) {
 function mapVideo(v) {
   const filename = v.path.split(/[\\/]/).pop();
   return {
-    id: v.path,
+    id: v.id ?? v.path,
     path: v.path,
     src: streamUrl(v.path),
     thumb: `${streamUrl(v.path)}#t=0.5`,

@@ -55,7 +55,7 @@ async def lifespan(app: FastAPI):
     global ai_pool, search_engine, storage, search_storage
     logger.info('Starting VisionArchive server (skip_model_load=%s)', CONFIG.skip_model_load)
     if not CONFIG.skip_model_load:
-        ai_pool = AIEnginePool(pool_size=CONFIG.effective_workers)
+        ai_pool = AIEnginePool(pool_size=CONFIG.ai_engine_pool_size)
         try:
             search_engine = SearchEngine()
         except Exception:
@@ -123,7 +123,7 @@ async def health():
         'status': 'ok' if ready else 'degraded',
         'models': {
             'gpu_enabled': CONFIG.use_gpu,
-            'pool_size': CONFIG.effective_workers,
+            'pool_size': ai_pool.pool_size if ai_pool else CONFIG.ai_engine_pool_size,
         },
         'indexes': {
             'faces': storage.index.ntotal if storage else 0,

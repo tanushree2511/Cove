@@ -5,41 +5,74 @@ from concurrent.futures import ThreadPoolExecutor
 
 def extract_frames(video_path, fast_mode=True):
     """
-    Extracts frames from a video. 
-    fast_mode=True: Samples frames at fixed intervals (MUCH faster).
-    fast_mode=False: Uses scene detection (more accurate but slower).
+    Extracts representative frames from a video maintaining temporal story flow.
+    fast_mode=True: Samples 14 frames evenly across timeline, downscales for speed, and filters out static duplicates using color histograms.
     """
     cap = cv2.VideoCapture(video_path)
     frames = []
-    
+
+    total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+    if total_frames <= 0: total_frames = 60
+
     if fast_mode:
-        # Optimized for speed: Fixed count of 4 frames per video
-        total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
-        if total_frames <= 0: total_frames = 60
-        
-        # Target exactly 4 frames to keep CPU load low
-        num_frames = 4
-        indices = np.linspace(0, total_frames - 1, num_frames).astype(int)
-        
+        # Sample 14 frames uniformly across video duration to preserve full story flow
+        num_samples = 14
+        indices = np.linspace(0, total_frames - 1, num_samples).astype(int)
+        raw_frames = []
+
         for i in indices:
             cap.set(cv2.CAP_PROP_POS_FRAMES, i)
             ret, frame = cap.read()
             if ret:
-                # Downscale for faster processing
+                # Downscale to max width 1280 for fast CLIP embedding and face detection
                 h, w = frame.shape[:2]
-                new_w = 640
-                frame = cv2.resize(frame, (new_w, int(h * new_w / w)))
-                frames.append(frame)
+                if w > 1280:
+                    new_w = 1280
+                    frame = cv2.resize(frame, (new_w, int(h * new_w / w)))
+                raw_frames.append(frame)
+
+        # Filter near-duplicate consecutive frames to speed up while keeping narrative progression
+        if len(raw_frames) > 4:
+            hists = []
+            for f in raw_frames:
+                gray = cv2.cvtColor(f, cv2.COLOR_BGR2GRAY)
+                hist = cv2.calcHist([gray], [0], None, [256], [0, 256])
+                hist = cv2.normalize(hist, hist).flatten()
+                hists.append(hist)
+
+            selected_indices = [0]  # Start anchor frame
+            for i in range(1, len(raw_frames)):
+                # Compare histogram with the previous selected frame to avoid repetitive static shots
+                last_selected = selected_indices[-1]
+                corr = cv2.compareHist(hists[i], hists[last_selected], cv2.HISTCMP_CORREL)
+                if corr < 0.95:  # Distinct scene/motion threshold
+                    selected_indices.append(i)
+
+            # Ensure at least 4 keyframes are retained across story timeline
+            if len(selected_indices) < 4:
+                remaining = [x for x in range(len(raw_frames)) if x not in selected_indices]
+                remaining.sort(key=lambda x: min([cv2.compareHist(hists[x], hists[s], cv2.HISTCMP_CORREL) for s in selected_indices]))
+                while len(selected_indices) < 4 and remaining:
+                    selected_indices.append(remaining.pop(0))
+
+            # Keep chronological story order
+            frames = [raw_frames[s] for s in sorted(selected_indices)]
+        else:
+            frames = raw_frames
     else:
-        # Scene detection fallback (slow)
+        # Scene detection fallback
         from scenedetect import detect, ContentDetector
         scene_list = detect(video_path, ContentDetector(threshold=27.0))
         if scene_list:
             for scene in scene_list:
                 cap.set(cv2.CAP_PROP_POS_MSEC, scene[0].get_seconds() * 1000)
                 ret, frame = cap.read()
-                if ret: frames.append(frame)
-    
+                if ret:
+                    h, w = frame.shape[:2]
+                    new_w = 1280
+                    frame = cv2.resize(frame, (new_w, int(h * new_w / w)))
+                    frames.append(frame)
+
     cap.release()
     return frames
 
