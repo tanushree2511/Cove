@@ -20,9 +20,10 @@ function openAdvancedTools() {
 }
 
 export function VideoView() {
-  const videos    = useAppStore((s) => s.videos);
-  const setVideos = useAppStore((s) => s.setVideos);
+  const videos         = useAppStore((s) => s.videos);
+  const setVideos      = useAppStore((s) => s.setVideos);
   const openMediaModal = useAppStore((s) => s.openMediaModal);
+  const setUploadState = useAppStore((s) => s.setUploadState);
 
   const [filter, setFilter] = useState('all');
   const [hoveredId, setHoveredId] = useState(null);
@@ -55,23 +56,65 @@ export function VideoView() {
     const input = document.createElement('input');
     input.type = 'file';
     input.multiple = true;
-    input.accept = 'video/*';
+    input.accept = 'video/*,.mp4,.mkv,.avi,.mov,.webm,.MP4,.MKV,.AVI,.MOV';
+    input.style.position = 'fixed';
+    input.style.top = '-9999px';
+    document.body.appendChild(input);
+
     input.onchange = async (e) => {
-      if (!e.target.files?.length) return;
+      const files = e.target.files;
+      if (!files || files.length === 0) {
+        input.remove();
+        return;
+      }
       setImporting(true);
+      setUploadState({
+        isUploading: true,
+        isCompleted: false,
+        totalFiles: files.length,
+        currentFileIndex: 1,
+        fileName: files[0]?.name || '',
+        mediaType: 'video',
+        progress: 0,
+        bytesUploaded: 0,
+        totalBytes: Array.from(files).reduce((acc, f) => acc + f.size, 0),
+        error: null,
+      });
+
       try {
-        const { count, total } = await uploadVideos(e.target.files);
+        const { count, total } = await uploadVideos(files, (info) => {
+          setUploadState({
+            currentFileIndex: info.fileIndex,
+            fileName: info.fileName,
+            progress: info.percent,
+            bytesUploaded: info.loaded,
+            totalBytes: info.total,
+          });
+        });
+
+        setUploadState({
+          isUploading: false,
+          isCompleted: true,
+          progress: 100,
+        });
+
         if (count > 0) toast.success(`Indexed ${count} of ${total} video${total > 1 ? 's' : ''}`);
         if (count < total) toast.error(`${total - count} video${total - count > 1 ? 's' : ''} failed to index`);
         await loadVideos();
-      } catch {
-        toast.error('Import failed');
+      } catch (err) {
+        setUploadState({
+          isUploading: false,
+          isCompleted: false,
+          error: err?.message || 'Video import failed',
+        });
+        toast.error(err?.message || 'Import failed');
       } finally {
         setImporting(false);
+        input.remove();
       }
     };
     input.click();
-  }, [loadVideos]);
+  }, [loadVideos, setUploadState]);
 
   if (loading) {
     return (

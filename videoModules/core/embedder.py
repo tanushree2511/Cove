@@ -1,68 +1,58 @@
-import torch
 import numpy as np
-from transformers import CLIPProcessor, CLIPModel
 from PIL import Image
+import os
+import sys
 
-device = "cuda" if torch.cuda.is_available() else "cpu"
+# Ensure cove modules can be imported for shared ONNX models
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../../cove')))
+from engines.search_engine import SearchEngine
 
-# Load model and processor (will use local cache if already downloaded)
-model = CLIPModel.from_pretrained("openai/clip-vit-base-patch32").to(device)
-processor = CLIPProcessor.from_pretrained("openai/clip-vit-base-patch32")
+_search_engine = None
 
-model.eval()
+def _get_engine():
+    global _search_engine
+    if _search_engine is None:
+        _search_engine = SearchEngine()
+    return _search_engine
 
 def encode_image(frame):
+    engine = _get_engine()
     image = Image.fromarray(frame)
-    inputs = processor(images=image, return_tensors="pt")
-    pixel_values = inputs["pixel_values"].to(device)
-
-    with torch.no_grad():
-        vision_outputs = model.vision_model(pixel_values=pixel_values)
-        pooled_output = vision_outputs.pooler_output
-        image_features = model.visual_projection(pooled_output)
-
-    image_features = image_features / image_features.norm(dim=-1, keepdim=True)
-    return image_features.cpu().numpy()[0]
+    emb = engine.get_image_embedding(image)
+    if emb is None:
+        raise ValueError("Failed to encode image")
+    return emb
 
 def encode_images_batch(frames, batch_size=32):
-    """Encodes a batch of frames efficiently on the GPU."""
+    """Encodes a batch of frames using the shared ONNX engine."""
+    engine = _get_engine()
     all_embeddings = []
-    for i in range(0, len(frames), batch_size):
-        batch = frames[i : i + batch_size]
-        images = [Image.fromarray(f) for f in batch]
-        
-        inputs = processor(images=images, return_tensors="pt", padding=True)
-        pixel_values = inputs["pixel_values"].to(device)
-
-        with torch.no_grad():
-            vision_outputs = model.vision_model(pixel_values=pixel_values)
-            pooled_output = vision_outputs.pooler_output
-            image_features = model.visual_projection(pooled_output)
-
-        image_features = image_features / image_features.norm(dim=-1, keepdim=True)
-        all_embeddings.append(image_features.cpu().numpy())
     
-    return np.concatenate(all_embeddings, axis=0)
+    # We process them sequentially through the ONNX engine.
+    for f in frames:
+        emb = engine.get_image_embedding(Image.fromarray(f))
+        if emb is not None:
+            all_embeddings.append(emb)
+    
+    if not all_embeddings:
+        raise ValueError("Failed to encode any frames")
+        
+    return np.array(all_embeddings)
 
 def encode_text(text):
-    inputs = processor(text=[text], return_tensors="pt", padding=True)
-    input_ids = inputs["input_ids"].to(device)
-    attention_mask = inputs["attention_mask"].to(device)
-
-    with torch.no_grad():
-        text_outputs = model.text_model(input_ids=input_ids, attention_mask=attention_mask)
-        pooled_output = text_outputs.pooler_output
-        text_features = model.text_projection(pooled_output)
-
-    text_features = text_features / text_features.norm(dim=-1, keepdim=True)
-    return text_features.cpu().numpy()[0]
+    engine = _get_engine()
+    emb = engine.get_text_embedding(text)
+    if emb is None:
+        raise ValueError("Failed to encode text")
+    return emb
 
 def generate_video_embedding(frames):
     if len(frames) == 0:
         raise ValueError("No frames extracted from video")
     
-    # Use batch encoding for better performance
     embeddings = encode_images_batch(frames)
     video_embedding = np.mean(embeddings, axis=0)
-    video_embedding = video_embedding / np.linalg.norm(video_embedding)
+    norm = np.linalg.norm(video_embedding)
+    if norm > 0:
+        video_embedding = video_embedding / norm
     return video_embedding

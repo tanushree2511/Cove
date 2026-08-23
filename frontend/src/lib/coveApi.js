@@ -3,7 +3,16 @@
  * Reached via the nginx (or Vite dev) reverse proxy at /api/cove, so no
  * base-URL env var or CORS setup is needed.
  */
-const BASE = '/api/cove';
+const isTauri = typeof window !== 'undefined' && Boolean(
+  window.__TAURI__ ||
+  window.__TAURI_INTERNALS__ ||
+  window.location.protocol === 'tauri:' ||
+  window.location.hostname === 'tauri.localhost' ||
+  window.location.origin.includes('tauri') ||
+  (window.location.protocol === 'http:' && !window.location.port) ||
+  (window.location.protocol === 'https:' && !window.location.port)
+);
+const BASE = isTauri ? 'http://127.0.0.1:8005/api/cove' : '/api/cove';
 
 function mediaUrl(path) {
   return `${BASE}/media/${path}`;
@@ -30,18 +39,50 @@ export async function fetchImages(page = 0, pageSize = 1000) {
 }
 
 /** Fetch face clusters (people) */
-export async function fetchClusters() {
-  const res = await fetch(`${BASE}/people`);
+export async function fetchClusters(offset = 0, limit = 200) {
+  const res = await fetch(`${BASE}/people?offset=${offset}&limit=${limit}`);
   if (!res.ok) throw new Error('Failed to fetch people');
   const data = await res.json();
-  return data.people.map((p) => ({
-    id: p.id,
-    name: p.name,
-    previewUrl: p.photos[0] ? mediaUrl(p.photos[0]) : undefined,
-    imageCount: p.photo_count,
-    confidence: 1,
-    photos: p.photos,
-  }));
+  const rawPeople = data.people ?? [];
+  const people = rawPeople.map((p) => {
+    const thumbPath = p.preview_photo || (p.photos && p.photos[0]);
+    const thumbUrl = thumbPath ? mediaUrl(thumbPath) : undefined;
+    return {
+      id: p.id,
+      name: p.name,
+      thumbnail: thumbUrl,
+      previewUrl: thumbUrl,
+      count: p.photo_count ?? (p.photos ? p.photos.length : 0),
+      imageCount: p.photo_count ?? (p.photos ? p.photos.length : 0),
+      confidence: 1,
+    };
+  });
+  return {
+    total: data.total ?? people.length,
+    people,
+  };
+}
+
+/** Fetch live photo paths for a specific person cluster */
+export async function fetchPersonPhotos(personId, offset = 0, limit = 1000) {
+  const res = await fetch(`${BASE}/people/${personId}/photos?offset=${offset}&limit=${limit}`);
+  if (!res.ok) throw new Error('Failed to fetch person photos');
+  const data = await res.json();
+  return {
+    total: data.total ?? 0,
+    photos: data.photos ?? [],
+  };
+}
+
+/** Rename a person in the backend database */
+export async function renamePerson(personId, newName) {
+  const res = await fetch(`${BASE}/people/${personId}/rename`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name: newName }),
+  });
+  if (!res.ok) throw new Error('Failed to rename person');
+  return res.json();
 }
 
 /** Perform semantic search using CLIP embeddings */
@@ -50,7 +91,7 @@ export async function searchImages(query, limit = 40) {
   const res = await fetch(`${BASE}/search/text`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ text: query, limit }),
+    body: JSON.stringify({ text: query, limit, threshold: 0.01 }),
   });
   if (!res.ok) throw new Error('Search failed');
   const data = await res.json();
@@ -86,16 +127,6 @@ export async function startIndexing() {
   return res.json();
 }
 
-/** Rename a clustered person */
-export async function renamePerson(personId, name) {
-  const res = await fetch(`${BASE}/people/${personId}/rename`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ name }),
-  });
-  return res.json();
-}
-
 /** Permanently delete images (removes the file, embeddings, and people-DB references) */
 export async function deleteImages(paths) {
   const res = await fetch(`${BASE}/images/delete`, {
@@ -107,13 +138,83 @@ export async function deleteImages(paths) {
   return res.json();
 }
 
-/** Upload new images into the library (auto-triggers indexing) */
-export async function uploadImages(fileList) {
-  const form = new FormData();
-  Array.from(fileList).forEach((file) => form.append('files', file));
-  const res = await fetch(`${BASE}/upload`, { method: 'POST', body: form });
-  if (!res.ok) throw new Error('Upload failed');
-  return res.json();
+/** Upload new images into the library with real-time per-file progress */
+export async function uploadImages(fileList, onProgress) {
+  const files = Array.from(fileList);
+  const totalFiles = files.length;
+  const totalBytes = files.reduce((acc, f) => acc + f.size, 0);
+
+  const BATCH_SIZE = 50; // Keep batches under Starlette max_files limit
+  let processedFiles = 0;
+  let loadedBytesSoFar = 0;
+  let totalSaved = [];
+  let indexingStarted = false;
+
+  for (let i = 0; i < files.length; i += BATCH_SIZE) {
+    const chunk = files.slice(i, i + BATCH_SIZE);
+    const chunkBytes = chunk.reduce((acc, f) => acc + f.size, 0);
+    const form = new FormData();
+    chunk.forEach((file) => form.append('files', file));
+
+    await new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      xhr.open('POST', `${BASE}/upload`);
+
+      if (onProgress) {
+        xhr.upload.addEventListener('progress', (e) => {
+          if (e.lengthComputable) {
+            const currentTotalLoaded = loadedBytesSoFar + e.loaded;
+            const percent = totalBytes > 0 ? (currentTotalLoaded / totalBytes) * 100 : 50;
+            const currentFileIdx = Math.min(
+              totalFiles,
+              Math.max(1, Math.round((currentTotalLoaded / totalBytes) * totalFiles))
+            );
+            onProgress({
+              percent: Math.min(99, percent),
+              loaded: currentTotalLoaded,
+              total: totalBytes,
+              fileIndex: currentFileIdx,
+              totalFiles,
+              fileName: chunk[0]?.name || '',
+            });
+          }
+        });
+      }
+
+      xhr.onload = () => {
+        if (xhr.status >= 200 && xhr.status < 300) {
+          try {
+            const data = JSON.parse(xhr.responseText);
+            if (data.saved) totalSaved.push(...data.saved);
+            if (data.indexing_started) indexingStarted = true;
+          } catch {
+            // fallback
+          }
+          loadedBytesSoFar += chunkBytes;
+          processedFiles += chunk.length;
+          resolve();
+        } else {
+          reject(new Error(`Upload failed (${xhr.status}): ${xhr.responseText || 'Server error'}`));
+        }
+      };
+
+      xhr.onerror = () => reject(new Error('Network connection to backend failed (check 127.0.0.1:8000)'));
+      xhr.send(form);
+    });
+  }
+
+  if (onProgress) {
+    onProgress({
+      percent: 100,
+      loaded: totalBytes,
+      total: totalBytes,
+      fileIndex: totalFiles,
+      totalFiles,
+      fileName: files[files.length - 1]?.name || '',
+    });
+  }
+
+  return { saved: totalSaved, count: totalSaved.length, indexing_started: indexingStarted };
 }
 
 /** Real system stats (GPU availability, worker pool, library size) — no fabricated metrics */
@@ -121,12 +222,12 @@ export async function getSystemStats() {
   const [health, imagesPage, people] = await Promise.all([
     fetch(`${BASE}/health`).then((r) => r.json()),
     fetch(`${BASE}/images?limit=1`).then((r) => r.json()),
-    fetchClusters(),
+    fetchClusters(0, 1),   // just fetch 1 person to get total count cheaply
   ]);
   return {
     gpuAvailable: !!health?.models?.gpu_enabled,
     poolSize: health?.models?.pool_size ?? 0,
     totalImages: imagesPage?.total ?? 0,
-    totalPeople: people.length,
+    totalPeople: people.total ?? 0,
   };
 }

@@ -5,34 +5,25 @@ services:
       dockerfile: Dockerfile
       target: backend
     working_dir: /app/cove
-    command: ["python3", "-m", "uvicorn", "api.server:app", "--host", "0.0.0.0", "--port", "8000"]
+    command:
+    - python3
+    - -m
+    - uvicorn
+    - api.server:app
+    - --host
+    - 0.0.0.0
+    - --port
+    - '8000'
     ports:
-      - "8000:8000"
+    - 8000:8000
     environment:
       VISION_USER_DATA: /data/cove
-      VISION_FORCE_CPU: "1"
+      VISION_FORCE_CPU: '1'
+      VISION_AI_WORKERS: '2'
     volumes:
-      - cove_data:/data/cove
-      - cove_models:/app/cove/models
-      - ./cove/test_images:/app/cove/test_images
-    restart: unless-stopped
-
-  cove-ui:
-    build:
-      context: .
-      dockerfile: Dockerfile
-      target: backend
-    working_dir: /app/cove
-    command: ["streamlit", "run", "ui/app.py", "--server.address=0.0.0.0", "--server.port=8501"]
-    ports:
-      - "8501:8501"
-    environment:
-      VISION_USER_DATA: /data/cove
-      VISION_FORCE_CPU: "1"
-    volumes:
-      - cove_data:/data/cove
-      - cove_models:/app/cove/models
-      - ./cove/test_images:/app/cove/test_images
+    - cove_data:/data/cove
+    - cove_models:/app/cove/models
+    - ./cove/test_images:/app/cove/test_images
     restart: unless-stopped
 
   video-api:
@@ -41,35 +32,25 @@ services:
       dockerfile: Dockerfile
       target: backend
     working_dir: /app/videoModules
-    command: ["python3", "-m", "uvicorn", "api:app", "--host", "0.0.0.0", "--port", "8001"]
+    command:
+    - python3
+    - -m
+    - uvicorn
+    - api:app
+    - --host
+    - 0.0.0.0
+    - --port
+    - '8001'
     ports:
-      - "8001:8001"
+    - 8001:8001
     volumes:
-      - video_data:/app/videoModules/data
-      - video_uploads:/app/videoModules/uploaded_videos
-      - video_static:/app/videoModules/static
-      - video_hf_cache:/root/.cache/huggingface
-      - video_insightface_cache:/root/.insightface
-      - ./videoModules/bulk_import:/app/videoModules/bulk_import
-    restart: unless-stopped
-
-  video-ui:
-    build:
-      context: .
-      dockerfile: Dockerfile
-      target: backend
-    working_dir: /app/videoModules
-    command: ["streamlit", "run", "app.py", "--server.address=0.0.0.0", "--server.port=8502"]
-    ports:
-      - "8502:8502"
-    environment:
-      VIDEO_API_URL: http://video-api:8001
-    volumes:
-      - video_data:/app/videoModules/data
-      - video_uploads:/app/videoModules/uploaded_videos
-      - video_static:/app/videoModules/static
-    depends_on:
-      - video-api
+    - video_data:/app/videoModules/data
+    - video_uploads:/app/videoModules/uploaded_videos
+    - video_static:/app/videoModules/static
+    - video_hf_cache:/root/.cache/huggingface
+    - video_insightface_cache:/root/.insightface
+    - ./videoModules/bulk_import:/app/videoModules/bulk_import
+    - cove_models:/app/cove/models
     restart: unless-stopped
 
   frontend:
@@ -78,17 +59,17 @@ services:
       dockerfile: Dockerfile
       target: frontend
     ports:
-      - "8080:80"
+    - 8080:80
     depends_on:
-      - cove-api
-      - video-api
+    - cove-api
+    - video-api
     restart: unless-stopped
 
 volumes:
-  cove_data:
-  cove_models:
-  video_data:
-  video_uploads:
-  video_static:
-  video_hf_cache:
-  video_insightface_cache:
+  cove_data: null
+  cove_models: null
+  video_data: null
+  video_uploads: null
+  video_static: null
+  video_hf_cache: null
+  video_insightface_cache: null

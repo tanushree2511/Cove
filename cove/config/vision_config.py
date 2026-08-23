@@ -4,7 +4,16 @@ import platform
 import sys
 import glob
 import ctypes
-from typing import Optional, Tuple
+from typing import Optional, Tuple, List
+import psutil
+
+# Force ultra-aggressive CPU threading for ONNX and OpenMP
+try:
+    physical_cores = str(psutil.cpu_count(logical=False) or 4)
+    os.environ["OMP_NUM_THREADS"] = physical_cores
+    os.environ["OMP_WAIT_POLICY"] = "ACTIVE" # Prevents threads from sleeping; forces immediate processing
+except Exception:
+    pass
 
 # Pre-load NVIDIA CUDA libraries if installed via pip (fixes ONNXRuntime CUDA 12 issues on Linux)
 if platform.system() == "Linux":
@@ -49,11 +58,108 @@ def _parse_tuple(value: str, default: Tuple[int, int]) -> Tuple[int, int]:
     return default
 
 
-def _detect_cuda_available() -> bool:
+def _get_installed_gpu_names() -> List[str]:
+    """Detect names of all GPU devices installed in the system across OSes."""
+    gpu_names = []
+    # 1. NVIDIA via nvidia-smi
+    try:
+        import subprocess
+        out = subprocess.check_output(
+            ["nvidia-smi", "--query-gpu=name", "--format=csv,noheader"],
+            timeout=2, stderr=subprocess.DEVNULL
+        ).decode().strip()
+        if out:
+            gpu_names.extend([line.strip() for line in out.splitlines() if line.strip()])
+    except Exception:
+        pass
+
+    # 2. Linux: inspect lspci and sysfs DRM devices
+    if sys.platform.startswith('linux'):
+        try:
+            import subprocess
+            out = subprocess.check_output(["lspci"], timeout=2, stderr=subprocess.DEVNULL).decode()
+            for line in out.splitlines():
+                if any(k in line.lower() for k in ["vga compatible controller", "3d controller", "display controller"]):
+                    gpu_names.append(line.strip())
+        except Exception:
+            pass
+        if not gpu_names:
+            import glob
+            for p in glob.glob("/sys/class/drm/*/device/uevent"):
+                try:
+                    with open(p) as f:
+                        content = f.read()
+                        if "DRIVER=i915" in content or "PCI_ID=8086" in content:
+                            gpu_names.append("Intel Integrated Graphics (i915)")
+                except Exception:
+                    pass
+    # 3. Windows: query WMI
+    elif sys.platform == 'win32':
+        try:
+            import subprocess
+            out = subprocess.check_output(
+                ["powershell", "-NoProfile", "-Command", "Get-CimInstance Win32_VideoController | Select-Object -ExpandProperty Name"],
+                timeout=3, stderr=subprocess.DEVNULL
+            ).decode()
+            for line in out.splitlines():
+                if line.strip():
+                    gpu_names.append(line.strip())
+        except Exception:
+            pass
+    # 4. macOS
+    elif sys.platform == 'darwin':
+        try:
+            import subprocess
+            out = subprocess.check_output(
+                ["system_profiler", "SPDisplaysDataType"], timeout=3, stderr=subprocess.DEVNULL
+            ).decode()
+            for line in out.splitlines():
+                if "Chipset Model:" in line:
+                    gpu_names.append(line.split("Chipset Model:")[-1].strip())
+        except Exception:
+            pass
+
+    return gpu_names
+
+
+def _is_weak_or_integrated_gpu_only(gpu_names: List[str]) -> bool:
+    """Check if all detected GPUs are weak integrated or low-power GPUs that perform slower than CPU."""
+    if not gpu_names:
+        return False
+    WEAK_PATTERNS = [
+        "uhd graphics", "hd graphics", "intel corporation", "gt1", "gt2", "gt3", 
+        "iris", "kaby lake", "skylake", "coffee lake", "comet lake", "tiger lake",
+        "vega 3", "vega 6", "vega 8", "radeon r2", "radeon r3", "radeon r4", "radeon r5",
+        "geforce gt 710", "geforce gt 730", "geforce gt 1030", "geforce mx", "i915"
+    ]
+    STRONG_PATTERNS = [
+        "rtx", "gtx 16", "gtx 10", "gtx 9", "quadro", "tesla", "a100", "h100", "titan",
+        "radeon rx", "radeon pro", "apple m", "arc a"
+    ]
+    has_strong = any(any(sp in g.lower() for sp in STRONG_PATTERNS) for g in gpu_names)
+    if has_strong:
+        return False
+    has_weak = any(any(wp in g.lower() for wp in WEAK_PATTERNS) for g in gpu_names)
+    return has_weak
+
+
+def _detect_hardware_acceleration() -> bool:
     if onnxruntime is None:
         return False
     try:
-        return "CUDAExecutionProvider" in onnxruntime.get_available_providers()
+        available = onnxruntime.get_available_providers()
+        accelerators = {'CUDAExecutionProvider', 'DmlExecutionProvider', 'CoreMLExecutionProvider', 'ROCMExecutionProvider', 'TensorrtExecutionProvider', 'QNNExecutionProvider', 'OpenVINOExecutionProvider'}
+        has_ep = len(accelerators.intersection(available)) > 0
+        if not has_ep:
+            return False
+
+        # Inspect hardware: if only weak iGPU (e.g. Intel UHD / HD Graphics) is present,
+        # fallback to CPU (AVX2 multi-threading is significantly faster and more stable).
+        installed_gpus = _get_installed_gpu_names()
+        if _is_weak_or_integrated_gpu_only(installed_gpus):
+            return False
+
+        return True
     except Exception:
         return False
 
@@ -85,31 +191,29 @@ def _resolve_assets_dir(package_dir: str) -> str:
     override = os.getenv("VISION_MODEL_DIR")
     if override:
         targets.append(override)
-    targets.extend([
-        os.path.join(os.getcwd(), "models"),
-        os.path.join(package_dir, "models"),
-        os.path.join(os.path.dirname(package_dir), "models"),
-    ])
+
     meipass = getattr(sys, "_MEIPASS", None)
     if meipass:
         targets.append(os.path.join(meipass, "models"))
 
-    for candidate in targets:
-        if candidate and _has_required_assets(candidate):
-            return os.path.abspath(candidate)
+    targets.extend([
+        os.path.join(os.path.dirname(os.path.dirname(package_dir)), "models"),
+        os.path.join(os.path.dirname(package_dir), "models"),
+        os.path.join(package_dir, "models"),
+        os.path.join(get_user_data_dir(), "models"),
+        os.path.join(os.getcwd(), "models"),
+    ])
 
-    # No candidate has the full asset set yet (e.g. first run, or CLIP models
-    # downloaded but buffalo_s not fetched yet since it lazy-loads on first
-    # face-detection request) — default to the same location candidate
-    # resolution would have picked first (cwd/models), NOT package_dir/models.
-    # In Docker this is the persistent cove_models volume mount point; in local
-    # dev it's the conventional cove/models/ directory. Falling back to
-    # package_dir/models here would silently write fresh downloads outside
-    # that volume, forcing a full re-download on every container recreation.
-    meipass = getattr(sys, "_MEIPASS", None)
+    for candidate in targets:
+        if candidate and os.path.isdir(candidate):
+            clip_model = os.path.join(candidate, "clip_image.onnx")
+            face_dir = os.path.join(candidate, "buffalo_s")
+            if os.path.isfile(clip_model) or os.path.isdir(face_dir):
+                return os.path.abspath(candidate)
+
     if meipass:
         return os.path.join(meipass, "models")
-    return os.path.join(os.getcwd(), "models")
+    return os.path.join(os.path.dirname(os.path.dirname(package_dir)), "models")
 
 
 def _migrate_asset_file(source_dir: str, target: str, filename: str) -> None:
@@ -171,29 +275,77 @@ class VisionConfig:
             return True
         if self._use_gpu_override.lower() in {"0", "false", "no", "off"}:
             return False
-        return _detect_cuda_available()
+        return _detect_hardware_acceleration()
+
+    @property
+    def provider_configs(self):
+        """Returns a tuple of (providers_list, provider_options_list) to safely configure ONNX Runtime."""
+        import onnxruntime as ort
+        available = ort.get_available_providers()
+        
+        eps = []
+        opts = []
+        
+        def add_provider(name, options=None):
+            if name in available:
+                eps.append(name)
+                opts.append(options or {})
+        
+        # 1. Dedicated NPUs & Mac Neural Engine (Highest efficiency)
+        add_provider('QNNExecutionProvider')
+        add_provider('CoreMLExecutionProvider')
+        add_provider('OpenVINOExecutionProvider', {
+            # 'AUTO' tells Intel OpenVINO to dynamically scan for an NPU, then iGPU, then CPU, 
+            # and auto-route the math to the most efficient Intel silicon available.
+            "device_type": "AUTO"
+        })
+        
+        # 2. High-Performance Dedicated GPUs
+        # For NVIDIA GPUs, we specify the primary device.
+        cuda_opts = {}
+        trt_opts = {}
+        if self.use_gpu:
+            cuda_opts = {
+                "device_id": 0,
+                # EXHAUSTIVE forces CuDNN to benchmark all algorithms on the first run 
+                # and pick the one that perfectly maxes out the specific GPU's VRAM and CUDA cores.
+                "cudnn_conv_algo_search": "EXHAUSTIVE",
+            }
+            trt_opts = {
+                "device_id": 0,
+                # Engine caching prevents TensorRT from having to recompile the AI model on every boot.
+                # It saves the optimized GPU engine to disk, dropping boot times from minutes to seconds.
+                "trt_engine_cache_enable": True,
+            }
+        
+        add_provider('TensorrtExecutionProvider', trt_opts)
+        add_provider('CUDAExecutionProvider', cuda_opts)
+        add_provider('ROCMExecutionProvider')
+        
+        # 3. Universal OS Graphics APIs (iGPUs & standard GPUs)
+        add_provider('DmlExecutionProvider')
+        
+        # 4. Universal Fallback
+        eps.append('CPUExecutionProvider')
+        opts.append({})
+        
+        # If the user explicitly disabled GPU/Hardware acceleration in settings, force CPU only
+        if not self.use_gpu:
+            return ['CPUExecutionProvider'], [{}]
+            
+        return eps, opts
 
     @property
     def providers(self):
-        return ["CUDAExecutionProvider", "CPUExecutionProvider"] if self.use_gpu else ["CPUExecutionProvider"]
-
+        return self.provider_configs[0]
+        
+    @property
+    def provider_options(self):
+        return self.provider_configs[1]
+        
     @property
     def ctx_id(self):
         return 0 if self.use_gpu else -1
-
-    @property
-    def session_options(self):
-        opts = {
-            "arena_extend_strategy": "kNextPowerOfTwo",
-            "do_copy_in_default_stream": "1",
-        }
-        if self.use_gpu:
-            opts.update({
-                "device_id": 0,
-                "gpu_mem_limit": 4 * 1024 * 1024 * 1024,
-                "cudnn_conv_algo_search": "EXHAUSTIVE", # Changed from HEURISTIC to EXHAUSTIVE for better performance
-            })
-        return opts
 
     @property
     def effective_workers(self) -> int:

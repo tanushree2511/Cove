@@ -1,0 +1,54 @@
+name: Build Vision Archive
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    name: Build on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [windows-latest, macos-latest, ubuntu-latest]
+    
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Python Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pyinstaller
+
+      - name: Build Unified Backend (PyInstaller)
+        run: |
+          pyinstaller --name vision-backend --onedir --clean backend_server.py
+
+      - name: Setup Rust & Tauri
+        uses: dtolnay/rust-toolchain@stable
+        
+      - name: Install Frontend Dependencies
+        working-directory: ./frontend
+        run: npm install
+
+      - name: Build Tauri App
+        working-directory: ./frontend
+        run: npx tauri build
+        
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: vision-archive-${{ matrix.os }}
+          path: frontend/src-tauri/target/release/bundle/

@@ -4,9 +4,9 @@
  */
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Download, Film, Calendar, Tag, Music, Loader2 } from 'lucide-react';
+import { X, Download, Film, Calendar, Tag, Music, Loader2, Trash2 } from 'lucide-react';
 import { useAppStore } from '@/store/useAppStore';
-import { extractAudio } from '@/lib/videoApi';
+import { extractAudio, deleteSingleVideo, fetchVideos } from '@/lib/videoApi';
 import { toast } from 'sonner';
 
 export function VideoModal() {
@@ -131,7 +131,7 @@ export function VideoModal() {
                   </div>
                 )}
 
-                <div className="pt-2 border-t border-border">
+                <div className="pt-2 border-t border-border space-y-2">
                   <button
                     onClick={handleExtractAudio}
                     disabled={extracting}
@@ -139,6 +139,26 @@ export function VideoModal() {
                   >
                     {extracting ? <Loader2 size={13} className="animate-spin" /> : <Music size={13} />}
                     Extract Audio
+                  </button>
+
+                  <button
+                    onClick={async () => {
+                      if (!window.confirm(`Are you sure you want to delete "${video.title}"?`)) return;
+                      try {
+                        const target = video.id ?? video.path;
+                        await deleteSingleVideo(target);
+                        useAppStore.getState().removeVideoById(target);
+                        fetchVideos().then((vids) => useAppStore.getState().setVideos(vids));
+                        closeMediaModal();
+                        toast.success('Video deleted from library');
+                      } catch (err) {
+                        toast.error(err?.message || 'Failed to delete video');
+                      }
+                    }}
+                    className="flex items-center gap-1.5 w-full justify-center rounded-lg bg-destructive/10 hover:bg-destructive/20 text-destructive px-3 py-2 text-[12px] font-medium transition-colors"
+                  >
+                    <Trash2 size={13} />
+                    Delete Video
                   </button>
                 </div>
               </div>

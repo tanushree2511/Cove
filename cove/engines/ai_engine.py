@@ -44,7 +44,7 @@ class AIEngine:
         try:
             for model in self.app.models.values():
                 if hasattr(model, "session") and model.session is not None:
-                    model.session.set_providers(["CUDAExecutionProvider"], [self.config.session_options])
+                    model.session.set_providers(self.config.providers, self.config.provider_options)
         except Exception as exc:
             logger.warning("Failed to set GPU session options: %s", exc)
 
@@ -70,8 +70,8 @@ class AIEnginePool:
             self._queue.put(engine)
 
     @contextmanager
-    def borrow(self):
-        engine = self._queue.get()
+    def borrow(self, timeout: Optional[float] = 30.0):
+        engine = self._queue.get(timeout=timeout)
         try:
             yield engine
         finally:

@@ -8,14 +8,18 @@ import { Download, Trash2, CheckSquare, X, AlertTriangle } from 'lucide-react';
 import { useAppStore } from '@/store/useAppStore';
 import { toast } from 'sonner';
 import { deleteImages, fetchClusters, fetchImages } from '@/lib/coveApi';
+import { deleteVideos, fetchVideos } from '@/lib/videoApi';
 
 export function SelectionBar() {
-  const selectedImages    = useAppStore((s) => s.selectedImages);
-  const clearSelection    = useAppStore((s) => s.clearSelection);
-  const selectAllImages   = useAppStore((s) => s.selectAllImages);
-  const deleteSelectedImages = useAppStore((s) => s.deleteSelectedImages);
-  const setImages         = useAppStore((s) => s.setImages);
-  const setClusters       = useAppStore((s) => s.setClusters);
+  const selectedImages      = useAppStore((s) => s.selectedImages);
+  const clearSelection      = useAppStore((s) => s.clearSelection);
+  const selectAllImages     = useAppStore((s) => s.selectAllImages);
+  const images              = useAppStore((s) => s.images);
+  const videos              = useAppStore((s) => s.videos);
+  const setImages           = useAppStore((s) => s.setImages);
+  const setVideos           = useAppStore((s) => s.setVideos);
+  const setClusters         = useAppStore((s) => s.setClusters);
+  const deleteSelectedMedia = useAppStore((s) => s.deleteSelectedMedia);
 
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [deleting, setDeleting] = useState(false);
@@ -38,14 +42,50 @@ export function SelectionBar() {
     setConfirmDelete(false);
     setDeleting(true);
     try {
-      const paths = Array.from(selectedImages);
-      const result = await deleteImages(paths);
-      deleteSelectedImages();
-      toast.success(`Deleted ${result.count} item${result.count !== 1 ? 's' : ''}`);
-      fetchImages(0, 1000).then(setImages);
-      fetchClusters().then(setClusters);
-    } catch {
-      toast.error('Delete failed');
+      const selectedList = Array.from(selectedImages);
+      const photoPaths = [];
+      const videoIds = [];
+      const videoPaths = [];
+      const deletedPhotoIds = new Set();
+      const deletedVideoIds = new Set();
+
+      selectedList.forEach((id) => {
+        const isVid = videos.some((v) => v.id === id || v.path === id) || /\.(mp4|mov|avi|mkv|webm)$/i.test(String(id));
+        if (isVid) {
+          const v = videos.find((v) => v.id === id || v.path === id);
+          if (v?.id && typeof v.id === 'number') videoIds.push(v.id);
+          else videoPaths.push(String(id));
+          deletedVideoIds.add(id);
+          if (v?.id) deletedVideoIds.add(v.id);
+          if (v?.path) deletedVideoIds.add(v.path);
+        } else {
+          photoPaths.push(String(id));
+          deletedPhotoIds.add(id);
+        }
+      });
+
+      const promises = [];
+      if (photoPaths.length > 0) promises.push(deleteImages(photoPaths));
+      if (videoIds.length > 0 || videoPaths.length > 0) promises.push(deleteVideos({ videoIds, paths: videoPaths }));
+
+      await Promise.all(promises);
+      deleteSelectedMedia(deletedPhotoIds, deletedVideoIds);
+      clearSelection();
+
+      const details = [];
+      if (photoPaths.length > 0) details.push(`${photoPaths.length} photo${photoPaths.length > 1 ? 's' : ''}`);
+      if (deletedVideoIds.size > 0) details.push(`${deletedVideoIds.size} video${deletedVideoIds.size > 1 ? 's' : ''}`);
+      toast.success(`Deleted ${details.join(' and ')}`);
+
+      if (photoPaths.length > 0) {
+        fetchImages(0, 1000).then(setImages);
+        fetchClusters().then(setClusters);
+      }
+      if (deletedVideoIds.size > 0) {
+        fetchVideos().then(setVideos);
+      }
+    } catch (err) {
+      toast.error(err?.message || 'Delete failed');
     } finally {
       setDeleting(false);
     }

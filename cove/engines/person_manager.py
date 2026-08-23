@@ -32,12 +32,24 @@ class PersonManager:
             
             # Create person if not exists
             if person_id not in self.people:
-                self.people[person_id] = {"name": "Unknown", "photos": []}
+                self.people[person_id] = {"name": f"Person {int(label) + 1}", "photos": []}
+            elif self.people[person_id].get("name") in ("Unknown", None, ""):
+                self.people[person_id]["name"] = f"Person {int(label) + 1}"
             
             # Avoid duplicates
             if valid_paths[i] not in self.people[person_id]["photos"]:
                 self.people[person_id]["photos"].append(valid_paths[i])
         
+        # Ensure all photo lists within every person are strictly deduplicated
+        for pid in list(self.people.keys()):
+            seen = set()
+            unique_photos = []
+            for p in self.people[pid].get("photos", []):
+                if p not in seen:
+                    seen.add(p)
+                    unique_photos.append(p)
+            self.people[pid]["photos"] = unique_photos
+
         # Save to disk
         os.makedirs(os.path.dirname(self.db_path), exist_ok=True)
         with open(self.db_path, 'w') as f:

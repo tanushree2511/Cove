@@ -24,11 +24,12 @@ def extract_frames(video_path, fast_mode=True):
             cap.set(cv2.CAP_PROP_POS_FRAMES, i)
             ret, frame = cap.read()
             if ret:
-                # Downscale to max width 1280 for fast CLIP embedding and face detection
+                # Downscale while preserving aspect ratio for fast CLIP embedding and face detection
                 h, w = frame.shape[:2]
-                if w > 1280:
-                    new_w = 1280
-                    frame = cv2.resize(frame, (new_w, int(h * new_w / w)))
+                max_dim = max(w, h)
+                if max_dim > 1280:
+                    scale = 1280.0 / max_dim
+                    frame = cv2.resize(frame, (int(w * scale), int(h * scale)))
                 raw_frames.append(frame)
 
         # Filter near-duplicate consecutive frames to speed up while keeping narrative progression

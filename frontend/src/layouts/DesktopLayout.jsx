@@ -15,6 +15,7 @@ import { SettingsView } from '@/components/features/SettingsView';
 import { PhotoModal } from '@/components/features/PhotoModal';
 import { VideoModal } from '@/components/features/VideoModal';
 import { SelectionBar } from '@/components/features/SelectionBar';
+import { UploadProgressModal } from '@/components/features/UploadProgressModal';
 import { NetworkStatus } from '@/components/NetworkStatus';
 
 const views = {
@@ -28,8 +29,26 @@ const views = {
 
 export function DesktopLayout() {
     useKeyboardShortcuts();
-    const sidebarCollapsed = useAppStore((s) => s.sidebarCollapsed);
-    const activeView = useAppStore((s) => s.activeView);
+    const sidebarCollapsed    = useAppStore((s) => s.sidebarCollapsed);
+    const activeView          = useAppStore((s) => s.activeView);
+    const setActiveView       = useAppStore((s) => s.setActiveView);
+    const indexingStatus      = useAppStore((s) => s.indexingStatus);
+    const videoIndexingStatus = useAppStore((s) => s.videoIndexingStatus);
+
+    const isPhotoIndexing = Boolean(indexingStatus?.isIndexing || indexingStatus?.status === 'running');
+    const isVideoIndexing = Boolean(videoIndexingStatus?.status === 'processing');
+    const isAnyIndexing   = (isPhotoIndexing || isVideoIndexing) && activeView !== 'indexing';
+
+    const currentMsg = isVideoIndexing
+        ? (videoIndexingStatus?.message || 'AI analyzing video keyframes & faces…')
+        : (indexingStatus?.message || (indexingStatus?.stage === 'detecting' ? 'Detecting Faces…' : indexingStatus?.stage === 'embedding' ? 'Generating CLIP Search Embeddings…' : indexingStatus?.stage === 'clustering' ? 'Clustering People…' : 'Indexing Library…'));
+
+    const currentProgress = isVideoIndexing
+        ? (videoIndexingStatus?.total > 0 ? (videoIndexingStatus.current / videoIndexingStatus.total) * 100 : 50)
+        : (indexingStatus?.progress || 0);
+
+    const currentProcessed = isVideoIndexing ? videoIndexingStatus?.current : indexingStatus?.processed;
+    const currentTotal     = isVideoIndexing ? videoIndexingStatus?.total : indexingStatus?.total;
 
     const ActiveComponent = views[activeView] || GalleryView;
 
@@ -49,6 +68,48 @@ export function DesktopLayout() {
             {/* Main content */}
             <div className="flex flex-1 flex-col min-w-0 bg-background relative">
                 <CommandBar />
+                
+                {/* Global Indexing Progress Bar */}
+                <AnimatePresence>
+                    {isAnyIndexing && (
+                        <motion.div
+                            initial={{ height: 0, opacity: 0 }}
+                            animate={{ height: 'auto', opacity: 1 }}
+                            exit={{ height: 0, opacity: 0 }}
+                            className="bg-primary/10 border-b border-primary/20 px-4 py-1.5 flex items-center justify-between text-xs backdrop-blur-sm z-20 flex-shrink-0 overflow-hidden"
+                        >
+                            <div className="flex items-center gap-2">
+                                <span className="relative flex h-2 w-2">
+                                    <span className="absolute inset-0 rounded-full bg-primary animate-ping" />
+                                    <span className="rounded-full bg-primary h-2 w-2" />
+                                </span>
+                                <span className="font-medium text-foreground">
+                                    {currentMsg}
+                                </span>
+                                {currentTotal > 0 && (
+                                    <span className="text-muted-foreground mono text-[11px]">
+                                        ({currentProcessed} / {currentTotal})
+                                    </span>
+                                )}
+                            </div>
+                            <div className="flex items-center gap-3">
+                                <div className="w-32 h-1.5 bg-muted rounded-full overflow-hidden">
+                                    <div
+                                        className="h-full bg-primary transition-all duration-300 rounded-full"
+                                        style={{ width: `${Math.max(5, currentProgress)}%` }}
+                                    />
+                                </div>
+                                <span className="mono font-semibold text-primary text-[11px]">{Math.round(currentProgress)}%</span>
+                                <button
+                                    onClick={() => setActiveView('indexing')}
+                                    className="text-[11px] text-primary hover:underline font-medium"
+                                >
+                                    View Pipeline →
+                                </button>
+                            </div>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
                 <AnimatePresence mode="wait">
                     <motion.main
                         key={activeView}
@@ -69,6 +130,7 @@ export function DesktopLayout() {
             {/* Media Lightbox & Video Player Modals */}
             <PhotoModal />
             <VideoModal />
+            <UploadProgressModal />
         </div>
     );
 }

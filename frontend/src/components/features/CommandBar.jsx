@@ -8,11 +8,13 @@ import { Search, FolderOpen, Cpu, Zap, Sun, Moon, X } from 'lucide-react';
 import { useAppStore } from '@/store/useAppStore';
 import { toast } from 'sonner';
 import { fetchImages, uploadImages } from '@/lib/coveApi';
+import { fetchVideos, uploadVideos } from '@/lib/videoApi';
 
 export function CommandBar() {
   const [focused, setFocused] = useState(false);
 
   const inputRef        = useRef(null);
+  const fileInputRef    = useRef(null);
   const searchQuery     = useAppStore((s) => s.searchQuery);
   const setSearchQuery  = useAppStore((s) => s.setSearchQuery);
   const setActiveView   = useAppStore((s) => s.setActiveView);
@@ -20,8 +22,12 @@ export function CommandBar() {
   const indexingStatus  = useAppStore((s) => s.indexingStatus);
   const systemStats     = useAppStore((s) => s.systemStats);
   const setImages       = useAppStore((s) => s.setImages);
-  const theme           = useAppStore((s) => s.theme);
-  const toggleTheme     = useAppStore((s) => s.toggleTheme);
+  const setVideos       = useAppStore((s) => s.setVideos);
+  const setIndexingStatus      = useAppStore((s) => s.setIndexingStatus);
+  const setVideoIndexingStatus = useAppStore((s) => s.setVideoIndexingStatus);
+  const theme                  = useAppStore((s) => s.theme);
+  const toggleTheme            = useAppStore((s) => s.toggleTheme);
+  const setUploadState         = useAppStore((s) => s.setUploadState);
 
   // Auto-focus when navigating to search view
   useEffect(() => {
@@ -42,30 +48,131 @@ export function CommandBar() {
     inputRef.current?.focus();
   };
 
-  const handleImportClick = () => {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.multiple = true;
-    input.accept = 'image/jpeg,image/png';
-    input.onchange = async (e) => {
-      if (!e.target.files?.length) return;
-      try {
-        const result = await uploadImages(e.target.files);
-        toast.success(
-          `Uploaded ${result.count} image${result.count !== 1 ? 's' : ''}` +
-            (result.indexing_started ? ' — indexing started' : '')
-        );
-        fetchImages(0, 1000).then(setImages);
-        if (result.indexing_started) setActiveView('indexing');
-      } catch {
-        toast.error('Upload failed');
+  const processSelectedFiles = async (files) => {
+    if (!files || files.length === 0) return;
+    const photoFiles = files.filter(f => !/\.(mp4|mov|avi|mkv|webm)$/i.test(f.name) && !f.type.startsWith('video/'));
+    const videoFiles = files.filter(f => /\.(mp4|mov|avi|mkv|webm)$/i.test(f.name) || f.type.startsWith('video/'));
+    const mediaType = videoFiles.length > 0 && photoFiles.length === 0 ? 'video' : 'photo';
+
+    setUploadState({
+      isUploading: true,
+      isCompleted: false,
+      totalFiles: files.length,
+      currentFileIndex: 1,
+      fileName: files[0]?.name || '',
+      mediaType,
+      progress: 0,
+      bytesUploaded: 0,
+      totalBytes: files.reduce((acc, f) => acc + f.size, 0),
+      error: null,
+    });
+
+    try {
+      if (photoFiles.length > 0) {
+        const uploadRes = await uploadImages(photoFiles, (info) => {
+          setUploadState({
+            progress: info.percent,
+            bytesUploaded: info.loaded,
+            totalBytes: info.total,
+            fileName: info.fileName,
+          });
+        });
+        if (uploadRes?.indexing_started || (uploadRes?.saved && uploadRes.saved.length > 0)) {
+          setIndexingStatus({
+            isIndexing: true,
+            status: 'running',
+            stage: 'detecting',
+            progress: 0,
+            processed: 0,
+            total: photoFiles.length,
+            message: `AI analyzing ${photoFiles.length} photo(s)...`,
+          });
+        }
       }
-    };
-    input.click();
+
+      if (videoFiles.length > 0) {
+        await uploadVideos(videoFiles, (info) => {
+          setUploadState({
+            progress: info.percent,
+            bytesUploaded: info.loaded,
+            totalBytes: info.total,
+            fileName: info.fileName,
+          });
+        });
+        setVideoIndexingStatus({
+          status: 'processing',
+          current: 1,
+          total: videoFiles.length,
+          message: `AI analyzing ${videoFiles[0]?.name || 'video'} (1/${videoFiles.length})...`,
+        });
+      }
+
+      setUploadState({
+        isUploading: false,
+        isCompleted: true,
+        progress: 100,
+      });
+
+      toast.success(`Imported ${files.length} item${files.length !== 1 ? 's' : ''}`);
+      fetchImages(0, 1000).then(setImages);
+      fetchVideos().then(setVideos);
+    } catch (err) {
+      setUploadState({
+        isUploading: false,
+        isCompleted: false,
+        error: err?.message || 'Upload failed',
+      });
+      toast.error(err?.message || 'Upload failed');
+    }
+  };
+
+  const handleImportClick = async () => {
+    if (typeof window !== 'undefined' && typeof window.showOpenFilePicker === 'function') {
+      try {
+        const handles = await window.showOpenFilePicker({
+          multiple: true,
+          types: [
+            {
+              description: 'Photos & Videos',
+              accept: {
+                'image/*': ['.png', '.jpg', '.jpeg', '.webp', '.bmp'],
+                'video/*': ['.mp4', '.mov', '.mkv', '.webm'],
+              },
+            },
+          ],
+        });
+        if (handles && handles.length > 0) {
+          const files = await Promise.all(handles.map((h) => h.getFile()));
+          processSelectedFiles(files);
+          return;
+        }
+      } catch (err) {
+        if (err.name === 'AbortError') return;
+      }
+    }
+    fileInputRef.current?.click();
+  };
+
+  const handleFileInputChange = (e) => {
+    const files = Array.from(e.target.files || []);
+    e.target.value = '';
+    if (files.length > 0) {
+      processSelectedFiles(files);
+    }
   };
 
   return (
     <div className="flex h-[52px] items-center gap-3 border-b border-border px-4 bg-surface/50 flex-shrink-0 backdrop-blur-sm">
+      {/* Hidden native file input element */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        multiple
+        accept="image/*,video/*"
+        className="hidden"
+        onChange={handleFileInputChange}
+      />
+
       {/* Search input */}
       <motion.div
         className={`

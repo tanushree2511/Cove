@@ -1,6 +1,11 @@
-from fastapi import FastAPI, UploadFile, Query, BackgroundTasks
+import logging
+logger = logging.getLogger(__name__)
+
+from fastapi import FastAPI, UploadFile, Query, BackgroundTasks, HTTPException, File, Form
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
+from pydantic import BaseModel
+from typing import List, Optional, Union
 import shutil, os, sqlite3, json, time, threading, traceback, subprocess
 import numpy as np
 
@@ -11,7 +16,32 @@ from core.vector_store import add_vector, search_vector
 from core.classifier import classify_video
 from core.database import init_db, add_video, get_video_by_index, DB_PATH, link_face_to_person
 
-app = FastAPI()
+from fastapi.middleware.cors import CORSMiddleware
+from contextlib import asynccontextmanager
+
+try:
+    from config.vision_config import CONFIG
+    BASE_DATA_DIR = CONFIG.user_data_dir
+except Exception:
+    try:
+        from cove.config.vision_config import CONFIG
+        BASE_DATA_DIR = CONFIG.user_data_dir
+    except Exception:
+        BASE_DATA_DIR = os.getcwd()
+
+UPLOAD_DIR = os.path.join(BASE_DATA_DIR, "uploaded_videos")
+THUMB_DIR = os.path.join(BASE_DATA_DIR, "static", "face_thumbnails")
+AUDIO_DIR = os.path.join(BASE_DATA_DIR, "static", "audio")
+import cv2
+
+UPLOAD_DIR = os.path.join(BASE_DATA_DIR, "uploaded_videos")
+THUMB_DIR = os.path.join(BASE_DATA_DIR, "static", "face_thumbnails")
+VID_THUMB_DIR = os.path.join(BASE_DATA_DIR, "static", "video_thumbnails")
+AUDIO_DIR = os.path.join(BASE_DATA_DIR, "static", "audio")
+os.makedirs(UPLOAD_DIR, exist_ok=True)
+os.makedirs(THUMB_DIR, exist_ok=True)
+os.makedirs(VID_THUMB_DIR, exist_ok=True)
+os.makedirs(AUDIO_DIR, exist_ok=True)
 
 job_progress = {
     "bulk_index": {"status": "idle", "current": 0, "total": 0, "eta": 0, "message": ""},
@@ -21,36 +51,209 @@ stop_flags = {"bulk_index": False, "clustering": False}
 
 init_db()
 
-UPLOAD_DIR = "uploaded_videos"
-THUMB_DIR = "static/face_thumbnails"
-AUDIO_DIR = "static/audio"
-os.makedirs(UPLOAD_DIR, exist_ok=True)
-os.makedirs(THUMB_DIR, exist_ok=True)
-os.makedirs(AUDIO_DIR, exist_ok=True)
+def rebuild_vector_index():
+    try:
+        from core.vector_store import INDEX_PATH, DIM
+        import faiss
+        new_index = faiss.IndexFlatIP(DIM)
+        conn = sqlite3.connect(DB_PATH)
+        cur = conn.cursor()
+        cur.execute("SELECT embedding FROM videos ORDER BY id ASC")
+        for (emb_json,) in cur.fetchall():
+            if emb_json:
+                emb = np.array(json.loads(emb_json)).astype("float32")
+                new_index.add(np.array([emb]))
+        conn.close()
+        faiss.write_index(new_index, INDEX_PATH)
+        import core.vector_store
+        core.vector_store.index = new_index
+    except Exception as e:
+        logger.warning("Error syncing vector index: %s", e)
+
+def process_single_video(file_path):
+    logger.info(f"DEBUG: Processing {file_path}")
+    frames = extract_frames(file_path)
+    if not frames:
+        logger.info(f"DEBUG: No frames extracted from {file_path}")
+        return "unknown"
+
+    # Save a video cover thumbnail image
+    try:
+        vid_thumb_name = f"{os.path.splitext(os.path.basename(file_path))[0]}.jpg"
+        vid_thumb_path = os.path.join(VID_THUMB_DIR, vid_thumb_name)
+        if not os.path.exists(vid_thumb_path):
+            cv2.imwrite(vid_thumb_path, frames[0])
+    except Exception as e:
+        logger.warning(f"Failed to write video thumbnail: {e}")
+
+    v_emb = generate_video_embedding(frames)
+    label = classify_video(v_emb)
+    video_id = add_video(file_path, label, v_emb)
+    process_and_link_faces(frames, video_id)
+    rebuild_vector_index()
+    return label
+
+video_queue = []
+video_queue_lock = threading.Lock()
+is_queue_worker_running = False
+total_batch_count = 0
+completed_batch_count = 0
+
+def video_queue_worker():
+    global job_progress, is_queue_worker_running, total_batch_count, completed_batch_count
+    while True:
+        with video_queue_lock:
+            if not video_queue:
+                is_queue_worker_running = False
+                job_progress["bulk_index"]["status"] = "completed"
+                job_progress["bulk_index"]["message"] = f"Finished analyzing {completed_batch_count} video(s)."
+                try:
+                    cluster_res = cluster_all_faces()
+                    logger.info(f"Auto-clustering completed: {cluster_res}")
+                except Exception as e:
+                    logger.warning(f"Auto-clustering error: {e}")
+                break
+            file_path = video_queue.pop(0)
+
+        filename = os.path.basename(file_path)
+        current_num = completed_batch_count + 1
+        job_progress["bulk_index"] = {
+            "status": "processing",
+            "current": current_num,
+            "total": total_batch_count,
+            "eta": 0,
+            "start_time": time.time(),
+            "message": f"AI analyzing {filename} ({current_num}/{total_batch_count})",
+        }
+        try:
+            label = process_single_video(file_path)
+            completed_batch_count += 1
+            job_progress["bulk_index"]["current"] = completed_batch_count
+            job_progress["bulk_index"]["message"] = f"Indexed {filename} -> {label}"
+        except Exception as err:
+            logger.exception(f"Error processing video {filename}: {err}")
+            completed_batch_count += 1
+
+def enqueue_video_processing(file_path: str, batch_total: int = None):
+    global is_queue_worker_running, total_batch_count, completed_batch_count
+    with video_queue_lock:
+        if not is_queue_worker_running:
+            total_batch_count = 0
+            completed_batch_count = 0
+        if batch_total is not None and batch_total > total_batch_count:
+            total_batch_count = batch_total
+        elif batch_total is None:
+            total_batch_count += 1
+        video_queue.append(file_path)
+        if not is_queue_worker_running:
+            is_queue_worker_running = True
+            t = threading.Thread(target=video_queue_worker, daemon=True)
+            t.start()
+
+def reconcile_video_storage_with_disk():
+    """
+    Scans UPLOAD_DIR on startup.
+    1. Removes database records whose video files are missing on disk.
+    2. Registers any unindexed video files found in UPLOAD_DIR and enqueues them for background AI processing.
+    3. Resumes processing for any videos with incomplete labels, missing faces, or missing thumbnails.
+    4. Rebuilds the FAISS vector index.
+    """
+    logger.info("Reconciling video database with disk...")
+    if not os.path.exists(UPLOAD_DIR):
+        os.makedirs(UPLOAD_DIR, exist_ok=True)
+        return
+
+    valid_exts = ('.mp4', '.mkv', '.avi', '.mov', '.webm')
+    disk_files = [
+        os.path.join(UPLOAD_DIR, f)
+        for f in os.listdir(UPLOAD_DIR)
+        if f.lower().endswith(valid_exts) and os.path.isfile(os.path.join(UPLOAD_DIR, f))
+    ]
+    disk_names = {os.path.basename(p): p for p in disk_files}
+
+    conn = sqlite3.connect(DB_PATH)
+    cur = conn.cursor()
+    cur.execute("SELECT id, path, label, embedding FROM videos")
+    db_videos = cur.fetchall()
+
+    db_paths = set()
+    to_enqueue = []
+
+    for vid_id, v_path, v_label, v_emb in db_videos:
+        fn = os.path.basename(v_path)
+        actual_path = disk_names.get(fn)
+        if not actual_path or not os.path.exists(actual_path):
+            logger.info(f"Removing missing video record from DB: {v_path}")
+            cur.execute("DELETE FROM faces WHERE video_id = ?", (vid_id,))
+            cur.execute("DELETE FROM videos WHERE id = ?", (vid_id,))
+        else:
+            db_paths.add(fn)
+            if v_path != actual_path:
+                cur.execute("UPDATE videos SET path = ? WHERE id = ?", (actual_path, vid_id))
+            
+            cur.execute("SELECT COUNT(*) FROM faces WHERE video_id = ?", (vid_id,))
+            face_cnt = cur.fetchone()[0]
+
+            vid_thumb_name = f"{os.path.splitext(fn)[0]}.jpg"
+            vid_thumb_path = os.path.join(VID_THUMB_DIR, vid_thumb_name)
+
+            if not v_emb or v_label == "Processing AI tags..." or v_label == "unknown" or not os.path.exists(vid_thumb_path):
+                to_enqueue.append(actual_path)
+
+    cur.execute("DELETE FROM persons WHERE id NOT IN (SELECT DISTINCT person_id FROM faces WHERE person_id IS NOT NULL)")
+    conn.commit()
+    conn.close()
+
+    for fn, f_path in disk_names.items():
+        if fn not in db_paths:
+            logger.info(f"Discovered unindexed video on disk: {fn}")
+            add_video(f_path, "Processing AI tags...")
+            to_enqueue.append(f_path)
+
+    rebuild_vector_index()
+
+    if to_enqueue:
+        logger.info(f"Enqueuing {len(to_enqueue)} video(s) for background processing...")
+        for vp in to_enqueue:
+            enqueue_video_processing(vp, batch_total=len(to_enqueue))
+    else:
+        try:
+            cluster_all_faces()
+        except Exception as e:
+            logger.warning(f"Startup face clustering error: {e}")
+
+@asynccontextmanager
+async def video_lifespan(app: FastAPI):
+    try:
+        reconcile_video_storage_with_disk()
+    except Exception as e:
+        logger.warning(f"Video startup reconciliation error: {e}")
+    yield
+
+app = FastAPI(lifespan=video_lifespan)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 app.mount("/stream", StaticFiles(directory=UPLOAD_DIR), name="stream")
 app.mount("/faces", StaticFiles(directory=THUMB_DIR), name="faces")
+app.mount("/thumbnails", StaticFiles(directory=VID_THUMB_DIR), name="thumbnails")
 app.mount("/audio", StaticFiles(directory=AUDIO_DIR), name="audio")
 
-def process_single_video(file_path):
-    print(f"DEBUG: Processing {file_path}")
-    frames = extract_frames(file_path)
-    if not frames:
-        print(f"DEBUG: No frames extracted from {file_path}")
-        return "unknown"
-    v_emb = generate_video_embedding(frames)
-    label = classify_video(v_emb)
-    add_vector(v_emb)
-    video_id = add_video(file_path, label, v_emb)
-    process_and_link_faces(frames, video_id)
-    return label
-
 @app.post("/index-video")
-async def index_video(file: UploadFile):
+async def index_video(file: UploadFile = File(...), batch_total: Optional[int] = Form(None)):
     file_path = os.path.join(UPLOAD_DIR, file.filename)
-    with open(file_path, "wb") as buffer: shutil.copyfileobj(file.file, buffer)
-    label = process_single_video(file_path)
-    return {"message": "Success", "label": label}
+    with open(file_path, "wb") as buffer:
+        shutil.copyfileobj(file.file, buffer)
+    # Register video immediately so it is playable in the Library right away
+    video_id = add_video(file_path, "Processing AI tags...")
+    enqueue_video_processing(file_path, batch_total=batch_total)
+    return {"message": "Success", "video_id": video_id, "path": file_path, "label": "Processing AI tags..."}
 
 def run_bulk_index_task(directory_path: str):
     global job_progress, stop_flags
@@ -75,7 +278,7 @@ def run_bulk_index_task(directory_path: str):
             job_progress["bulk_index"] = {"status": "error", "message": f"Path does not exist: {directory_path}"}
             return
                     
-        print(f"DEBUG: Found {len(files_to_process)} video file(s) at {directory_path}")
+        logger.info(f"DEBUG: Found {len(files_to_process)} video file(s) at {directory_path}")
         
         if not files_to_process:
             job_progress["bulk_index"] = {"status": "error", "message": "No matching video files found."}
@@ -111,17 +314,17 @@ def run_bulk_index_task(directory_path: str):
             
             if dest_path in indexed_paths:
                 label = indexed_paths[dest_path]
-                print(f"DEBUG: Skipping {filename}, already indexed as '{label}'.")
+                logger.info(f"DEBUG: Skipping {filename}, already indexed as '{label}'.")
             elif file_path in indexed_paths:
                 label = indexed_paths[file_path]
-                print(f"DEBUG: Skipping {filename}, already indexed as '{label}'.")
+                logger.info(f"DEBUG: Skipping {filename}, already indexed as '{label}'.")
             else:
                 try:
                     if not filename.lower().endswith(".mp4"):
                         new_filename = os.path.splitext(filename)[0] + ".mp4"
                         dest_path = os.path.normpath(os.path.join(UPLOAD_DIR, new_filename))
                         if not os.path.exists(dest_path):
-                            print(f"DEBUG: Fast converting {filename} to MP4...")
+                            logger.info(f"DEBUG: Fast converting {filename} to MP4...")
                             import imageio_ffmpeg
                             ffmpeg_exe = imageio_ffmpeg.get_ffmpeg_exe()
                             subprocess.run([
@@ -135,7 +338,7 @@ def run_bulk_index_task(directory_path: str):
                             
                     label = process_single_video(dest_path)
                 except Exception as e:
-                    print(f"DEBUG: Error processing {filename}: {str(e)}")
+                    logger.info(f"DEBUG: Error processing {filename}: {str(e)}")
                     print(traceback.format_exc())
                     label = "error"
                 
@@ -150,7 +353,7 @@ def run_bulk_index_task(directory_path: str):
         job_progress["bulk_index"]["status"] = "completed"
         job_progress["bulk_index"]["message"] = f"Finished indexing {len(files_to_process)} videos in {mins}m {secs}s."
     except Exception as e:
-        print(f"DEBUG: Bulk task failed: {str(e)}")
+        logger.info(f"DEBUG: Bulk task failed: {str(e)}")
         print(traceback.format_exc())
         job_progress["bulk_index"]["status"] = "error"
         job_progress["bulk_index"]["message"] = str(e)
@@ -161,6 +364,53 @@ async def index_bulk(directory_path: str, background_tasks: BackgroundTasks):
     if not os.path.exists(normalized_path): 
         return {"error": f"Directory not found: {normalized_path}"}
     background_tasks.add_task(run_bulk_index_task, normalized_path)
+    return {"message": "Started"}
+
+@app.post("/reindex-all")
+async def reindex_all(background_tasks: BackgroundTasks):
+    def task():
+        global job_progress, stop_flags
+        try:
+            stop_flags["bulk_index"] = False
+            extensions = ('.mp4', '.avi', '.mov', '.mkv', '.wmv')
+            files_to_process = []
+            if os.path.exists(UPLOAD_DIR):
+                for f in os.listdir(UPLOAD_DIR):
+                    if f.lower().endswith(extensions):
+                        files_to_process.append(os.path.join(UPLOAD_DIR, f))
+            if not files_to_process:
+                job_progress["bulk_index"] = {"status": "completed", "current": 0, "total": 0, "message": "No videos in library."}
+                return
+
+            job_progress["bulk_index"] = {
+                "status": "processing",
+                "current": 0,
+                "total": len(files_to_process),
+                "eta": 0,
+                "start_time": time.time(),
+                "message": f"Indexing {len(files_to_process)} video(s)..."
+            }
+
+            for i, dest_path in enumerate(files_to_process):
+                if stop_flags.get("bulk_index"):
+                    job_progress["bulk_index"]["status"] = "cancelled"
+                    return
+                filename = os.path.basename(dest_path)
+                try:
+                    label = process_single_video(dest_path)
+                    job_progress["bulk_index"]["message"] = f"Processed: {filename} -> {label}"
+                except Exception as err:
+                    logger.exception(f"Error processing video {filename}: {err}")
+                job_progress["bulk_index"]["current"] = i + 1
+
+            job_progress["bulk_index"]["status"] = "completed"
+            job_progress["bulk_index"]["message"] = f"Indexed {len(files_to_process)} videos."
+        except Exception as e:
+            logger.exception(f"Reindex all failed: {e}")
+            job_progress["bulk_index"]["status"] = "error"
+            job_progress["bulk_index"]["message"] = str(e)
+
+    background_tasks.add_task(task)
     return {"message": "Started"}
 
 @app.post("/cluster-faces")
@@ -194,7 +444,7 @@ async def run_clustering(background_tasks: BackgroundTasks):
                 "message": f"Clustering complete! Grouped into {res.get('clusters', 0)} distinct identities."
             }
         except Exception as e:
-            print(f"DEBUG: Clustering failed: {str(e)}")
+            logger.info(f"DEBUG: Clustering failed: {str(e)}")
             job_progress["clustering"] = {
                 "status": "error",
                 "current": 0,
@@ -247,7 +497,7 @@ async def search(query: str, threshold: float = 0.23):
     
     for score, idx in zip(scores, indices):
         raw_score = float(score)
-        if raw_score >= (threshold - 0.05):  # Inclusive threshold for semantic matching
+        if raw_score >= threshold:  # Inclusive threshold for semantic matching
             video = get_video_by_index(idx)
             if video:
                 v_id, v_path, v_label = video[0], video[1], video[2]
@@ -293,20 +543,29 @@ async def extract_audio_task(video_path: str):
                 err_msg = result.stderr.decode(errors='ignore') if result.stderr else "Unknown ffmpeg error"
                 if "does not contain any stream" in err_msg or "Invalid argument" in err_msg:
                     return {"error": "This video does not contain an audio track."}
-                print(f"DEBUG: Audio extraction failed: {err_msg}")
+                logger.info(f"DEBUG: Audio extraction failed: {err_msg}")
                 return {"error": f"Extraction failed: {err_msg}"}
                 
         return {"audio_url": f"/audio/{audio_filename}"}
     except Exception as e:
-        print(f"DEBUG: Audio task error: {str(e)}")
+        logger.info(f"DEBUG: Audio task error: {str(e)}")
         return {"error": str(e)}
 
 @app.get("/all-persons")
 async def get_all_persons():
-    conn = sqlite3.connect(DB_PATH); cursor = conn.cursor()
-    cursor.execute("SELECT p.id, p.name, p.thumbnail, COUNT(f.id) FROM persons p LEFT JOIN faces f ON p.id = f.person_id GROUP BY p.id")
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    cursor.execute("""
+        SELECT p.id, p.name, p.thumbnail, COUNT(f.id) 
+        FROM persons p 
+        JOIN faces f ON p.id = f.person_id 
+        GROUP BY p.id 
+        HAVING COUNT(f.id) > 0 
+        ORDER BY p.id ASC
+    """)
     res = [{"id": r[0], "name": r[1], "thumbnail": r[2], "count": r[3]} for r in cursor.fetchall()]
-    conn.close(); return {"persons": res}
+    conn.close()
+    return {"persons": res}
 
 @app.post("/rebuild-index")
 async def rebuild_index():
@@ -321,6 +580,131 @@ async def rebuild_index():
 
 @app.delete("/remove-duplicates")
 async def cleanup_duplicates(): return {"removed_count": remove_duplicate_faces()}
+
+class DeleteVideosRequest(BaseModel):
+    video_ids: Optional[List[Union[int, str]]] = None
+    paths: Optional[List[str]] = None
+
+
+def _perform_video_deletion(cursor, conn, target_ids=None, target_paths=None):
+    """Clean up files, thumbnails, faces, and SQLite rows for video IDs and/or paths."""
+    video_rows = []
+    
+    # Resolve any numeric IDs or string IDs from target_ids
+    valid_numeric_ids = []
+    extra_paths = list(target_paths or [])
+    
+    if target_ids:
+        for tid in target_ids:
+            if isinstance(tid, int) or (isinstance(tid, str) and tid.isdigit()):
+                valid_numeric_ids.append(int(tid))
+            elif isinstance(tid, str):
+                extra_paths.append(tid)
+
+    if valid_numeric_ids:
+        placeholders = ",".join("?" for _ in valid_numeric_ids)
+        cursor.execute(f"SELECT id, path FROM videos WHERE id IN ({placeholders})", valid_numeric_ids)
+        video_rows.extend(cursor.fetchall())
+    
+    if extra_paths:
+        for p in extra_paths:
+            fn = os.path.basename(p)
+            cursor.execute("SELECT id, path FROM videos WHERE path = ? OR path = ? OR path LIKE ?", (p, f"uploaded_videos/{fn}", f"%{fn}"))
+            video_rows.extend(cursor.fetchall())
+
+    # Build unique mapping of id -> path
+    unique_videos = {r[0]: r[1] for r in video_rows}
+    
+    # Also clean unindexed physical files from disk if given in paths
+    for p in extra_paths:
+        fn = os.path.basename(p)
+        for candidate in [p, os.path.join(UPLOAD_DIR, fn), os.path.join("/app/videoModules/uploaded_videos", fn)]:
+            if os.path.exists(candidate):
+                try:
+                    os.remove(candidate)
+                except Exception:
+                    pass
+
+    if not unique_videos:
+        conn.commit()
+        return len(extra_paths) if extra_paths else 0
+
+    all_ids = list(unique_videos.keys())
+    id_placeholders = ",".join("?" for _ in all_ids)
+
+    # 1. Fetch face thumbnails to remove from disk
+    cursor.execute(f"SELECT thumbnail_path FROM faces WHERE video_id IN ({id_placeholders})", all_ids)
+    for (thumb_name,) in cursor.fetchall():
+        if thumb_name:
+            for candidate in [os.path.join(THUMB_DIR, thumb_name), os.path.join("static/face_thumbnails", thumb_name)]:
+                if os.path.exists(candidate):
+                    try:
+                        os.remove(candidate)
+                    except Exception:
+                        pass
+
+    # 2. Delete physical video files
+    for vid_id, path in unique_videos.items():
+        fn = os.path.basename(path)
+        for candidate in [path, os.path.join(UPLOAD_DIR, fn), os.path.join("/app/videoModules/uploaded_videos", fn)]:
+            if candidate and os.path.exists(candidate):
+                try:
+                    os.remove(candidate)
+                except Exception:
+                    pass
+
+    # 3. Clean database tables
+    cursor.execute(f"DELETE FROM faces WHERE video_id IN ({id_placeholders})", all_ids)
+    cursor.execute(f"DELETE FROM videos WHERE id IN ({id_placeholders})", all_ids)
+
+    # 4. Clean up orphaned persons (people with 0 remaining faces)
+    cursor.execute("DELETE FROM persons WHERE id NOT IN (SELECT DISTINCT person_id FROM faces WHERE person_id IS NOT NULL)")
+
+    conn.commit()
+
+    # 5. Rebuild FAISS index
+    try:
+        from core.vector_store import INDEX_PATH, DIM
+        import faiss
+        if os.path.exists(INDEX_PATH):
+            os.remove(INDEX_PATH)
+        new_index = faiss.IndexFlatIP(DIM)
+        cursor.execute("SELECT embedding FROM videos ORDER BY id ASC")
+        for (emb_json,) in cursor.fetchall():
+            if emb_json:
+                emb = np.array(json.loads(emb_json)).astype("float32")
+                new_index.add(np.array([emb]))
+        faiss.write_index(new_index, INDEX_PATH)
+        import core.vector_store
+        core.vector_store.index = new_index
+    except Exception as exc:
+        logger.warning("Error rebuilding FAISS index after deletion: %s", exc)
+
+    return len(unique_videos)
+
+
+@app.post("/videos/delete")
+async def delete_videos_endpoint(payload: DeleteVideosRequest):
+    """Delete selected videos by ID or path."""
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    deleted = _perform_video_deletion(cursor, conn, payload.video_ids, payload.paths)
+    conn.close()
+    return {"deleted": deleted, "count": deleted}
+
+
+@app.delete("/videos/{video_id}")
+async def delete_single_video_endpoint(video_id: str):
+    """Delete a single video by its database ID or path."""
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    if video_id.isdigit():
+        deleted = _perform_video_deletion(cursor, conn, [int(video_id)], None)
+    else:
+        deleted = _perform_video_deletion(cursor, conn, None, [video_id])
+    conn.close()
+    return {"deleted": deleted, "video_id": video_id}
+
 
 # --- DELETE VIDEOS BY TIME ---
 @app.delete("/videos/delete-by-time")
@@ -337,27 +721,15 @@ async def delete_videos_by_time(hours: float = Query(...)):
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
     # Select videos newer than cutoff (stored as TEXT timestamps)
-    print(f"DEBUG: Deleting videos newer than {cutoff_str}")
+    logger.info(f"DEBUG: Deleting videos newer than {cutoff_str}")
     cursor.execute(
         "SELECT id, path FROM videos WHERE datetime(created_at) >= ?",
         (cutoff_str,)
     )
     rows = cursor.fetchall()
-    print(f"DEBUG: Found {len(rows)} videos to delete")
-    deleted = 0
-    for vid_id, path in rows:
-        # Remove video file if it exists
-        try:
-            if os.path.exists(path):
-                os.remove(path)
-        except Exception:
-            pass
-        # Remove related faces
-        cursor.execute("DELETE FROM faces WHERE video_id=?", (vid_id,))
-        # Remove video record
-        cursor.execute("DELETE FROM videos WHERE id=?", (vid_id,))
-        deleted += 1
-    conn.commit()
+    logger.info(f"DEBUG: Found {len(rows)} videos to delete")
+    target_ids = [r[0] for r in rows]
+    deleted = _perform_video_deletion(cursor, conn, target_ids)
     conn.close()
     return {"deleted": deleted}
 
@@ -476,7 +848,7 @@ async def remove_blurred_faces():
                     reason = "corrupt image file"
 
         if should_delete:
-            print(f"DEBUG: Removing face {f_path} — {reason}")
+            logger.info(f"DEBUG: Removing face {f_path} — {reason}")
             cursor.execute("DELETE FROM faces WHERE id=?", (f_id,))
             full_path = os.path.join(THUMB_DIR, f_path)
             try:

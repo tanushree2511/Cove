@@ -84,3 +84,41 @@ videoModules/bulk_import/*
 
 cove2/*
 .claude/
+
+# --- AI / editor tool dirs ---
+.gemini/
+.mcp.json
+GEMINI.md
+graphify-out/
+
+# --- Model files (large binaries) ---
+models/
+*.zip
+*.deb
+*.AppImage
+*.tar.gz
+*.tar.bz2
+
+# --- Built binaries (Tauri / PyInstaller) ---
+frontend/src-tauri/bin/
+*.spec
+build_backend.py
+build_all.sh
+cove-backend.spec
+Dockerfile.tauri_build
+
+# --- Screenshot / test output images ---
+*.png
+*.jpg
+*.jpeg
+!frontend/src-tauri/icons/*.png
+!frontend/src-tauri/icons/*.ico
+!frontend/src-tauri/icons/*.icns
+
+# --- Benchmark outputs ---
+benchmarks/benchmark_results.json
+
+# --- Misc one-off scripts ---
+fix_imports.py
+test_e2e.py
+backend_server.py

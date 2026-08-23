@@ -39,6 +39,16 @@ export function useKeyboardShortcuts() {
         return;
       }
 
+      // Ctrl/Cmd + A → select all items in library
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'a') {
+        const state = useAppStore.getState();
+        if (state.activeView === 'library' && !state.activeMediaModal) {
+          e.preventDefault();
+          state.selectAllImages();
+          return;
+        }
+      }
+
       // Escape → close modal first, then clear selection
       if (e.key === 'Escape') {
         if (activeMediaModal) {

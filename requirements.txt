@@ -3,10 +3,8 @@ uvicorn[standard]
 insightface
 onnxruntime
 numpy
-opencv-python
+opencv-python-headless
 faiss-cpu
-hdbscan
-streamlit
 Pillow
 tokenizers
 requests
@@ -16,8 +14,8 @@ pytest
 httpx
 tqdm
 scipy
-torch
-torchvision
-transformers
 imageio-ffmpeg
 scenedetect[opencv]
+scikit-learn
+psutil
+python-multipart

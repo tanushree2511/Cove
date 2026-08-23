@@ -12,7 +12,6 @@ import { useAppStore } from '@/store/useAppStore';
 const NAV_ITEMS = [
   { id: 'library',  label: 'Library',  icon: Images   },
   { id: 'people',   label: 'People',   icon: Users    },
-  { id: 'video',    label: 'Videos',   icon: Film     },
   { id: 'search',   label: 'Search',   icon: Search   },
   { id: 'indexing', label: 'Indexing', icon: Activity },
   { id: 'settings', label: 'Settings', icon: Settings },
@@ -113,9 +112,12 @@ export function AppSidebar() {
                     animate={{ opacity: 1, width: 'auto' }}
                     exit={{ opacity: 0, width: 0 }}
                     transition={{ duration: 0.12 }}
-                    className="relative z-10 flex-1 flex items-center gap-1.5 truncate whitespace-nowrap"
+                    className="relative z-10 flex-1 flex items-center justify-between gap-1.5 truncate whitespace-nowrap"
                   >
-                    {item.label}
+                    <span>{item.label}</span>
+                    {item.id === 'indexing' && (
+                      <IndexingNavBadge />
+                    )}
                   </motion.span>
                 )}
               </AnimatePresence>
@@ -153,17 +155,47 @@ export function AppSidebar() {
   );
 }
 
+function IndexingNavBadge() {
+  const photoStatus = useAppStore((s) => s.indexingStatus);
+  const videoStatus = useAppStore((s) => s.videoIndexingStatus);
+
+  const isPhotoActive = Boolean(photoStatus?.isIndexing || photoStatus?.status === 'running');
+  const isVideoActive = Boolean(videoStatus?.status === 'processing');
+
+  if (!isPhotoActive && !isVideoActive) return null;
+
+  return (
+    <span className="flex h-2 w-2 relative">
+      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75" />
+      <span className="relative inline-flex rounded-full h-2 w-2 bg-primary" />
+    </span>
+  );
+}
+
 function IndexingMini({ collapsed }) {
-  const { isIndexing, progress, stage } = useAppStore((s) => s.indexingStatus);
-  if (!isIndexing) return null;
+  const photoStatus = useAppStore((s) => s.indexingStatus);
+  const videoStatus = useAppStore((s) => s.videoIndexingStatus);
+
+  const isPhotoActive = Boolean(photoStatus?.isIndexing || photoStatus?.status === 'running');
+  const isVideoActive = Boolean(videoStatus?.status === 'processing');
+
+  if (!isPhotoActive && !isVideoActive) return null;
+
+  const stage = isVideoActive
+    ? `Video AI (${videoStatus.current || 0}/${videoStatus.total || 1})`
+    : (photoStatus.stage || 'indexing');
+
+  const progress = isVideoActive
+    ? (videoStatus.total > 0 ? (videoStatus.current / videoStatus.total) * 100 : 50)
+    : (photoStatus.progress || 0);
 
   return (
     <div className="mx-2 mb-1 rounded-md bg-sidebar-accent/50 p-2 border border-border/40">
       <div className="flex items-center gap-2">
         {/* Pulsing dot */}
         <div className="relative h-1.5 w-1.5 flex-shrink-0">
-          <span className="absolute inset-0 rounded-full bg-success" />
-          <span className="absolute inset-0 rounded-full bg-success animate-pulse" />
+          <span className="absolute inset-0 rounded-full bg-primary" />
+          <span className="absolute inset-0 rounded-full bg-primary animate-pulse" />
         </div>
 
         <AnimatePresence>
@@ -178,7 +210,7 @@ function IndexingMini({ collapsed }) {
               <div className="mt-1 h-[3px] rounded-full bg-muted overflow-hidden">
                 <motion.div
                   className="h-full bg-gradient-to-r from-primary to-accent rounded-full"
-                  animate={{ width: `${progress}%` }}
+                  animate={{ width: `${Math.max(5, progress)}%` }}
                   transition={{ duration: 0.6, ease: 'easeOut' }}
                 />
               </div>
