@@ -43,39 +43,74 @@ const Index = () => {
             fetchAllVideoPersons().then(() => {}).catch(() => {});
         };
 
-        const pollIndexing = () => {
-            getIndexingStatus().then((status) => {
-                if (!isMounted || !status) return;
-                setIndexingStatus(status);
-                if (status.status === 'completed' && lastPhotoStatus === 'running') {
-                    refreshStats();
-                    refreshPhotos();
-                }
-                lastPhotoStatus = status.status;
-            }).catch(() => {});
+        let timeoutId = null;
 
-            getVideoJobStatus().then((vStatus) => {
-                if (!isMounted || !vStatus) return;
-                setVideoIndexingStatus(vStatus.bulk_index || { status: 'idle' });
-                const currentStatus = vStatus.bulk_index?.status;
-                if (currentStatus === 'completed' && lastVideoStatus === 'processing') {
-                    refreshVideos();
-                }
-                lastVideoStatus = currentStatus;
-            }).catch(() => {});
+        const scheduleNextPoll = (delay) => {
+            if (!isMounted) return;
+            if (timeoutId) clearTimeout(timeoutId);
+            timeoutId = setTimeout(runPoll, delay);
         };
 
+        const runPoll = async () => {
+            if (!isMounted || document.hidden) return;
+
+            let photoRunning = false;
+            let videoRunning = false;
+
+            try {
+                const status = await getIndexingStatus();
+                if (isMounted && status) {
+                    setIndexingStatus(status);
+                    photoRunning = Boolean(status.isIndexing || status.status === 'running');
+                    if (status.status === 'completed' && lastPhotoStatus === 'running') {
+                        refreshStats();
+                        refreshPhotos();
+                    }
+                    lastPhotoStatus = status.status;
+                }
+            } catch {
+                // Ignore transient errors
+            }
+
+            try {
+                const vStatus = await getVideoJobStatus();
+                if (isMounted && vStatus) {
+                    const bulkStatus = vStatus.bulk_index || { status: 'idle' };
+                    setVideoIndexingStatus(bulkStatus);
+                    videoRunning = bulkStatus.status === 'processing';
+                    if (bulkStatus.status === 'completed' && lastVideoStatus === 'processing') {
+                        refreshVideos();
+                    }
+                    lastVideoStatus = bulkStatus.status;
+                }
+            } catch {
+                // Ignore transient errors
+            }
+
+            if (!isMounted) return;
+            // Adaptive backoff: 1.5s while indexing, 10s when idle
+            const nextInterval = (photoRunning || videoRunning) ? 1500 : 10000;
+            scheduleNextPoll(nextInterval);
+        };
+
+        const handleVisibilityChange = () => {
+            if (!document.hidden && isMounted) {
+                runPoll();
+            }
+        };
+
+        document.addEventListener('visibilitychange', handleVisibilityChange);
+
         // Initial fetch
-        pollIndexing();
+        runPoll();
         refreshStats();
         refreshPhotos();
         refreshVideos();
 
-        const interval = setInterval(pollIndexing, 1200);
-
         return () => {
             isMounted = false;
-            clearInterval(interval);
+            if (timeoutId) clearTimeout(timeoutId);
+            document.removeEventListener('visibilitychange', handleVisibilityChange);
         };
     }, [setIndexingStatus, setVideoIndexingStatus, setSystemStats, setVideos, setImages, setClusters]);
 

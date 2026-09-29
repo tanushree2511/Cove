@@ -86,12 +86,12 @@ export async function renamePerson(personId, newName) {
 }
 
 /** Perform semantic search using CLIP embeddings */
-export async function searchImages(query, limit = 40) {
+export async function searchImages(query, limit = 40, threshold = 0.24) {
   if (!query?.trim()) return [];
   const res = await fetch(`${BASE}/search/text`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ text: query, limit, threshold: 0.01 }),
+    body: JSON.stringify({ text: query, limit, threshold }),
   });
   if (!res.ok) throw new Error('Search failed');
   const data = await res.json();
@@ -102,6 +102,7 @@ export async function searchImages(query, limit = 40) {
     thumbnail: mediaUrl(r.path),
     tags: [],
     score: r.score,
+    similarity: r.score,
   }));
 }
 

@@ -1,6 +1,7 @@
 /**
  * Settings view — real system stats, theme controls, library info, and app info.
  */
+import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useAppStore } from '@/store/useAppStore';
 import { Images, Users, Zap, HardDrive, Folder, Info, RefreshCw, Sun, Moon } from 'lucide-react';
@@ -12,6 +13,17 @@ export function SettingsView() {
   const setSystemStats = useAppStore((s) => s.setSystemStats);
   const theme        = useAppStore((s) => s.theme);
   const setTheme     = useAppStore((s) => s.setTheme);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    setLoading(true);
+    getSystemStats()
+      .then((stats) => {
+        if (stats) setSystemStats(stats);
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, [setSystemStats]);
 
   const cards = [
     {
@@ -35,12 +47,14 @@ export function SettingsView() {
   ];
 
   const refreshStats = () => {
+    setLoading(true);
     getSystemStats()
       .then((stats) => {
-        setSystemStats(stats);
+        if (stats) setSystemStats(stats);
         toast.success('System stats refreshed');
       })
-      .catch(() => toast.error('Failed to refresh system stats'));
+      .catch(() => toast.error('Failed to refresh system stats'))
+      .finally(() => setLoading(false));
   };
 
   return (
@@ -53,11 +67,12 @@ export function SettingsView() {
         </div>
         <button
           onClick={refreshStats}
+          disabled={loading}
           aria-label="Refresh system stats"
-          className="p-2 rounded-lg bg-card border border-border text-muted-foreground hover:text-foreground transition-colors"
+          className="p-2 rounded-lg bg-card border border-border text-muted-foreground hover:text-foreground disabled:opacity-50 transition-colors"
           title="Refresh System Stats"
         >
-          <RefreshCw size={14} />
+          <RefreshCw size={14} className={loading ? 'animate-spin' : ''} />
         </button>
       </div>
 
@@ -131,7 +146,7 @@ export function SettingsView() {
               <Folder size={14} className="text-muted-foreground" />
               Photo Library Directory
             </div>
-            <span className="text-[11px] mono text-muted-foreground">test_images/ (on the cove backend)</span>
+            <span className="text-[11px] mono text-muted-foreground">test_images/ (cove photo directory)</span>
           </div>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2 text-[13px] text-foreground">

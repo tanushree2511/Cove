@@ -45,7 +45,8 @@ function mapVideo(v) {
     label: v.label,
     tags: v.label ? v.label.split(',').map((s) => s.trim()).filter(Boolean) : [],
     date: v.created_at ? v.created_at.split(' ')[0] : 'Recent',
-    similarity: v.similarity,
+    score: v.score ?? v.similarity,
+    similarity: v.score ?? v.similarity,
   };
 }
 

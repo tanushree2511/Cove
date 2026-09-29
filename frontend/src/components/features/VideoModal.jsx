@@ -4,7 +4,7 @@
  */
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Download, Film, Calendar, Tag, Music, Loader2, Trash2 } from 'lucide-react';
+import { X, Download, Film, Calendar, Tag, Music, Loader2, Trash2, AlertCircle } from 'lucide-react';
 import { useAppStore } from '@/store/useAppStore';
 import { extractAudio, deleteSingleVideo, fetchVideos } from '@/lib/videoApi';
 import { toast } from 'sonner';
@@ -17,6 +17,11 @@ export function VideoModal() {
   const video        = activeMediaModal?.item;
 
   const [extracting, setExtracting] = useState(false);
+  const [videoError, setVideoError] = useState(false);
+
+  useEffect(() => {
+    setVideoError(false);
+  }, [video?.id, video?.src]);
 
   useEffect(() => {
     if (!isVideoModal) return;
@@ -69,13 +74,29 @@ export function VideoModal() {
           >
             {/* ── Video Player ── */}
             <div className="relative flex-1 bg-black flex items-center justify-center overflow-hidden">
-              <video
-                key={video.id}
-                src={video.src}
-                controls
-                autoPlay
-                className="w-full h-full object-contain"
-              />
+              {videoError ? (
+                <div className="flex flex-col items-center justify-center p-8 text-center max-w-sm">
+                  <div className="h-12 w-12 rounded-full bg-destructive/10 border border-destructive/20 flex items-center justify-center mb-3">
+                    <AlertCircle size={24} className="text-destructive" />
+                  </div>
+                  <h3 className="text-sm font-semibold text-white mb-1">Unable to stream video</h3>
+                  <p className="text-xs text-zinc-400 mb-4 leading-relaxed">
+                    The video stream returned an error or could not be found on the server.
+                  </p>
+                  <div className="rounded-lg bg-zinc-900 border border-zinc-800 p-2.5 w-full text-left font-mono text-[11px] text-zinc-400 truncate">
+                    {video.path || video.title}
+                  </div>
+                </div>
+              ) : (
+                <video
+                  key={video.id}
+                  src={video.src}
+                  controls
+                  autoPlay
+                  onError={() => setVideoError(true)}
+                  className="w-full h-full object-contain"
+                />
+              )}
             </div>
 
             {/* ── Video Info Sidebar ── */}

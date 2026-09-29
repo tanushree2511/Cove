@@ -6,6 +6,70 @@ a separate face/video indexing pipeline for video libraries (`videoModules/`).
 A single React frontend (`frontend/`) ties the photo features together; the
 video features currently live in their own Streamlit screen.
 
+---
+
+## ⚡ Quick Start
+
+### Requirements
+
+| Method | Requirements |
+|---|---|
+| **Docker** (recommended) | [Docker Desktop 4.x](https://www.docker.com/products/docker-desktop/) or Docker Engine + Compose v2 |
+| **Native** | Python 3.10+, Node.js 18+, [ffmpeg](https://ffmpeg.org/download.html) |
+
+> [!NOTE]
+> On first run the Docker build downloads ~600 MB of ML model weights. Subsequent
+> starts reuse the cached `cove_models` volume and are much faster.
+
+---
+
+### 🐳 Docker — any platform (recommended)
+
+```bash
+git clone <this-repo-url>
+cd Major-Project
+docker compose up
+```
+
+Open **<http://localhost:8080>**.
+
+#### With an NVIDIA GPU
+
+```bash
+docker compose -f docker-compose.yml -f docker-compose.gpu.yml up
+```
+
+---
+
+### 🐧 Linux / macOS — native
+
+```bash
+chmod +x start.sh
+./start.sh
+```
+
+`start.sh` will:
+- Create and populate `.venv` automatically if it doesn't exist
+- Auto-detect an NVIDIA GPU and set `VISION_FORCE_CPU` accordingly
+- Start **cove-api** (port 8000), **video-api** (port 8001), and the **React frontend** (port 8080)
+- Wait until cove-api is healthy, then print a success banner
+- Capture all service logs to `.logs/`
+- Shut everything down cleanly on **Ctrl+C**
+
+---
+
+### 🪟 Windows — native
+
+Double-click **`start.bat`** or run it in Command Prompt:
+
+```bat
+start.bat
+```
+
+`start.bat` will create `.venv`, start all three services, and automatically open **<http://localhost:8080>** in your browser after a 5-second delay. Logs are written to `.logs\`. Close the Command Prompt window (or press **Ctrl+C**) to stop all services.
+
+---
+
 This guide gets a fresh clone running end-to-end with Docker Compose — no
 manual Python/Node environment setup required.
 

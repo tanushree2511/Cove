@@ -151,9 +151,11 @@ export const useAppStore = create((set, get) => ({
   setTheme: (theme) => {
     set({ theme });
     if (theme === 'light') {
-      document.documentElement.classList.add('light-theme');
+      document.documentElement.classList.add('light-theme', 'light');
+      document.documentElement.classList.remove('dark');
     } else {
-      document.documentElement.classList.remove('light-theme');
+      document.documentElement.classList.remove('light-theme', 'light');
+      document.documentElement.classList.add('dark');
     }
   },
   toggleTheme: () => {

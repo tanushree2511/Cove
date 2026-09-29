@@ -53,7 +53,7 @@ export function SearchView() {
           const taggedImages = (images || []).map((img) => ({ ...img, type: 'photo', mediaType: 'photo' }));
           const taggedVideos = (videos || []).map((vid) => ({ ...vid, type: 'video', mediaType: 'video' }));
           const combined = [...taggedImages, ...taggedVideos].sort(
-            (a, b) => (b.similarity ?? 0) - (a.similarity ?? 0)
+            (a, b) => (b.similarity ?? b.score ?? 0) - (a.similarity ?? a.score ?? 0)
           );
           setSearchResults(combined);
         })
@@ -241,7 +241,7 @@ export function SearchView() {
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-[3px]">
               {filteredResults.map((item, i) => (
                 <motion.div
-                  key={item.id}
+                  key={item.path ? `${item.type || item.mediaType || 'media'}_${item.path}` : `${item.type || item.mediaType || 'media'}_${item.id ?? i}`}
                   initial={{ opacity: 0, scale: 0.97 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: Math.min(i * 0.015, 0.4), duration: 0.2 }}

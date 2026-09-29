@@ -1,11 +1,16 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Play } from 'lucide-react';
+import { Play, Loader2 } from 'lucide-react';
 import { useAppStore } from '@/store/useAppStore';
 
 export function VideoCard({ video }) {
   const [hovered, setHovered] = useState(false);
   const openMediaModal = useAppStore((s) => s.openMediaModal);
+
+  const isProcessing =
+    !video.thumb ||
+    video.label === 'Processing AI tags...' ||
+    video.status === 'processing';
 
   return (
     <div
@@ -24,37 +29,47 @@ export function VideoCard({ video }) {
       className="group cursor-pointer rounded-xl overflow-hidden border border-border bg-card hover:border-primary/40 transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-primary flex flex-col h-full"
     >
       {/* Thumbnail */}
-      <div className="relative overflow-hidden bg-black" style={{ height: 150 }}>
-        <video
-          src={video.thumb}
-          preload="metadata"
-          muted
-          playsInline
-          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
-
-        {/* Play overlay */}
-        <AnimatePresence>
-          {hovered && (
-            <motion.div
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.8 }}
-              transition={{ duration: 0.15 }}
-              className="absolute inset-0 flex items-center justify-center"
-            >
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm border border-white/30">
-                <Play size={14} fill="white" className="text-white ml-0.5" />
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {video.label && (
-          <div className="absolute top-2 right-2 rounded-full px-2 py-0.5 text-[10px] font-bold tracking-wide bg-primary text-primary-foreground capitalize">
-            {video.label}
+      <div className="relative overflow-hidden bg-muted/40" style={{ height: 150 }}>
+        {isProcessing ? (
+          <div className="w-full h-full flex flex-col items-center justify-center bg-muted/60 p-4 text-center">
+            <Loader2 size={24} className="text-primary animate-spin mb-1.5" />
+            <span className="text-[11px] font-medium text-foreground">Processing Video...</span>
+            <span className="text-[10px] text-muted-foreground mt-0.5">Extracting keyframes</span>
           </div>
+        ) : (
+          <>
+            <video
+              src={video.thumb}
+              preload="metadata"
+              muted
+              playsInline
+              className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent" />
+
+            {/* Play overlay */}
+            <AnimatePresence>
+              {hovered && (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.8 }}
+                  transition={{ duration: 0.15 }}
+                  className="absolute inset-0 flex items-center justify-center"
+                >
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-background/50 backdrop-blur-sm border border-foreground/20">
+                    <Play size={14} className="text-foreground ml-0.5 fill-current" />
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {video.label && (
+              <div className="absolute top-2 right-2 rounded-full px-2 py-0.5 text-[10px] font-bold tracking-wide bg-primary text-primary-foreground capitalize">
+                {video.label}
+              </div>
+            )}
+          </>
         )}
       </div>
 

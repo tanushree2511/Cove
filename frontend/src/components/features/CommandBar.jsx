@@ -33,8 +33,20 @@ export function CommandBar() {
   useEffect(() => {
     if (activeView === 'search' && inputRef.current) {
       inputRef.current.focus();
+      inputRef.current.select();
     }
   }, [activeView]);
+
+  useEffect(() => {
+    const handleFocusSearch = () => {
+      if (inputRef.current) {
+        inputRef.current.focus();
+        inputRef.current.select();
+      }
+    };
+    window.addEventListener('focus-search-input', handleFocusSearch);
+    return () => window.removeEventListener('focus-search-input', handleFocusSearch);
+  }, []);
 
   const handleSearch = (value) => {
     setSearchQuery(value);
@@ -214,7 +226,7 @@ export function CommandBar() {
           </button>
         )}
         <kbd className="hidden sm:inline-flex h-[18px] items-center rounded border border-border/60 bg-muted/50 px-1 text-[9px] font-mono text-muted-foreground flex-shrink-0">
-          ⌘F
+          ⌘K
         </kbd>
       </motion.div>
 

@@ -1,7 +1,7 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
-  "productName": "visionarchive-ai",
-  "version": "0.1.0",
+  "productName": "VisionArchive AI",
+  "version": "1.0.0",
   "identifier": "com.visionarchive.app",
   "build": {
     "frontendDist": "../dist",
@@ -14,10 +14,13 @@
     "windows": [
       {
         "title": "VisionArchive AI",
-        "width": 800,
-        "height": 600,
+        "width": 1280,
+        "height": 800,
+        "minWidth": 900,
+        "minHeight": 600,
         "resizable": true,
-        "fullscreen": false
+        "fullscreen": false,
+        "center": true
       }
     ],
     "security": {
@@ -26,8 +29,11 @@
   },
   "bundle": {
     "active": true,
-    "targets": ["deb"],
-    "externalBin": ["bin/cove-backend"],
+    "targets": "all",
+    "externalBin": [
+      "bin/cove-backend",
+      "bin/video-backend"
+    ],
     "icon": [
       "icons/32x32.png",
       "icons/128x128.png",
@@ -35,8 +41,17 @@
       "icons/icon.icns",
       "icons/icon.ico"
     ],
-    "android": {
-      "debugApplicationIdSuffix": ".debug"
+    "shortDescription": "Local-first AI photo and video manager",
+    "longDescription": "VisionArchive AI is a fully local, privacy-first photo and video manager with AI-powered face clustering and semantic search.",
+    "linux": {
+      "deb": {
+        "depends": ["ffmpeg", "libgl1", "libglib2.0-0"]
+      }
+    },
+    "windows": {
+      "wix": {
+        "language": "en-US"
+      }
     }
   }
 }

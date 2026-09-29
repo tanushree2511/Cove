@@ -127,7 +127,7 @@ if CONFIG.api_key:
 class SearchQuery(BaseModel):
     text: str
     limit: int = 40
-    threshold: float = 0.01
+    threshold: float = 0.24
 
 
 class ImageIndexRequest(BaseModel):
@@ -169,8 +169,18 @@ async def search_by_text(query: SearchQuery):
     if vector is None:
         raise HTTPException(status_code=422, detail='Unable to encode query')
 
-    results = search_storage.search(vector, k=query.limit)
-    filtered_results = [r for r in results if r['score'] >= query.threshold]
+    k_candidates = max(query.limit, 40)
+    results = search_storage.search(vector, k=k_candidates)
+    if not results:
+        return {'results': []}
+
+    top_score = results[0]['score']
+    min_floor = max(query.threshold, 0.245)
+    if top_score < min_floor:
+        return {'results': []}
+
+    adaptive_cutoff = max(min_floor, top_score * 0.90)
+    filtered_results = [r for r in results if r['score'] >= adaptive_cutoff][:query.limit]
     return {'results': filtered_results}
 
 

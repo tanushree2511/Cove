@@ -2,7 +2,7 @@ services:
   cove-api:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.gpu
       target: backend
     working_dir: /app/cove
     command:
@@ -19,18 +19,27 @@ services:
     environment:
       VISION_USER_DATA: /data/cove
       VISION_MODEL_DIR: /app/models
-      VISION_FORCE_CPU: "1"
-      VISION_AI_WORKERS: "2"
+      VISION_FORCE_CPU: "0"
+      VISION_USE_GPU: "1"
+      VISION_AI_WORKERS: "8"
     volumes:
       - cove_photos:/data/cove/test_images
       - cove_data:/data/cove
       - models:/app/models
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities:
+                - gpu
     restart: unless-stopped
 
   video-api:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.gpu
       target: backend
     working_dir: /app/videoModules
     command:
@@ -46,6 +55,9 @@ services:
       - "8001:8001"
     environment:
       VISION_MODEL_DIR: /app/models
+      VISION_FORCE_CPU: "0"
+      VISION_USE_GPU: "1"
+      VISION_AI_WORKERS: "8"
     volumes:
       - video_data:/app/videoModules/data
       - video_uploads:/app/videoModules/uploaded_videos
@@ -54,12 +66,20 @@ services:
       - video_insightface_cache:/root/.insightface
       - ./videoModules/bulk_import:/app/videoModules/bulk_import
       - models:/app/models
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities:
+                - gpu
     restart: unless-stopped
 
   frontend:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.gpu
       target: frontend
     ports:
       - "8080:80"

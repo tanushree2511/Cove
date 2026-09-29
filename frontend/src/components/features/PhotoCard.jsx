@@ -1,6 +1,6 @@
 import { memo, useState, useCallback, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { Check, Play, Film } from 'lucide-react';
+import { Check, Play, Film, Loader2 } from 'lucide-react';
 import { useAppStore } from '@/store/useAppStore';
 
 export const PhotoCard = memo(function PhotoCard({ image, isSelected, onSelect }) {
@@ -13,8 +13,15 @@ export const PhotoCard = memo(function PhotoCard({ image, isSelected, onSelect }
   const isVideo =
     image.type === 'video' ||
     image.mediaType === 'video' ||
-    /\.(mp4|mov|avi|mkv|webm)$/i.test(image.path || '') ||
-    Boolean(image.label);
+    image.media_type === 'video' ||
+    Boolean(image.video_id) ||
+    /\.(mp4|mov|avi|mkv|webm)$/i.test(image.path || image.filename || image.url || '');
+
+  const isProcessing =
+    isVideo &&
+    (image.label === 'Processing AI tags...' ||
+     image.status === 'processing' ||
+     (!image.thumbnail && !image.thumb));
 
   const handleClick = useCallback(
     (e) => {
@@ -81,8 +88,14 @@ export const PhotoCard = memo(function PhotoCard({ image, isSelected, onSelect }
 
       {/* Render Video or Photo */}
       {isVideo ? (
-        <div className="relative w-full h-full bg-slate-900">
-          {!imgError ? (
+        <div className="relative w-full h-full bg-muted/40">
+          {isProcessing ? (
+            <div className="w-full h-full flex flex-col items-center justify-center bg-muted/60 p-3 text-center">
+              <Loader2 size={24} className="text-primary animate-spin mb-1.5" />
+              <span className="text-[11px] font-medium text-foreground">Processing Video...</span>
+              <span className="text-[10px] text-muted-foreground mt-0.5 line-clamp-1">Extracting keyframes</span>
+            </div>
+          ) : !imgError ? (
             <img
               src={image.thumbnail || image.thumb}
               alt={image.title || 'Video preview'}
@@ -94,13 +107,13 @@ export const PhotoCard = memo(function PhotoCard({ image, isSelected, onSelect }
                 setLoaded(true);
               }}
               className={`
-                w-full h-full object-cover aspect-square bg-black
+                w-full h-full object-cover aspect-square bg-muted
                 transition-all duration-300 ease-out
                 ${loaded ? 'opacity-100' : 'opacity-0'}
               `}
             />
           ) : (
-            <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-slate-950 via-slate-900 to-primary/20 p-3 text-center">
+            <div className="w-full h-full flex flex-col items-center justify-center bg-muted/50 p-3 text-center">
               <Film size={26} className="text-primary/70 mb-1" />
               <span className="text-[10px] text-muted-foreground line-clamp-2 px-1">
                 {image.title || 'Video'}
@@ -108,16 +121,18 @@ export const PhotoCard = memo(function PhotoCard({ image, isSelected, onSelect }
             </div>
           )}
           {/* Subtle Video duration / badge indicator */}
-          <div className="absolute top-2 right-2 z-10 flex items-center gap-1 rounded-md bg-black/70 px-1.5 py-0.5 text-[10px] font-semibold text-white backdrop-blur-md shadow-sm pointer-events-none">
+          <div className="absolute top-2 right-2 z-10 flex items-center gap-1 rounded-md bg-background/80 text-foreground border border-border/50 px-1.5 py-0.5 text-[10px] font-semibold backdrop-blur-md shadow-sm pointer-events-none">
             <Film size={11} className="text-primary" />
             <span>VIDEO</span>
           </div>
           {/* Play button overlay on hover */}
-          <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg transform group-hover:scale-105 transition-transform">
-              <Play size={18} className="fill-current ml-0.5" />
+          {!isProcessing && (
+            <div className="absolute inset-0 z-10 flex items-center justify-center bg-background/20 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg transform group-hover:scale-105 transition-transform">
+                <Play size={18} className="fill-current ml-0.5" />
+              </div>
             </div>
-          </div>
+          )}
         </div>
       ) : (
         <img
@@ -137,7 +152,7 @@ export const PhotoCard = memo(function PhotoCard({ image, isSelected, onSelect }
 
       {/* Video Indicator Badge */}
       {isVideo && (
-        <div className="absolute bottom-2 left-2 z-10 flex items-center gap-1 rounded-md bg-black/70 px-2 py-0.5 text-[10px] font-medium text-white backdrop-blur-md shadow-sm max-w-[85%] truncate pointer-events-none">
+        <div className="absolute bottom-2 left-2 z-10 flex items-center gap-1 rounded-md bg-background/80 text-foreground border border-border/50 px-2 py-0.5 text-[10px] font-medium backdrop-blur-md shadow-sm max-w-[85%] truncate pointer-events-none">
           <span className="truncate">{image.label ? image.label : image.title}</span>
         </div>
       )}

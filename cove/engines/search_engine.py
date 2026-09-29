@@ -129,12 +129,29 @@ class SearchEngine:
                 return self._encode_single_text(q)
 
             # Ensemble prompts to capture both literal and descriptive contexts
-            templates = [
-                q,
-                f"a photo of {q}",
-                f"a photo of a {q}",
-                f"a picture showing {q}",
-            ]
+            templates = [q]
+            words = q.split()
+            starts_vowel = lower[0] in "aeiou" if lower else False
+            article = "an" if starts_vowel else "a"
+            if len(words) == 1:
+                templates.extend([
+                    f"a photo of {article} {q}",
+                    f"a photograph of {article} {q}",
+                    f"a picture of {article} {q}",
+                    f"a close-up photo of {article} {q}",
+                    f"a photo of the {q}",
+                    f"a photo of {q}",
+                ])
+            else:
+                templates.extend([
+                    f"a photo of {q}",
+                    f"a photograph of {q}",
+                    f"a picture showing {q}",
+                    f"an image of {q}",
+                ])
+                if not q[0].isupper():
+                    templates.append(f"a photo of {article} {q}")
+
             vectors = [self._encode_single_text(t) for t in templates]
             avg = np.mean(vectors, axis=0)
             norm = np.linalg.norm(avg)

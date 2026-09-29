@@ -32,6 +32,27 @@ def extract_frames(video_path, fast_mode=True):
                     frame = cv2.resize(frame, (int(w * scale), int(h * scale)))
                 raw_frames.append(frame)
 
+        # Fallback to sequential read if seeking yielded too few frames (e.g. truncated file or bad container index)
+        if len(raw_frames) < 4:
+            cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
+            seq_frames = []
+            while True:
+                ret, frame = cap.read()
+                if not ret:
+                    break
+                h, w = frame.shape[:2]
+                max_dim = max(w, h)
+                if max_dim > 1280:
+                    scale = 1280.0 / max_dim
+                    frame = cv2.resize(frame, (int(w * scale), int(h * scale)))
+                seq_frames.append(frame)
+            if len(seq_frames) > 0:
+                if len(seq_frames) > num_samples:
+                    sub_idx = np.linspace(0, len(seq_frames) - 1, num_samples).astype(int)
+                    raw_frames = [seq_frames[idx] for idx in sub_idx]
+                else:
+                    raw_frames = seq_frames
+
         # Filter near-duplicate consecutive frames to speed up while keeping narrative progression
         if len(raw_frames) > 4:
             hists = []

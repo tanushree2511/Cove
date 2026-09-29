@@ -18,22 +18,42 @@ export function useKeyboardShortcuts() {
 
   useEffect(() => {
     const handler = (e) => {
-      // Ignore shortcuts when focus is inside a text input
       const tag = document.activeElement?.tagName;
-      if (tag === 'INPUT' || tag === 'TEXTAREA') {
-        // Only allow Escape from inputs
-        if (e.key !== 'Escape') return;
+      const isInput = tag === 'INPUT' || tag === 'TEXTAREA';
+
+      // Escape → close modal first, then blur input, or clear selection
+      if (e.key === 'Escape') {
+        if (activeMediaModal) {
+          closeMediaModal();
+        } else if (isInput) {
+          document.activeElement?.blur();
+        } else {
+          clearSelection();
+        }
+        return;
       }
 
-      // Ctrl/Cmd + F → open search
-      if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
+      // Ctrl/Cmd + K or Ctrl/Cmd + F → focus and select search input (works from anywhere)
+      if ((e.ctrlKey || e.metaKey) && (e.key.toLowerCase() === 'k' || e.key.toLowerCase() === 'f')) {
         e.preventDefault();
         setActiveView('search');
+        window.dispatchEvent(new CustomEvent('focus-search-input'));
+        return;
+      }
+
+      // Ignore remaining shortcuts when typing inside an input
+      if (isInput) return;
+
+      // '/' → open and focus search
+      if (e.key === '/') {
+        e.preventDefault();
+        setActiveView('search');
+        window.dispatchEvent(new CustomEvent('focus-search-input'));
         return;
       }
 
       // Ctrl/Cmd + B → toggle sidebar
-      if ((e.ctrlKey || e.metaKey) && e.key === 'b') {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'b') {
         e.preventDefault();
         toggleSidebar();
         return;
@@ -46,15 +66,6 @@ export function useKeyboardShortcuts() {
           e.preventDefault();
           state.selectAllImages();
           return;
-        }
-      }
-
-      // Escape → close modal first, then clear selection
-      if (e.key === 'Escape') {
-        if (activeMediaModal) {
-          closeMediaModal();
-        } else {
-          clearSelection();
         }
       }
     };

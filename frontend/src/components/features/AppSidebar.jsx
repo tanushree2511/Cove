@@ -12,6 +12,7 @@ import { useAppStore } from '@/store/useAppStore';
 const NAV_ITEMS = [
   { id: 'library',  label: 'Library',  icon: Images   },
   { id: 'people',   label: 'People',   icon: Users    },
+  { id: 'video',    label: 'Videos',   icon: Film     },
   { id: 'search',   label: 'Search',   icon: Search   },
   { id: 'indexing', label: 'Indexing', icon: Activity },
   { id: 'settings', label: 'Settings', icon: Settings },

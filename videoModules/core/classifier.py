@@ -4,37 +4,38 @@ from .embedder import encode_text
 
 LABEL_DEFINITIONS = {
     # --- Everyday Life & People ---
-    "person talking": {"group": "people", "prompts": ["a person talking to the camera", "someone speaking", "a close-up of a person talking"]},
-    "person smiling": {"group": "people", "prompts": ["a person smiling", "someone looking happy", "a portrait of a smiling person"]},
-    "group of people": {"group": "people", "prompts": ["a group of people", "a crowd", "many people gathered together"]},
-    "selfie video": {"group": "people", "prompts": ["a selfie video", "someone filming themselves", "a vlogger looking at camera"]},
+    "person talking": {"group": "people", "prompts": ["a video of people talking", "two people talking", "a person talking to camera", "an interview with people speaking", "someone talking"]},
+    "person smiling": {"group": "people", "prompts": ["a person smiling happily", "people smiling at the camera", "a portrait of smiling people"]},
+    "group of people": {"group": "people", "prompts": ["a group of multiple people gathered together", "two or more people together", "a crowd of people"]},
+    "selfie video": {"group": "people", "prompts": ["a selfie video of someone filming themselves", "a vlogger holding a phone camera"]},
     "party or celebration": {"group": "people", "prompts": ["a party", "people celebrating", "a festive gathering with friends"]},
     "children playing": {"group": "people", "prompts": ["children playing", "kids having fun", "young children running around"]},
     
     # --- Nature & Outdoors ---
-    "forest or trees": {"group": "nature", "prompts": ["a dense forest", "trees in nature", "woodland scenery"]},
+    "forest or trees": {"group": "nature", "prompts": ["a dense forest with green trees", "woodland nature and trees"]},
     "beach or ocean": {"group": "nature", "prompts": ["a sandy beach", "ocean waves crashing", "coastline scenery"]},
-    "mountains": {"group": "nature", "prompts": ["high mountains", "mountain landscape", "snowy mountain peaks"]},
+    "mountains": {"group": "nature", "prompts": ["snowy mountain peaks", "high mountains landscape"]},
     "sunset or sunrise": {"group": "nature", "prompts": ["a beautiful sunset", "sun setting in the sky", "colorful sunrise"]},
     "snow or winter": {"group": "nature", "prompts": ["snow falling", "a winter landscape", "ground covered in snow"]},
     "underwater nature": {"group": "nature", "prompts": ["underwater marine life", "swimming underwater", "fishes in the ocean"]},
-    "flower garden": {"group": "nature", "prompts": ["colorful flowers", "a blooming garden", "close up of a flower"]},
+    "flower garden": {"group": "nature", "prompts": ["blooming colorful flower garden", "flowers in nature"]},
+    "rain or storm": {"group": "nature", "prompts": ["rain drops falling", "rainfall and storm", "rain on a window glass", "rainy weather"]},
     
     # --- Animals & Pets ---
-    "dog playing": {"group": "animals", "prompts": ["a dog playing", "a happy dog", "someone walking a dog"]},
-    "cat resting": {"group": "animals", "prompts": ["a cat sleeping or resting", "a domestic cat", "a kitten"]},
+    "dog playing": {"group": "animals", "prompts": ["a dog playing or running", "a domestic dog or puppy"]},
+    "cat resting": {"group": "animals", "prompts": ["a cat resting or sleeping", "a domestic cat or kitten"]},
     "bird flying": {"group": "animals", "prompts": ["a bird flying in the sky", "a flock of birds", "a bird perched on a branch"]},
-    "wild animal": {"group": "animals", "prompts": ["a wild animal", "wildlife documentary footage", "animal in the wild"]},
+    "wild animal": {"group": "animals", "prompts": ["wild animal in nature", "wildlife documentary animals"]},
     "fish or marine life": {"group": "animals", "prompts": ["fish swimming", "aquarium", "marine animals like jellyfish or fish"]},
     
     # --- Vehicles & Travel ---
-    "car driving": {"group": "travel", "prompts": ["a car driving on a road", "driving view from inside a car", "traffic on a street"]},
+    "car driving": {"group": "travel", "prompts": ["a car driving on a road or highway", "automobile in traffic"]},
     "airplane flying": {"group": "travel", "prompts": ["an airplane in the sky", "a plane taking off", "looking out an airplane window"]},
     "train moving": {"group": "travel", "prompts": ["a train on train tracks", "subway moving", "riding a train"]},
     "city street": {"group": "travel", "prompts": ["a busy city street", "urban architecture", "buildings and skyscrapers"]},
     
     # --- Home & Activities ---
-    "cooking or food": {"group": "home", "prompts": ["cooking food in a kitchen", "a delicious meal", "someone preparing food"]},
+    "cooking or food": {"group": "home", "prompts": ["cooking food in a kitchen", "preparing a meal", "cooking delicious food"]},
     "eating or drinking": {"group": "home", "prompts": ["someone eating food", "drinking from a cup", "enjoying a meal"]},
     "reading a book": {"group": "home", "prompts": ["reading a book", "studying at a desk", "looking at pages of a book"]},
     "working on computer": {"group": "home", "prompts": ["typing on a laptop", "working at a computer desk", "staring at a screen"]},
@@ -42,12 +43,10 @@ LABEL_DEFINITIONS = {
     "playing music": {"group": "home", "prompts": ["playing a musical instrument", "playing guitar or piano", "a musical performance"]},
     
     # --- Media & Formats ---
-    "screen recording": {"group": "media", "prompts": ["a computer screen recording", "screencast video", "software interface"]},
-    "animation or cartoon": {"group": "media", "prompts": ["a 3d animated movie", "cartoon animation", "CGI graphics"]},
-    "news broadcast": {"group": "media", "prompts": ["a news anchor on television", "a news broadcast", "TV news graphics"]},
-    "text on screen": {"group": "media", "prompts": ["text written on a screen", "title card", "presentation slides"]},
-    "abstract visuals": {"group": "media", "prompts": ["abstract colorful visuals", "kaleidoscope patterns", "generated visual art"]},
-    "historical footage": {"group": "media", "prompts": ["black and white historical footage", "old vintage video", "sepia tone classic video"]}
+    "screen recording": {"group": "media", "prompts": ["a screen recording of a computer desktop showing software windows and mouse cursor", "a screencast capturing computer monitor operating system desktop", "screen recording of computer software and browser windows"]},
+    "animation or cartoon": {"group": "media", "prompts": ["an animated cartoon movie", "animated illustrated characters", "a 3D CGI cartoon animation with animated characters"]},
+    "news broadcast": {"group": "media", "prompts": ["a news anchor in a television news studio", "TV news broadcast studio with news anchor"]},
+    "text on screen": {"group": "media", "prompts": ["a video of text slides with title card and text on screen", "written text presentation"]}
 }
 
 
@@ -152,42 +151,22 @@ def classify_video(video_embedding):
     if not isinstance(video_embedding, np.ndarray):
         video_embedding = np.array(video_embedding, dtype=np.float32)
         
+    video_embedding = video_embedding.reshape(-1)
     norm = np.linalg.norm(video_embedding)
     if norm > 0:
         video_embedding = video_embedding / norm
-    
-    if video_embedding.ndim == 1:
-        video_embedding = np.expand_dims(video_embedding, axis=0)
+    video_embedding = np.expand_dims(video_embedding, axis=0)
         
-    # 1. Compute super-category probabilities P(group)
-    super_logits = 100.0 * (video_embedding @ super_features.T)
-    super_probs = softmax(super_logits)  # shape: [1, 5]
+    # Compute direct cosine similarities across all calibrated label representations
+    sims = (video_embedding[0] @ text_features.T).astype(np.float32)
     
-    # 2. Compute fine-grained category probabilities P(label)
-    label_logits = 100.0 * (video_embedding @ text_features.T)
-    label_probs = softmax(label_logits)  # shape: [1, 154]
-    
-    # 3. Apply Bayesian Gating: P(label) = P_flat(label) * P(group_of_label)
-    super_keys = list(SUPER_CATEGORIES.keys())
-    group_probs = []
-    for label in LABELS:
-        group = LABEL_DEFINITIONS[label]["group"]
-        group_idx = super_keys.index(group)
-        group_probs.append(super_probs[0, group_idx])
-        
-    group_probs = np.array(group_probs)  # shape: [154]
-    
-    # Joint probability
-    joint_probs = label_probs[0] * group_probs
-    
-    # 4. Exemplar Learning Boost
+    # Exemplar Learning Boost
     try:
         from core.database import get_all_feedback
         feedback_list = get_all_feedback()
     except Exception:
         feedback_list = []
         
-    feedback_boosts = np.zeros(len(LABELS))
     for corrected_label, embedding_str in feedback_list:
         if corrected_label in LABELS and embedding_str:
             try:
@@ -197,28 +176,20 @@ def classify_video(video_embedding):
                     emb = emb / emb_norm
                 
                 sim = np.clip(np.dot(video_embedding[0], emb), 0.0, 1.0)
-                
                 if sim > 0.80:
-                    boost = 2.0 * ((sim - 0.80) / 0.20)
+                    boost = 0.05 * ((sim - 0.80) / 0.20)
                     label_idx = LABELS.index(corrected_label)
-                    feedback_boosts[label_idx] = max(feedback_boosts[label_idx], boost)
+                    sims[label_idx] += boost
             except Exception:
                 pass
                 
-    joint_probs = joint_probs + feedback_boosts
-    
-    # Normalize joint probabilities
-    joint_probs = joint_probs / np.sum(joint_probs)
-    
-    # 5. Multi-Label Extraction
-    max_prob = np.max(joint_probs)
-    selected_with_probs = []
-    
-    for i, prob in enumerate(joint_probs):
-        if prob >= 0.40 * max_prob and prob > 0.02:
-            selected_with_probs.append((LABELS[i], prob))
-            
-    selected_with_probs.sort(key=lambda x: x[1], reverse=True)
-    selected_labels = [x[0] for x in selected_with_probs]
-    
+    max_sim = float(np.max(sims))
+    if max_sim < 0.220:
+        return "video"
+        
+    # Adaptive relative margin filtering: select top-performing labels within 0.005 of the best match
+    cutoff = max(max_sim - 0.005, 0.245)
+    selected = [(LABELS[i], sims[i]) for i in range(len(LABELS)) if sims[i] >= cutoff]
+    selected.sort(key=lambda x: x[1], reverse=True)
+    selected_labels = [s[0] for s in selected[:3]]
     return ", ".join(selected_labels)

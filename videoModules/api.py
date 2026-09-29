@@ -471,40 +471,74 @@ async def clear_jobs():
     return {"message": "Cleared"}
 
 @app.post("/search")
-async def search(query: str, threshold: float = 0.23):
-    # Ensembled text prompts for robust CLIP semantic matching
-    prompts = [
-        f"a video of {query}",
-        f"a video showing {query}",
-        f"a scene with {query}",
-        query
-    ]
+async def search(query: str, threshold: float = 0.24):
+    q_clean = query.strip().lower()
+    words = q_clean.split()
     
-    if any(x in query.lower() for x in ["person", "someone", "people", "man", "woman", "boy", "girl"]):
-        prompts.append(f"a person {query}")
-        prompts.append(f"someone performing {query}")
-        
-    if any(x in query.lower() for x in ["sign", "gesture", "hand", "finger"]):
-        prompts.append(f"a person using hand gestures to {query}")
-        prompts.append(f"sign language or hand movement showing {query}")
+    if len(words) == 1:
+        article = "an" if q_clean[0] in "aeiou" else "a"
+        prompts = [
+            f"a video of {article} {q_clean}",
+            f"a video showing {article} {q_clean}",
+            f"footage of {article} {q_clean}",
+            q_clean
+        ]
+    else:
+        prompts = [
+            f"a video of {q_clean}",
+            f"a video showing {q_clean}",
+            f"footage of {q_clean}",
+            q_clean
+        ]
+    
+    if any(x in q_clean for x in ["person", "someone", "people", "man", "woman", "boy", "girl"]):
+        prompts.append(f"a video of people {q_clean}")
         
     embs = [encode_text(p) for p in prompts]
     q_emb = np.mean(embs, axis=0)
     q_emb = q_emb / np.linalg.norm(q_emb)
     
+    import re
     scores, indices = search_vector(q_emb, top_k=50)
-    results = []
+    candidates = []
+    seen_vids = set()
+    
+    query_terms = set(re.findall(r'\b\w+\b', q_clean))
+    meaningful_terms = [t for t in query_terms if len(t) > 2]
     
     for score, idx in zip(scores, indices):
+        if int(idx) < 0:
+            continue
         raw_score = float(score)
-        if raw_score >= threshold:  # Inclusive threshold for semantic matching
-            video = get_video_by_index(idx)
-            if video:
-                v_id, v_path, v_label = video[0], video[1], video[2]
-                results.append({"id": v_id, "path": v_path, "label": v_label, "score": raw_score})
+        video = get_video_by_index(idx)
+        if video:
+            v_id, v_path, v_label = video[0], video[1], video[2]
+            if v_id in seen_vids:
+                continue
+            seen_vids.add(v_id)
+            
+            label_lower = (v_label or "").lower()
+            fn_lower = os.path.basename(v_path).lower()
+            label_words = set(re.findall(r'\b\w+\b', label_lower))
+            fn_words = set(re.findall(r'\b\w+\b', fn_lower))
+            
+            # Hybrid relevance boost only if meaningful query terms match as whole words
+            if any(term in label_words or term in fn_words for term in meaningful_terms):
+                raw_score = max(raw_score, 0.285)
+                
+            candidates.append({"id": v_id, "path": v_path, "label": v_label, "score": raw_score})
     
-    # Sort by true CLIP semantic similarity score
-    results.sort(key=lambda x: x['score'], reverse=True)
+    if not candidates:
+        return {"results": []}
+
+    candidates.sort(key=lambda x: x['score'], reverse=True)
+    top_score = candidates[0]['score']
+    min_floor = max(threshold, 0.260)
+    if top_score < min_floor:
+        return {"results": []}
+
+    adaptive_cutoff = max(min_floor, top_score * 0.90)
+    results = [c for c in candidates if c['score'] >= adaptive_cutoff]
     return {"results": results}
 
 @app.get("/videos")
