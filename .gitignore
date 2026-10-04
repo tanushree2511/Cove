@@ -1,0 +1,124 @@
+docker-compose.override.yml
+
+# --- Python (cove/, videoModules/) ---
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# Virtual environments
+venv/
+.venv/
+env/
+ENV/
+
+# Python tooling caches
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# --- Node / React frontend ---
+frontend/node_modules/
+frontend/dist/
+frontend/dist-ssr/
+frontend/.vite/
+frontend/coverage/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# --- Data & model artifacts ---
+# ML models, embeddings, and vector indexes are large binaries and
+# should not be committed; fetch/generate them via download_models.py etc.
+cove/models/*.onnx
+cove/models/*.pt
+cove/models/*.pth
+*.onnx
+*.npy
+*.npz
+*.pkl
+
+# Databases / vector stores generated at runtime
+*.db
+*.sqlite
+*.sqlite3
+
+# Media assets ingested/produced by the pipelines
+*.mp4
+*.avi
+*.mov
+*.mkv
+uploads/
+media/
+known_faces/
+
+# --- Logs ---
+*.log
+logs/
+
+# --- Env / secrets ---
+.env
+.env.*
+!.env.example
+
+# --- OS / editor ---
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+MajorProject/
+
+cove/test_images/
+cove/test_images_full_backup/
+test_images/
+
+videoModules/bulk_import/*
+!videoModules/bulk_import/.gitkeep
+
+cove2/*
+.claude/
+
+# --- AI / editor tool dirs ---
+.gemini/
+.mcp.json
+GEMINI.md
+graphify-out/
+
+# --- Model files (large binaries) ---
+models/
+*.zip
+*.deb
+*.AppImage
+*.tar.gz
+*.tar.bz2
+
+# --- Built binaries (Tauri / PyInstaller) ---
+frontend/src-tauri/bin/
+*.spec
+build_backend.py
+build_all.sh
+cove-backend.spec
+Dockerfile.tauri_build
+
+# --- Screenshot / test output images ---
+*.png
+*.jpg
+*.jpeg
+!frontend/src-tauri/icons/*.png
+!frontend/src-tauri/icons/*.ico
+!frontend/src-tauri/icons/*.icns
+
+# --- Benchmark outputs ---
+benchmarks/benchmark_results.json
+
+# --- Misc one-off scripts ---
+fix_imports.py
+test_e2e.py
+backend_server.py

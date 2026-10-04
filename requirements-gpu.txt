@@ -1,7 +1,7 @@
 fastapi
 uvicorn[standard]
 insightface
-onnxruntime
+onnxruntime-gpu
 numpy
 opencv-python-headless
 faiss-cpu

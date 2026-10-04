@@ -1,0 +1,101 @@
+name: cove
+
+services:
+  cove-api:
+    build:
+      context: .
+      dockerfile: Dockerfile.gpu
+      target: backend
+    working_dir: /app/cove
+    command:
+      - python3
+      - -m
+      - uvicorn
+      - api.server:app
+      - --host
+      - 0.0.0.0
+      - --port
+      - "8000"
+    ports:
+      - "8000:8000"
+    environment:
+      COVE_USER_DATA: /data/cove
+      COVE_MODEL_DIR: /app/models
+      COVE_FORCE_CPU: "0"
+      COVE_USE_GPU: "1"
+      COVE_AI_WORKERS: "8"
+    volumes:
+      - cove_photos:/data/cove/test_images
+      - cove_data:/data/cove
+      - models:/app/models
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities:
+                - gpu
+    restart: unless-stopped
+
+  video-api:
+    build:
+      context: .
+      dockerfile: Dockerfile.gpu
+      target: backend
+    working_dir: /app/videoModules
+    command:
+      - python3
+      - -m
+      - uvicorn
+      - api:app
+      - --host
+      - 0.0.0.0
+      - --port
+      - "8001"
+    ports:
+      - "8001:8001"
+    environment:
+      COVE_MODEL_DIR: /app/models
+      COVE_FORCE_CPU: "0"
+      COVE_USE_GPU: "1"
+      COVE_AI_WORKERS: "8"
+    volumes:
+      - video_data:/app/videoModules/data
+      - video_uploads:/app/videoModules/uploaded_videos
+      - video_static:/app/videoModules/static
+      - video_hf_cache:/root/.cache/huggingface
+      - video_insightface_cache:/root/.insightface
+      - ./videoModules/bulk_import:/app/videoModules/bulk_import
+      - models:/app/models
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities:
+                - gpu
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.gpu
+      target: frontend
+    ports:
+      - "8080:80"
+    depends_on:
+      - cove-api
+      - video-api
+    restart: unless-stopped
+
+volumes:
+  cove_photos:
+  cove_data:
+  models:
+  video_data:
+  video_uploads:
+  video_static:
+  video_hf_cache:
+  video_insightface_cache:
