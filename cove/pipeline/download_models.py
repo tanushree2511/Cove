@@ -8,6 +8,13 @@ if _project_root not in sys.path:
 
 from config.vision_config import CONFIG
 
+# The progress lines use emoji; a piped Windows console (CI, redirected output) defaults to cp1252 and would crash on them.
+for _stream in (sys.stdout, sys.stderr):
+    try:
+        _stream.reconfigure(encoding="utf-8", errors="replace")
+    except (AttributeError, ValueError):
+        pass
+
 # CLIP ViT-B/16, full precision (~570 MB). Compared with the previous int8 ViT-B/32 it raised COCO-1k
 # text->image Recall@1 from 39% to 51% and UCF101 video-tagging top-1 from 58% to 70%.
 # (Set COVE_CLIP_MODEL=b32 to keep using a legacy clip_image.onnx / clip_text.onnx pair.)

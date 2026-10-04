@@ -61,7 +61,7 @@ def host_triple() -> str:
 
 def fetch_models() -> None:
     """CLIP (ONNX, from Hugging Face) + the InsightFace buffalo_s bundle, into <repo>/models (resumable, idempotent)."""
-    env = dict(os.environ, COVE_MODEL_DIR=MODELS_DIR)
+    env = dict(os.environ, COVE_MODEL_DIR=MODELS_DIR, PYTHONUTF8="1")
     os.makedirs(MODELS_DIR, exist_ok=True)
     subprocess.run([sys.executable, os.path.join(COVE, "pipeline", "download_models.py")], check=True, env=env)
     if not os.path.isdir(os.path.join(MODELS_DIR, "models", "buffalo_s")) and not os.path.isdir(os.path.join(MODELS_DIR, "buffalo_s")):
@@ -71,7 +71,7 @@ def fetch_models() -> None:
             "providers=['CPUExecutionProvider'])\n"
             "app.prepare(ctx_id=-1, det_size=(320, 320))\n"
         )
-        subprocess.run([sys.executable, "-c", code], check=True)
+        subprocess.run([sys.executable, "-c", code], check=True, env=env)
     if not os.path.isdir(os.path.join(MODELS_DIR, "buffalo_s")):
         raise SystemExit(f"buffalo_s face model missing from {MODELS_DIR} after download")
 

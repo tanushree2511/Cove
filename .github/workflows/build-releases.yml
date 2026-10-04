@@ -5,6 +5,9 @@ on:
       - 'v*'
   workflow_dispatch:
 
+env:
+  PYTHONUTF8: '1'   # Windows runners pipe output as cp1252, which cannot print the emoji in our scripts
+
 jobs:
   build:
     # Windows only for now: the backend packaging (DirectML onnxruntime, bundled ffmpeg, sidecar naming) is
