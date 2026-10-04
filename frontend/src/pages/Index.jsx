@@ -7,7 +7,7 @@ import { useEffect } from 'react';
 import { DesktopLayout } from '@/layouts/DesktopLayout';
 import { useAppStore } from '@/store/useAppStore';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
-import { getIndexingStatus, getSystemStats, fetchImages, fetchClusters } from '@/lib/coveApi';
+import { getIndexingStatus, getSystemStats, fetchAllImages, fetchClusters } from '@/lib/coveApi';
 import { getVideoJobStatus, fetchVideos, fetchAllVideoPersons } from '@/lib/videoApi';
 
 const Index = () => {
@@ -28,7 +28,7 @@ const Index = () => {
         }).catch(() => {});
 
         const refreshPhotos = () => {
-            fetchImages(0, 1000).then((imgs) => {
+            fetchAllImages().then((imgs) => {
                 if (isMounted && imgs) setImages(imgs);
             }).catch(() => {});
             fetchClusters().then((cls) => {

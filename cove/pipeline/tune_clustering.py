@@ -13,7 +13,7 @@ from engines.person_manager import PersonManager
 from config.vision_config import CONFIG
 
 def main():
-    print("⚡ VISION ARCHIVE: INSTANT TUNER (Threshold Mode) ⚡")
+    print("⚡ COVE: INSTANT TUNER (Threshold Mode) ⚡")
     
     # Load Vectors from the CONFIG paths (Fixed by fix_data.py)
     if os.path.exists(CONFIG.embeddings_file):

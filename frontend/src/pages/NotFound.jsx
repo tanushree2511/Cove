@@ -26,7 +26,7 @@ const NotFound = () => {
                 <h1 className="mb-2 text-3xl font-bold text-foreground">404</h1>
                 <h2 className="mb-2 text-base font-semibold text-foreground">Page Not Found</h2>
                 <p className="mb-6 text-[13px] text-muted-foreground leading-relaxed">
-                    The path <code className="rounded bg-muted px-1.5 py-0.5 mono text-[11px] text-foreground">{location.pathname}</code> does not exist in VisionArchive.
+                    The path <code className="rounded bg-muted px-1.5 py-0.5 mono text-[11px] text-foreground">{location.pathname}</code> does not exist in Cove.
                 </p>
                 <Link
                     to="/"

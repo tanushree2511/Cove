@@ -1,8 +1,8 @@
-# VisionArchive AI
+# Cove
 
 > A local-first, AI-powered photo management desktop app built with React and Vite.
 
-![VisionArchive AI](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=white)
+![Cove](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=white)
 ![Vite](https://img.shields.io/badge/Vite-5-646CFF?logo=vite&logoColor=white)
 ![Zustand](https://img.shields.io/badge/State-Zustand-FF4154)
 ![License](https://img.shields.io/badge/license-MIT-green)
@@ -85,8 +85,8 @@ src/
 ### Installation
 
 ```bash
-git clone https://github.com/your-username/visionarchive-ai.git
-cd visionarchive-ai/frontend/cove
+git clone https://github.com/your-username/cove.git
+cd cove/frontend/cove
 npm install
 ```
 
@@ -138,4 +138,4 @@ npm run test
 
 ## License
 
-MIT © VisionArchive AI
+MIT © Cove

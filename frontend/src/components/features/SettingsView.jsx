@@ -1,12 +1,22 @@
 /**
- * Settings view — real system stats, theme controls, library info, and app info.
+ * Settings view - real system stats, theme controls, library info, and app info.
  */
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useAppStore } from '@/store/useAppStore';
-import { Images, Users, Zap, HardDrive, Folder, Info, RefreshCw, Sun, Moon } from 'lucide-react';
+import { Images, Users, Zap, HardDrive, Folder, RefreshCw, Sun, Moon } from 'lucide-react';
 import { toast } from 'sonner';
 import { getSystemStats } from '@/lib/coveApi';
+import { CoveMark } from '@/components/CoveMark';
+
+function Section({ id, title, children }) {
+  return (
+    <section className="mb-9" aria-labelledby={id}>
+      <p id={id} className="eyebrow mb-3">{title}</p>
+      {children}
+    </section>
+  );
+}
 
 export function SettingsView() {
   const systemStats  = useAppStore((s) => s.systemStats);
@@ -27,13 +37,13 @@ export function SettingsView() {
 
   const cards = [
     {
-      label: 'Photos Indexed',
+      label: 'Photos indexed',
       value: systemStats.totalImages.toLocaleString(),
       icon:  Images,
       color: 'text-primary',
     },
     {
-      label: 'People Detected',
+      label: 'People detected',
       value: systemStats.totalPeople.toLocaleString(),
       icon:  Users,
       color: 'text-accent',
@@ -57,115 +67,96 @@ export function SettingsView() {
       .finally(() => setLoading(false));
   };
 
+  const themeBtn = (id, label, Icon) => (
+    <button
+      onClick={() => setTheme(id)}
+      aria-pressed={theme === id}
+      className={`flex items-center gap-1.5 rounded-full px-4 py-1.5 text-[13px] font-medium transition-all ${
+        theme === id ? 'bg-foreground text-background shadow-sm' : 'text-muted-foreground hover:text-foreground'
+      }`}
+    >
+      <Icon size={14} /> {label}
+    </button>
+  );
+
   return (
-    <div className="h-full overflow-auto p-6 max-w-xl mx-auto">
-      {/* Page header */}
-      <div className="mb-8 flex items-center justify-between">
-        <div>
-          <h1 className="text-[15px] font-semibold text-foreground mb-0.5">Settings</h1>
-          <p className="text-[12px] text-muted-foreground">Configure VisionArchive AI preferences</p>
-        </div>
-        <button
-          onClick={refreshStats}
-          disabled={loading}
-          aria-label="Refresh system stats"
-          className="p-2 rounded-lg bg-card border border-border text-muted-foreground hover:text-foreground disabled:opacity-50 transition-colors"
-          title="Refresh System Stats"
-        >
-          <RefreshCw size={14} className={loading ? 'animate-spin' : ''} />
-        </button>
-      </div>
-
-      {/* System stat cards */}
-      <section className="mb-8" aria-labelledby="stats-heading">
-        <p id="stats-heading" className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground/60 mb-3">
-          Library &amp; Acceleration
-        </p>
-        <div className="grid grid-cols-3 gap-3">
-          {cards.map((card, i) => (
-            <motion.div
-              key={card.label}
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.06 }}
-              className="rounded-xl border border-border bg-card p-4 text-center shadow-sm"
-            >
-              <card.icon size={16} className={`mx-auto mb-2 ${card.color}`} />
-              <p className="text-[18px] font-semibold text-foreground mono">{card.value}</p>
-              <p className="text-[10px] text-muted-foreground mt-0.5">{card.label}</p>
-            </motion.div>
-          ))}
-        </div>
-      </section>
-
-      {/* Appearance */}
-      <section className="mb-8" aria-labelledby="appearance-heading">
-        <p id="appearance-heading" className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground/60 mb-3">
-          Appearance
-        </p>
-        <div className="rounded-xl border border-border bg-card p-4 flex items-center justify-between">
+    <div className="h-full overflow-auto px-7 pb-12 pt-7">
+      <div className="mx-auto max-w-2xl">
+        {/* Page header */}
+        <div className="mb-9 flex items-end justify-between gap-4">
           <div>
-            <p className="text-[13px] font-medium text-foreground">Theme Mode</p>
-            <p className="text-[11px] text-muted-foreground mt-0.5">Choose your preferred colour scheme</p>
+            <h1 className="font-display text-[36px] font-semibold leading-none text-foreground">Settings</h1>
+            <p className="mt-2.5 text-[14px] text-muted-foreground">Configure Cove preferences</p>
           </div>
-          <div className="flex gap-2">
-            <button
-              onClick={() => setTheme('dark')}
-              aria-pressed={theme === 'dark'}
-              className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-[12px] font-medium transition-colors ${
-                theme === 'dark'
-                  ? 'bg-primary text-primary-foreground'
-                  : 'bg-muted text-muted-foreground hover:text-foreground'
-              }`}
-            >
-              <Moon size={13} /> Dark
-            </button>
-            <button
-              onClick={() => setTheme('light')}
-              aria-pressed={theme === 'light'}
-              className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-[12px] font-medium transition-colors ${
-                theme === 'light'
-                  ? 'bg-primary text-primary-foreground'
-                  : 'bg-muted text-muted-foreground hover:text-foreground'
-              }`}
-            >
-              <Sun size={13} /> Light
-            </button>
-          </div>
+          <button
+            onClick={refreshStats}
+            disabled={loading}
+            aria-label="Refresh system stats"
+            className="rounded-full border border-border bg-card/70 p-2.5 text-muted-foreground transition-colors hover:text-foreground disabled:opacity-50"
+            title="Refresh System Stats"
+          >
+            <RefreshCw size={15} className={loading ? 'animate-spin' : ''} />
+          </button>
         </div>
-      </section>
 
-      {/* Library Storage */}
-      <section className="mb-8" aria-labelledby="storage-heading">
-        <p id="storage-heading" className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground/60 mb-3">
-          Library Storage
-        </p>
-        <div className="rounded-xl border border-border bg-card p-4 space-y-3 shadow-sm">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2 text-[13px] text-foreground">
-              <Folder size={14} className="text-muted-foreground" />
-              Photo Library Directory
-            </div>
-            <span className="text-[11px] mono text-muted-foreground">test_images/ (cove photo directory)</span>
+        <Section id="stats-heading" title="Library & acceleration">
+          <div className="grid grid-cols-3 gap-3">
+            {cards.map((card, i) => (
+              <motion.div
+                key={card.label}
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.06 }}
+                className="rounded-3xl border border-border bg-card/70 p-5"
+              >
+                <card.icon size={18} className={`mb-4 ${card.color}`} />
+                <p className="tabular font-display text-[28px] font-semibold leading-none text-foreground">{card.value}</p>
+                <p className="mt-2 text-[12px] text-muted-foreground">{card.label}</p>
+              </motion.div>
+            ))}
           </div>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2 text-[13px] text-foreground">
-              <HardDrive size={14} className="text-muted-foreground" />
-              Vector Index Storage
-            </div>
-            <span className="text-[11px] mono text-muted-foreground">Managed automatically (FAISS)</span>
-          </div>
-        </div>
-      </section>
+        </Section>
 
-      {/* About */}
-      <div className="rounded-xl border border-border bg-card p-4 flex items-center gap-3 shadow-sm">
-        <Info size={16} className="text-primary flex-shrink-0" />
-        <div>
-          <p className="text-[13px] font-medium text-foreground">VisionArchive AI v1.0.0</p>
-          <p className="text-[11px] text-muted-foreground mt-0.5">
-            CLIP Embeddings · InsightFace · FAISS · Local-first Architecture
-          </p>
+        <Section id="appearance-heading" title="Appearance">
+          <div className="flex items-center justify-between gap-4 rounded-3xl border border-border bg-card/70 p-5">
+            <div>
+              <p className="text-[14px] font-medium text-foreground">Theme Mode</p>
+              <p className="mt-0.5 text-[12.5px] text-muted-foreground">Choose your preferred colour scheme</p>
+            </div>
+            <div className="flex items-center gap-1 rounded-full border border-border/80 bg-background/40 p-1">
+              {themeBtn('dark', 'Dark', Moon)}
+              {themeBtn('light', 'Light', Sun)}
+            </div>
+          </div>
+        </Section>
+
+        <Section id="storage-heading" title="Library storage">
+          <div className="divide-y divide-border/70 rounded-3xl border border-border bg-card/70">
+            <div className="flex items-center justify-between gap-4 px-5 py-4">
+              <div className="flex items-center gap-2.5 text-[14px] text-foreground">
+                <Folder size={15} className="text-muted-foreground" />
+                Photo Library Directory
+              </div>
+              <span className="mono text-[12px] text-muted-foreground">test_images/ (cove photo directory)</span>
+            </div>
+            <div className="flex items-center justify-between gap-4 px-5 py-4">
+              <div className="flex items-center gap-2.5 text-[14px] text-foreground">
+                <HardDrive size={15} className="text-muted-foreground" />
+                Vector Index Storage
+              </div>
+              <span className="mono text-[12px] text-muted-foreground">Managed automatically (FAISS)</span>
+            </div>
+          </div>
+        </Section>
+
+        <div className="flex items-center gap-4 rounded-3xl border border-border bg-card/70 p-5">
+          <CoveMark size={40} />
+          <div>
+            <p className="font-display text-[18px] font-semibold text-foreground">Cove v1.0.0</p>
+            <p className="mt-0.5 text-[12.5px] text-muted-foreground">
+              CLIP Embeddings · InsightFace · FAISS · Local-first Architecture
+            </p>
+          </div>
         </div>
       </div>
     </div>

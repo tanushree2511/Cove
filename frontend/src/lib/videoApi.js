@@ -1,5 +1,5 @@
 /**
- * Video API — real client for the VisionArchive video FastAPI backend
+ * Video API — real client for the Cove video FastAPI backend
  * (videoModules/api.py). Reached via the nginx (or Vite dev) reverse proxy
  * at /api/video, so no base-URL env var or CORS setup is needed.
  */
@@ -12,7 +12,7 @@ const isTauri = typeof window !== 'undefined' && Boolean(
   (window.location.protocol === 'http:' && !window.location.port) ||
   (window.location.protocol === 'https:' && !window.location.port)
 );
-const BASE = isTauri ? 'http://127.0.0.1:8005/api/video' : '/api/video';
+const BASE = isTauri ? 'http://127.0.0.1:8001' : '/api/video';
 
 function streamUrl(path) {
   return `${BASE}/stream/${encodeURIComponent(path.split(/[\\/]/).pop())}`;
@@ -177,7 +177,7 @@ export async function renameVideoPerson(personId, newName) {
 }
 
 /** Perform semantic search over indexed videos */
-export async function searchVideos(query, threshold = 0.24) {
+export async function searchVideos(query, threshold = 0.20) {
   if (!query?.trim()) return [];
   const res = await fetch(`${BASE}/search?query=${encodeURIComponent(query)}&threshold=${threshold}`, {
     method: 'POST'

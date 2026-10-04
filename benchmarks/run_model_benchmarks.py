@@ -1,5 +1,5 @@
 """
-VisionArchive AI — Comprehensive Quantitative Model Evaluation and Benchmarking Suite.
+Cove — Comprehensive Quantitative Model Evaluation and Benchmarking Suite.
 Runs rigorous scientific evaluations on:
 1. CLIP Cross-Modal Text & Image Embedding Engine
 2. SCRFD Face Detection & ArcFace Feature Verification (ROC/AUC/EER)
@@ -334,7 +334,7 @@ def benchmark_video_pipeline():
     print(" [4/5] BENCHMARKING MULTI-FRAME TEMPORAL VIDEO CLASSIFICATION")
     print("="*70)
 
-    video_dir = os.path.expanduser("~/.config/VisionArchive/uploaded_videos")
+    video_dir = os.path.expanduser("~/.config/Cove/uploaded_videos")
     videos = glob.glob(os.path.join(video_dir, "*.mp4"))[:5]
 
     if not videos:
@@ -432,7 +432,7 @@ def benchmark_faiss_vector_search():
 
 def main():
     print("*"*70)
-    print(" VISIONARCHIVE AI — EMPIRICAL MODEL BENCHMARKING ENGINE")
+    print(" COVE — EMPIRICAL MODEL BENCHMARKING ENGINE")
     print("*"*70)
     
     specs = get_system_specs()

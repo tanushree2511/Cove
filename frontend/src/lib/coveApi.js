@@ -1,6 +1,7 @@
 /**
- * Cove API — real client for the VisionArchive FastAPI backend.
- * Reached via the nginx (or Vite dev) reverse proxy at /api/cove, so no
+ * Cove API — real client for the Cove FastAPI backend.
+ * Reached via the nginx (or Vite dev) reverse proxy at /api/cove (or, in the desktop app, straight at the bundled
+ * backend on 127.0.0.1:8000), so no
  * base-URL env var or CORS setup is needed.
  */
 const isTauri = typeof window !== 'undefined' && Boolean(
@@ -12,7 +13,7 @@ const isTauri = typeof window !== 'undefined' && Boolean(
   (window.location.protocol === 'http:' && !window.location.port) ||
   (window.location.protocol === 'https:' && !window.location.port)
 );
-const BASE = isTauri ? 'http://127.0.0.1:8005/api/cove' : '/api/cove';
+const BASE = isTauri ? 'http://127.0.0.1:8000' : '/api/cove';
 
 function mediaUrl(path) {
   return `${BASE}/media/${path}`;
@@ -23,19 +24,39 @@ function mtimeToDate(mtime) {
   return new Date(mtime * 1000).toISOString().split('T')[0];
 }
 
-/** Fetch paginated images from the library */
-export async function fetchImages(page = 0, pageSize = 1000) {
-  const res = await fetch(`${BASE}/images?offset=${page * pageSize}&limit=${pageSize}`);
-  if (!res.ok) throw new Error('Failed to fetch images');
-  const data = await res.json();
-  return data.images.map((img) => ({
+function mapImage(img) {
+  return {
     id: img.path,
     path: img.path,
     src: mediaUrl(img.path),
     thumbnail: mediaUrl(img.path),
     date: mtimeToDate(img.mtime),
     tags: [],
-  }));
+  };
+}
+
+/** Fetch one page of images from the library */
+export async function fetchImages(page = 0, pageSize = 1000) {
+  const res = await fetch(`${BASE}/images?offset=${page * pageSize}&limit=${pageSize}`);
+  if (!res.ok) throw new Error('Failed to fetch images');
+  const data = await res.json();
+  return data.images.map(mapImage);
+}
+
+/**
+ * Fetch the WHOLE library. The server pages its results, and the UI used to ask for page 0 only - so a library
+ * with more than 1,000 photos silently showed just the first 1,000. Keep asking until everything has arrived.
+ */
+export async function fetchAllImages(pageSize = 1000) {
+  const all = [];
+  for (let page = 0; ; page++) {
+    const res = await fetch(`${BASE}/images?offset=${page * pageSize}&limit=${pageSize}`);
+    if (!res.ok) throw new Error('Failed to fetch images');
+    const data = await res.json();
+    all.push(...data.images.map(mapImage));
+    if (data.images.length < pageSize || all.length >= (data.total ?? Infinity)) break;
+  }
+  return all;
 }
 
 /** Fetch face clusters (people) */
@@ -86,7 +107,7 @@ export async function renamePerson(personId, newName) {
 }
 
 /** Perform semantic search using CLIP embeddings */
-export async function searchImages(query, limit = 40, threshold = 0.24) {
+export async function searchImages(query, limit = 40, threshold = 0.20) {
   if (!query?.trim()) return [];
   const res = await fetch(`${BASE}/search/text`, {
     method: 'POST',

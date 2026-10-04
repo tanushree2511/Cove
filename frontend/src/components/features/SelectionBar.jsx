@@ -7,8 +7,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Download, Trash2, CheckSquare, X, AlertTriangle } from 'lucide-react';
 import { useAppStore } from '@/store/useAppStore';
 import { toast } from 'sonner';
-import { deleteImages, fetchClusters, fetchImages } from '@/lib/coveApi';
+import { deleteImages, fetchClusters, fetchAllImages } from '@/lib/coveApi';
 import { deleteVideos, fetchVideos } from '@/lib/videoApi';
+import { downloadUrl, filenameOf } from '@/lib/download';
 
 export function SelectionBar() {
   const selectedImages      = useAppStore((s) => s.selectedImages);
@@ -27,8 +28,23 @@ export function SelectionBar() {
   const count = selectedImages.size;
   if (count === 0) return null;
 
-  const handleDownload = () => {
-    toast.success(`Exporting ${count} selected item${count > 1 ? 's' : ''}…`);
+  // Export = download every selected photo/video. (This used to show a toast and do nothing.) Browsers allow a
+  // burst of downloads only with the user's permission, so cap it and say so instead of silently dropping files.
+  const MAX_EXPORT = 25;
+  const handleDownload = async () => {
+    const items = Array.from(selectedImages)
+      .map((id) => images.find((i) => i.id === id) || videos.find((v) => v.id === id || v.path === id))
+      .filter((it) => it && it.src);
+    const batch = items.slice(0, MAX_EXPORT);
+    for (const it of batch) {
+      downloadUrl(it.src, filenameOf(it.path || it.title || it.src));
+      await new Promise((r) => setTimeout(r, 350));
+    }
+    toast.success(
+      items.length > MAX_EXPORT
+        ? `Exported the first ${MAX_EXPORT} of ${items.length} selected items - select fewer to export the rest`
+        : `Exported ${batch.length} item${batch.length === 1 ? '' : 's'}`
+    );
   };
 
   const handleDeleteClick = async () => {
@@ -48,10 +64,12 @@ export function SelectionBar() {
       const videoPaths = [];
       const deletedPhotoIds = new Set();
       const deletedVideoIds = new Set();
+      let deletedVideoCount = 0; // one per selected video (deletedVideoIds holds an id AND a path for each)
 
       selectedList.forEach((id) => {
         const isVid = videos.some((v) => v.id === id || v.path === id) || /\.(mp4|mov|avi|mkv|webm)$/i.test(String(id));
         if (isVid) {
+          deletedVideoCount += 1;
           const v = videos.find((v) => v.id === id || v.path === id);
           if (v?.id && typeof v.id === 'number') videoIds.push(v.id);
           else videoPaths.push(String(id));
@@ -74,11 +92,11 @@ export function SelectionBar() {
 
       const details = [];
       if (photoPaths.length > 0) details.push(`${photoPaths.length} photo${photoPaths.length > 1 ? 's' : ''}`);
-      if (deletedVideoIds.size > 0) details.push(`${deletedVideoIds.size} video${deletedVideoIds.size > 1 ? 's' : ''}`);
+      if (deletedVideoCount > 0) details.push(`${deletedVideoCount} video${deletedVideoCount > 1 ? 's' : ''}`);
       toast.success(`Deleted ${details.join(' and ')}`);
 
       if (photoPaths.length > 0) {
-        fetchImages(0, 1000).then(setImages);
+        fetchAllImages().then(setImages);
         fetchClusters().then(setClusters);
       }
       if (deletedVideoIds.size > 0) {

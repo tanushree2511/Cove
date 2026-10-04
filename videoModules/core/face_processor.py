@@ -41,6 +41,9 @@ def get_face_app():
         )
         det_size = (320, 320) if not CONFIG.use_gpu else (640, 640)
         _face_app.prepare(ctx_id=CONFIG.ctx_id, det_size=det_size)
+        if not CONFIG.use_gpu:
+            from config.runtime import limit_face_model_threads
+            limit_face_model_threads(_face_app, CONFIG.runtime_profile)
     return _face_app
 
 clustering_progress = {"current": 0, "total": 100, "message": "Idle"}

@@ -1,8 +1,8 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
-  "productName": "VisionArchive AI",
+  "productName": "Cove",
   "version": "1.0.0",
-  "identifier": "com.visionarchive.app",
+  "identifier": "com.cove.app",
   "build": {
     "frontendDist": "../dist",
     "devUrl": "http://localhost:5173",
@@ -13,7 +13,7 @@
     "withGlobalTauri": true,
     "windows": [
       {
-        "title": "VisionArchive AI",
+        "title": "Cove",
         "width": 1280,
         "height": 800,
         "minWidth": 900,
@@ -34,6 +34,9 @@
       "bin/cove-backend",
       "bin/video-backend"
     ],
+    "resources": {
+      "../../models/": "models/"
+    },
     "icon": [
       "icons/32x32.png",
       "icons/128x128.png",
@@ -42,7 +45,7 @@
       "icons/icon.ico"
     ],
     "shortDescription": "Local-first AI photo and video manager",
-    "longDescription": "VisionArchive AI is a fully local, privacy-first photo and video manager with AI-powered face clustering and semantic search.",
+    "longDescription": "Cove is a fully local, privacy-first photo and video manager with AI-powered face clustering and semantic search.",
     "linux": {
       "deb": {
         "depends": ["ffmpeg", "libgl1", "libglib2.0-0"]

@@ -7,7 +7,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, ChevronLeft, ChevronRight, Download, Camera, MapPin, Tag, Calendar, Info, Trash2, AlertTriangle } from 'lucide-react';
 import { useAppStore } from '@/store/useAppStore';
 import { toast } from 'sonner';
-import { deleteImages, fetchClusters, fetchImages } from '@/lib/coveApi';
+import { deleteImages, fetchClusters, fetchAllImages } from '@/lib/coveApi';
+import { downloadUrl, filenameOf } from '@/lib/download';
 
 export function PhotoModal() {
   const activeMediaModal = useAppStore((s) => s.activeMediaModal);
@@ -50,7 +51,10 @@ export function PhotoModal() {
   }, [isPhotoModal, closeMediaModal, handlePrev, handleNext]);
 
   const handleDownload = () => {
-    toast.success(`Downloading ${photo?.title || 'photo'}…`);
+    if (!photo?.src) return;
+    const name = filenameOf(photo.path || photo.src);
+    downloadUrl(photo.src, name);   // used to be a toast only - nothing was ever downloaded
+    toast.success(`Downloading ${name}…`);
   };
 
   const handleDeleteClick = async () => {
@@ -68,7 +72,7 @@ export function PhotoModal() {
       await deleteImages([photo.path]);
       toast.success('Photo deleted');
       closeMediaModal();
-      fetchImages(0, 1000).then(setImages);
+      fetchAllImages().then(setImages);
       fetchClusters().then(setClusters);
     } catch {
       toast.error('Delete failed');

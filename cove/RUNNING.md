@@ -1,4 +1,4 @@
-# Running Vision Archive AI
+# Running Cove
 
 This project has two runtime surfaces:
 
@@ -36,7 +36,7 @@ Modules across folders use package-qualified imports (e.g. `from config.vision_c
 ## 1. Create and activate a virtual environment
 
 ```bash
-cd /path/to/Major-Project/cove
+cd /path/to/cove/cove
 python3 -m venv .venv
 source .venv/bin/activate
 export PYTHONPATH="$PWD"
@@ -86,7 +86,7 @@ python pipeline/prepare_lfw.py
 If you want to force a refresh of `test_images/`, run:
 
 ```bash
-VISION_LFW_FORCE_REFRESH=1 python pipeline/prepare_lfw.py
+COVE_LFW_FORCE_REFRESH=1 python pipeline/prepare_lfw.py
 ```
 
 ## 5. Build the face embeddings
@@ -95,7 +95,7 @@ VISION_LFW_FORCE_REFRESH=1 python pipeline/prepare_lfw.py
 python pipeline/production_pipeline.py
 ```
 
-This populates the face embedding index and the people database under the VisionArchive data directory.
+This populates the face embedding index and the people database under the Cove data directory.
 
 ## 6. Build the semantic search index
 

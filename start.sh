@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ─────────────────────────────────────────────────────────────
-#  VisionArchive AI — Linux / macOS launcher
+#  Cove — Linux / macOS launcher
 #  Usage: ./start.sh
 # ─────────────────────────────────────────────────────────────
 set -euo pipefail
@@ -13,10 +13,10 @@ CYAN='\033[0;36m'
 BOLD='\033[1m'
 RESET='\033[0m'
 
-info()    { echo -e "${CYAN}[VisionArchive]${RESET} $*"; }
-success() { echo -e "${GREEN}[VisionArchive]${RESET} $*"; }
-warn()    { echo -e "${YELLOW}[VisionArchive]${RESET} $*"; }
-error()   { echo -e "${RED}[VisionArchive]${RESET} $*" >&2; }
+info()    { echo -e "${CYAN}[Cove]${RESET} $*"; }
+success() { echo -e "${GREEN}[Cove]${RESET} $*"; }
+warn()    { echo -e "${YELLOW}[Cove]${RESET} $*"; }
+error()   { echo -e "${RED}[Cove]${RESET} $*" >&2; }
 
 # ── Resolve script directory (follow symlinks) ────────────────
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -28,6 +28,8 @@ if [[ ! -d "$VENV_DIR" ]]; then
     python3 -m venv "$VENV_DIR"
     "$VENV_DIR/bin/pip" install --upgrade pip -q
     "$VENV_DIR/bin/pip" install -r "$SCRIPT_DIR/requirements.txt"
+    # swap in the onnxruntime build that matches this machine's GPU/NPU (CUDA, DirectML, OpenVINO, ...)
+    "$VENV_DIR/bin/python3" "$SCRIPT_DIR/scripts/install_runtime.py" || warn "Runtime selection skipped - using the CPU build"
     success "Virtualenv ready."
 else
     info "Using existing virtualenv at .venv"
@@ -35,39 +37,26 @@ fi
 
 PYTHON="$VENV_DIR/bin/python3"
 
-# ── 2. GPU detection ──────────────────────────────────────────
-if command -v nvidia-smi &>/dev/null && nvidia-smi &>/dev/null; then
-    export VISION_FORCE_CPU=0
-    export VISION_USE_GPU=1
-    GPU_INFO=$(nvidia-smi --query-gpu=name --format=csv,noheader 2>/dev/null | head -1 || echo "unknown")
-    success "NVIDIA GPU detected: ${GPU_INFO}"
-else
-    export VISION_FORCE_CPU=1
-    export VISION_USE_GPU=0
-    warn "No NVIDIA GPU detected — running on CPU (set VISION_FORCE_CPU=0 to override)"
-fi
+# ── 2. Hardware ───────────────────────────────────────────────
+# The app detects the hardware itself (CPU cores, container limits, NVIDIA / AMD / Intel / Apple / Qualcomm
+# accelerators) and benchmarks the options on first start, keeping the fastest. Nothing to configure here;
+# export COVE_FORCE_CPU=1 to disable accelerators, or run: python3 scripts/install_runtime.py
+info "Hardware    : auto-detected at start-up (see http://localhost:8000/hardware)"
 
 # ── 3. Model & data directories ───────────────────────────────
-export VISION_MODEL_DIR="$SCRIPT_DIR/models"
+export COVE_MODEL_DIR="$SCRIPT_DIR/models"
 if [[ "$(uname)" == "Darwin" ]]; then
-    export VISION_USER_DATA="$HOME/Library/Application Support/VisionArchive"
+    export COVE_USER_DATA="$HOME/Library/Application Support/Cove"
 else
-    export VISION_USER_DATA="${XDG_CONFIG_HOME:-$HOME/.config}/VisionArchive"
+    export COVE_USER_DATA="${XDG_CONFIG_HOME:-$HOME/.config}/Cove"
 fi
-mkdir -p "$VISION_USER_DATA"
-info "Model dir   : $VISION_MODEL_DIR"
-info "User data   : $VISION_USER_DATA"
+mkdir -p "$COVE_USER_DATA"
+info "Model dir   : $COVE_MODEL_DIR"
+info "User data   : $COVE_USER_DATA"
 
 # ── 4. Worker count ───────────────────────────────────────────
-if command -v nproc &>/dev/null; then
-    CPU_CORES=$(nproc)
-elif command -v sysctl &>/dev/null; then
-    CPU_CORES=$(sysctl -n hw.logicalcpu 2>/dev/null || echo 2)
-else
-    CPU_CORES=2
-fi
-export VISION_AI_WORKERS="$CPU_CORES"
-info "AI workers  : $VISION_AI_WORKERS (logical CPU cores)"
+# Worker counts (CPU threads, model replicas, batch sizes) are sized automatically from the detected hardware.
+# Override with COVE_AI_WORKERS / COVE_ORT_THREADS / COVE_BATCH_SIZE if you need to.
 
 # ── 5. Kill stale processes on required ports ─────────────────
 kill_port() {
@@ -99,7 +88,7 @@ declare -a BG_PIDS=()
 
 cleanup() {
     echo ""
-    warn "Shutting down VisionArchive…"
+    warn "Shutting down Cove…"
     for pid in "${BG_PIDS[@]}"; do
         kill "$pid" 2>/dev/null || true
     done
@@ -168,7 +157,7 @@ fi
 # ── 10. Success banner ────────────────────────────────────────
 echo ""
 echo -e "${GREEN}${BOLD}╔══════════════════════════════════════════════╗${RESET}"
-echo -e "${GREEN}${BOLD}║  ✅  VisionArchive is running!               ║${RESET}"
+echo -e "${GREEN}${BOLD}║  ✅  Cove is running!               ║${RESET}"
 echo -e "${GREEN}${BOLD}║                                              ║${RESET}"
 echo -e "${GREEN}${BOLD}║  🌐  http://localhost:8080                   ║${RESET}"
 echo -e "${GREEN}${BOLD}║                                              ║${RESET}"

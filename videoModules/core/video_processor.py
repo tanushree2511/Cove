@@ -3,6 +3,24 @@ import os
 import numpy as np
 from concurrent.futures import ThreadPoolExecutor
 
+def video_duration(video_path):
+    """Length in seconds (None if the container doesn't report it)."""
+    cap = cv2.VideoCapture(video_path)
+    try:
+        frames, fps = cap.get(cv2.CAP_PROP_FRAME_COUNT), cap.get(cv2.CAP_PROP_FPS)
+        return float(frames / fps) if frames > 0 and fps > 0 else None
+    finally:
+        cap.release()
+
+
+def pick_evenly(items, count):
+    """`count` items evenly spread across `items`, order preserved."""
+    if count >= len(items):
+        return list(items)
+    idx = sorted(set(np.linspace(0, len(items) - 1, count).round().astype(int).tolist()))
+    return [items[i] for i in idx]
+
+
 def extract_frames(video_path, fast_mode=True):
     """
     Extracts representative frames from a video maintaining temporal story flow.

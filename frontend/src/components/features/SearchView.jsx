@@ -1,23 +1,23 @@
 /**
- * Semantic search — CLIP-powered results grid with suggestion chips.
+ * Semantic search - describe what you remember; CLIP finds the photos and videos that match.
  * Unifies photos and videos search with type filters and similarity ranking.
  */
 import { useEffect, useCallback, useRef, useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, Sparkles, Loader2, X, Image as ImageIcon, Film } from 'lucide-react';
+import { Search, Sparkles, X, Image as ImageIcon, Film } from 'lucide-react';
 import { useAppStore } from '@/store/useAppStore';
 import { searchImages } from '@/lib/coveApi';
 import { searchVideos } from '@/lib/videoApi';
 import { PhotoCard } from './PhotoCard';
 
 const SUGGESTIONS = [
-  'beach sunset',
-  'portrait photo',
-  'mountain hike',
-  'city skyline',
-  'family dinner',
-  'nature photography',
-  'sports and cars',
+  'a dog playing on the beach',
+  'birthday cake with candles',
+  'sunset over the water',
+  'friends laughing around a table',
+  'a snowy mountain',
+  'someone riding a bike',
+  'a quiet street at night',
 ];
 
 export function SearchView() {
@@ -97,9 +97,24 @@ export function SearchView() {
   const hasQuery   = searchQuery.trim().length > 0;
   const showEmpty  = hasQuery && !loading && !hasResults;
 
+  const filterBtn = (id, label, Icon) => (
+    <button
+      key={id}
+      onClick={() => setFilter(id)}
+      className={`flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-[13px] font-medium transition-all ${
+        filter === id
+          ? 'bg-foreground text-background shadow-sm'
+          : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+      }`}
+    >
+      {Icon && <Icon size={13} />}
+      <span>{label}</span>
+    </button>
+  );
+
   return (
-    <div className="h-full overflow-auto flex flex-col">
-      {/* Hero — shown when no query */}
+    <div className="flex h-full flex-col overflow-auto">
+      {/* Hero - shown before anything is typed */}
       <AnimatePresence>
         {!hasQuery && (
           <motion.div
@@ -108,22 +123,23 @@ export function SearchView() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.3 }}
-            className="flex flex-col items-center justify-center pt-24 pb-8 px-4"
+            className="flex flex-col items-center justify-center px-6 pb-8 pt-24"
           >
             <motion.div
-              className="h-14 w-14 rounded-2xl bg-primary/10 flex items-center justify-center mb-4 border border-primary/20 shadow-md"
-              animate={{ y: [0, -3, 0] }}
-              transition={{ repeat: Infinity, duration: 3, ease: 'easeInOut' }}
+              className="mb-6 flex h-16 w-16 items-center justify-center rounded-3xl border border-primary/25 bg-primary/10 shadow-[0_18px_44px_-14px_hsl(var(--primary)/0.55)]"
+              animate={{ y: [0, -4, 0] }}
+              transition={{ repeat: Infinity, duration: 5, ease: 'easeInOut' }}
             >
-              <Sparkles size={22} className="text-primary" />
+              <Sparkles size={26} className="text-primary" />
             </motion.div>
-            <h1 className="text-lg font-semibold text-foreground mb-1.5">Unified AI Search</h1>
-            <p className="text-[13px] text-muted-foreground mb-6 text-center max-w-sm leading-relaxed">
-              Search photos and videos across your entire collection using natural language descriptions, scenes, and actions.
+            <h1 className="mb-3 max-w-xl text-center font-display text-[42px] font-semibold leading-[1.1] text-foreground">
+              What are you looking for?
+            </h1>
+            <p className="mb-9 max-w-md text-center text-[15px] leading-relaxed text-muted-foreground">
+              Describe a scene, a feeling or a moment in your own words. Cove looks at what is actually in your photos and videos, not at their file names.
             </p>
 
-            {/* Suggestion chips */}
-            <div className="flex flex-wrap gap-1.5 justify-center max-w-md">
+            <div className="flex max-w-2xl flex-wrap justify-center gap-2.5">
               {SUGGESTIONS.map((suggestion, i) => (
                 <motion.button
                   key={suggestion}
@@ -131,7 +147,7 @@ export function SearchView() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.1 + i * 0.04 }}
                   onClick={() => setSearchQuery(suggestion)}
-                  className="rounded-full border border-border bg-card hover:bg-muted/60 hover:border-primary/40 px-3 py-1.5 text-[11px] font-medium text-secondary-foreground transition-all duration-200"
+                  className="rounded-full border border-border bg-card/60 px-4 py-2 text-[13px] font-medium text-secondary-foreground transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/50 hover:bg-card hover:text-foreground"
                 >
                   {suggestion}
                 </motion.button>
@@ -144,16 +160,14 @@ export function SearchView() {
       {/* Loading */}
       <AnimatePresence>
         {loading && (
-          <motion.div
-            key="loading"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="flex items-center justify-center py-20"
-          >
-            <div className="flex items-center gap-2.5 text-[13px] text-muted-foreground">
-              <Loader2 size={16} className="animate-spin text-primary" />
-              Searching library for &ldquo;{searchQuery}&rdquo;…
+          <motion.div key="loading" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="px-7 pt-8" aria-busy="true">
+            <p className="mb-6 font-display text-[22px] italic text-muted-foreground">
+              Looking for &ldquo;{searchQuery}&rdquo;…
+            </p>
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
+              {Array.from({ length: 12 }).map((_, i) => (
+                <div key={i} className="shimmer aspect-square rounded-2xl" style={{ animationDelay: `${i * 60}ms` }} />
+              ))}
             </div>
           </motion.div>
         )}
@@ -167,16 +181,20 @@ export function SearchView() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="flex flex-col items-center justify-center py-20 text-muted-foreground"
+            className="flex flex-col items-center justify-center px-6 py-24 text-center"
           >
-            <Search size={28} strokeWidth={1.2} className="mb-3 text-muted-foreground/50" />
-            <p className="text-[13px]">No media found for &ldquo;{searchQuery}&rdquo;</p>
-            <p className="text-[11px] text-muted-foreground/60 mt-1">Try describing objects, scenery, activities, or colors</p>
+            <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-full border border-border bg-card">
+              <Search size={26} strokeWidth={1.3} className="text-muted-foreground" />
+            </div>
+            <h2 className="font-display text-[26px] font-semibold text-foreground">Nothing matches that yet</h2>
+            <p className="mt-2 max-w-sm text-[14px] leading-relaxed text-muted-foreground">
+              No media found for &ldquo;{searchQuery}&rdquo;. Try describing objects, scenery, activities or colours.
+            </p>
             <button
               onClick={clearSearch}
-              className="mt-4 flex items-center gap-1.5 text-[11px] text-primary hover:underline"
+              className="mt-6 flex items-center gap-1.5 rounded-full border border-border px-4 py-2 text-[13px] font-medium text-primary transition-colors hover:bg-primary/10"
             >
-              <X size={12} /> Clear search
+              <X size={13} /> Clear search
             </button>
           </motion.div>
         )}
@@ -191,54 +209,26 @@ export function SearchView() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.25 }}
-            className="px-5 pb-5"
+            className="px-7 pb-10"
           >
-            <div className="flex items-center justify-between gap-2 mb-4 pt-3 border-b border-border/40 pb-3">
-              <div className="flex items-baseline gap-2">
-                <span className="text-[13px] font-semibold text-foreground">
+            <div className="flex flex-wrap items-end justify-between gap-4 pb-5 pt-7">
+              <div>
+                <h1 className="font-display text-[30px] font-semibold leading-none text-foreground">
                   {searchResults.length} result{searchResults.length !== 1 ? 's' : ''}
-                </span>
-                <span className="text-[11px] text-muted-foreground">for &ldquo;{searchQuery}&rdquo;</span>
+                </h1>
+                <p className="mt-2 text-[14px] text-muted-foreground">
+                  for <span className="font-display italic text-foreground/80">&ldquo;{searchQuery}&rdquo;</span>
+                </p>
               </div>
 
-              {/* Type Filter Buttons */}
-              <div className="flex items-center rounded-lg bg-muted/50 p-0.5 border border-border/60 text-xs">
-                <button
-                  onClick={() => setFilter('all')}
-                  className={`px-2.5 py-1 rounded-md font-medium transition-all ${
-                    filter === 'all'
-                      ? 'bg-card text-foreground shadow-sm'
-                      : 'text-muted-foreground hover:text-foreground'
-                  }`}
-                >
-                  All ({searchResults.length})
-                </button>
-                <button
-                  onClick={() => setFilter('photos')}
-                  className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md font-medium transition-all ${
-                    filter === 'photos'
-                      ? 'bg-card text-foreground shadow-sm'
-                      : 'text-muted-foreground hover:text-foreground'
-                  }`}
-                >
-                  <ImageIcon size={12} />
-                  <span>Photos ({photoCount})</span>
-                </button>
-                <button
-                  onClick={() => setFilter('videos')}
-                  className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md font-medium transition-all ${
-                    filter === 'videos'
-                      ? 'bg-card text-foreground shadow-sm'
-                      : 'text-muted-foreground hover:text-foreground'
-                  }`}
-                >
-                  <Film size={12} />
-                  <span>Videos ({videoCount})</span>
-                </button>
+              <div className="flex items-center gap-1 rounded-full border border-border/80 bg-card/60 p-1">
+                {filterBtn('all', `All (${searchResults.length})`)}
+                {filterBtn('photos', `Photos (${photoCount})`, ImageIcon)}
+                {filterBtn('videos', `Videos (${videoCount})`, Film)}
               </div>
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-[3px]">
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
               {filteredResults.map((item, i) => (
                 <motion.div
                   key={item.path ? `${item.type || item.mediaType || 'media'}_${item.path}` : `${item.type || item.mediaType || 'media'}_${item.id ?? i}`}

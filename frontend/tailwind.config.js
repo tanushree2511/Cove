@@ -12,8 +12,9 @@ export default {
         },
         extend: {
             fontFamily: {
-                sans: ["Inter", "system-ui", "-apple-system", "sans-serif"],
-                mono: ["JetBrains Mono", "monospace"],
+                sans: ["DM Sans Variable", "DM Sans", "system-ui", "-apple-system", "Segoe UI", "sans-serif"],
+                display: ["Fraunces Variable", "Fraunces", "Georgia", "Times New Roman", "serif"],
+                mono: ["JetBrains Mono Variable", "JetBrains Mono", "ui-monospace", "monospace"],
             },
             colors: {
                 border: "hsl(var(--border))",

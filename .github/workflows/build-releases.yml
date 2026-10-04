@@ -1,17 +1,17 @@
-name: Build Vision Archive
+name: Build Cove
 on:
   push:
     tags:
       - 'v*'
+  workflow_dispatch:
 
 jobs:
   build:
-    name: Build on ${{ matrix.os }}
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [windows-latest, macos-latest, ubuntu-latest]
-    
+    # Windows only for now: the backend packaging (DirectML onnxruntime, bundled ffmpeg, sidecar naming) is
+    # verified there. macOS / Linux need their own onnxruntime build and Tauri system packages before being re-added.
+    name: Build installer (Windows)
+    runs-on: windows-latest
+
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -25,30 +25,42 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
+          cache: pip
 
       - name: Install Python Dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
-          pip install pyinstaller
+          pip install -r requirements.txt pyinstaller
 
-      - name: Build Unified Backend (PyInstaller)
-        run: |
-          pyinstaller --name vision-backend --onedir --clean backend_server.py
+      # One onnxruntime build runs on every Windows PC: DirectML drives any DX12 GPU, and the app benchmarks at
+      # start-up and falls back to the CPU on its own.
+      - name: Select the Windows onnxruntime build
+        env:
+          COVE_ORT_PACKAGE: onnxruntime-directml
+        run: python scripts/install_runtime.py
 
-      - name: Setup Rust & Tauri
+      - name: Run backend tests
+        working-directory: ./cove
+        run: python -m pytest tests -q
+
+      # Downloads the CLIP + face models into ./models (bundled once as a Tauri resource) and freezes the photo and
+      # video backends into frontend/src-tauri/bin/<name>-<target-triple>.exe (the sidecars Tauri launches).
+      - name: Build backends (models + PyInstaller sidecars)
+        run: python scripts/build_backends.py
+
+      - name: Setup Rust
         uses: dtolnay/rust-toolchain@stable
-        
+
       - name: Install Frontend Dependencies
         working-directory: ./frontend
-        run: npm install
+        run: npm ci
 
       - name: Build Tauri App
         working-directory: ./frontend
         run: npx tauri build
-        
-      - name: Upload Artifacts
+
+      - name: Upload Installers
         uses: actions/upload-artifact@v4
         with:
-          name: vision-archive-${{ matrix.os }}
+          name: cove-windows
           path: frontend/src-tauri/target/release/bundle/

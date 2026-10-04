@@ -4,10 +4,10 @@
  */
 import { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Search, FolderOpen, Cpu, Zap, Sun, Moon, X } from 'lucide-react';
+import { Sparkles, Plus, Cpu, Zap, Sun, Moon, X } from 'lucide-react';
 import { useAppStore } from '@/store/useAppStore';
 import { toast } from 'sonner';
-import { fetchImages, uploadImages } from '@/lib/coveApi';
+import { fetchAllImages, uploadImages } from '@/lib/coveApi';
 import { fetchVideos, uploadVideos } from '@/lib/videoApi';
 
 export function CommandBar() {
@@ -126,7 +126,7 @@ export function CommandBar() {
       });
 
       toast.success(`Imported ${files.length} item${files.length !== 1 ? 's' : ''}`);
-      fetchImages(0, 1000).then(setImages);
+      fetchAllImages().then(setImages);
       fetchVideos().then(setVideos);
     } catch (err) {
       setUploadState({
@@ -174,7 +174,7 @@ export function CommandBar() {
   };
 
   return (
-    <div className="flex h-[52px] items-center gap-3 border-b border-border px-4 bg-surface/50 flex-shrink-0 backdrop-blur-sm">
+    <div className="relative z-20 flex h-[72px] flex-shrink-0 items-center gap-4 border-b border-border/70 bg-background/60 px-7 backdrop-blur-md">
       {/* Hidden native file input element */}
       <input
         ref={fileInputRef}
@@ -185,24 +185,24 @@ export function CommandBar() {
         onChange={handleFileInputChange}
       />
 
-      {/* Search input */}
+      {/* Search: the heart of the app - describe what you remember */}
       <motion.div
         className={`
-          relative flex flex-1 max-w-2xl items-center gap-2.5 rounded-lg px-3 py-[7px]
+          relative flex max-w-[640px] flex-1 items-center gap-3 rounded-2xl px-4 py-2.5
           transition-all duration-200
           ${focused
-            ? 'bg-background border border-primary/50'
-            : 'bg-muted/40 border border-transparent hover:bg-muted/60'}
+            ? 'bg-card border border-primary/60'
+            : 'bg-card/60 border border-border/80 hover:bg-card hover:border-border'}
         `}
         animate={
           focused
-            ? { boxShadow: '0 0 0 3px hsl(var(--primary) / 0.12), 0 0 20px -4px hsl(var(--primary) / 0.25)' }
+            ? { boxShadow: '0 0 0 4px hsl(var(--primary) / 0.14), 0 14px 40px -14px hsl(var(--primary) / 0.45)' }
             : { boxShadow: 'none' }
         }
         transition={{ duration: 0.2 }}
       >
-        <Search
-          size={14}
+        <Sparkles
+          size={17}
           className={`flex-shrink-0 transition-colors ${focused ? 'text-primary' : 'text-muted-foreground'}`}
         />
         <input
@@ -211,75 +211,72 @@ export function CommandBar() {
           onChange={(e) => handleSearch(e.target.value)}
           onFocus={() => setFocused(true)}
           onBlur={() => setFocused(false)}
-          placeholder="Search photos with CLIP AI…"
+          placeholder="Search by describing it - “dog on the beach”"
           aria-label="Search photos"
-          className="flex-1 bg-transparent text-[13px] text-foreground placeholder:text-muted-foreground/70 outline-none"
+          className="flex-1 bg-transparent text-[15px] text-foreground outline-none placeholder:text-muted-foreground/70"
         />
-        {/* Clear button */}
         {searchQuery.length > 0 && (
           <button
             onMouseDown={(e) => { e.preventDefault(); handleClearSearch(); }}
             aria-label="Clear search"
-            className="flex-shrink-0 p-0.5 rounded text-muted-foreground hover:text-foreground transition-colors"
+            className="flex-shrink-0 rounded-full p-1 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
           >
-            <X size={12} />
+            <X size={14} />
           </button>
         )}
-        <kbd className="hidden sm:inline-flex h-[18px] items-center rounded border border-border/60 bg-muted/50 px-1 text-[9px] font-mono text-muted-foreground flex-shrink-0">
+        <kbd className="mono hidden h-6 flex-shrink-0 items-center rounded-md border border-border bg-muted/60 px-1.5 text-[10.5px] text-muted-foreground sm:inline-flex">
           ⌘K
         </kbd>
       </motion.div>
 
-      <div className="flex-1" />
-
-      {/* Status & Actions */}
-      <div className="flex items-center gap-2">
-        {/* Indexing status pill */}
+      {/* Status & actions */}
+      <div className="ml-auto flex items-center gap-2.5">
         {indexingStatus.isIndexing && (
           <button
             onClick={() => setActiveView('indexing')}
             title="View indexing status"
-            className="flex items-center gap-1.5 rounded-full bg-success/10 border border-success/20 px-2.5 py-1 hover:bg-success/20 transition-colors"
+            className="flex items-center gap-2 rounded-full border border-success/25 bg-success/10 px-3 py-1.5 transition-colors hover:bg-success/20"
           >
-            <span className="relative flex h-1.5 w-1.5">
-              <span className="absolute inset-0 rounded-full bg-success animate-pulse" />
-              <span className="rounded-full bg-success h-1.5 w-1.5" />
+            <span className="relative flex h-2 w-2">
+              <span className="absolute inset-0 animate-pulse rounded-full bg-success" />
+              <span className="h-2 w-2 rounded-full bg-success" />
             </span>
-            <span className="text-[10px] font-medium text-success mono">
+            <span className="mono text-[11px] font-medium text-success">
               {Math.round(indexingStatus.progress)}%
             </span>
           </button>
         )}
 
-        {/* System info */}
+        {/* Where the work runs */}
         <div
-          className="hidden md:flex items-center gap-1 rounded-full bg-muted/40 border border-border/40 px-2.5 py-1"
+          className="hidden items-center gap-2 rounded-full border border-border/70 bg-card/60 px-3 py-1.5 md:flex"
           title={`${systemStats.totalImages.toLocaleString()} photos · ${systemStats.poolSize} workers · ${systemStats.gpuAvailable ? 'GPU accelerated' : 'CPU only'}`}
         >
-          <Cpu size={11} className="text-muted-foreground" />
-          <span className="text-[10px] mono text-muted-foreground">{systemStats.poolSize}w</span>
-          <span className="text-muted-foreground/30 mx-0.5">·</span>
-          <Zap size={11} className={systemStats.gpuAvailable ? 'text-primary' : 'text-muted-foreground/50'} />
-          <span className="text-[10px] mono text-muted-foreground">{systemStats.gpuAvailable ? 'GPU' : 'CPU'}</span>
+          {systemStats.gpuAvailable
+            ? <Zap size={13} className="text-primary" />
+            : <Cpu size={13} className="text-muted-foreground" />}
+          <span className="text-[12px] text-muted-foreground">
+            {systemStats.gpuAvailable ? 'GPU' : 'CPU'}
+            <span className="mx-1.5 text-border">|</span>
+            <span className="mono tabular">{systemStats.poolSize}</span> workers
+          </span>
         </div>
 
-        {/* Theme Toggle */}
         <button
           onClick={toggleTheme}
           title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
           aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
-          className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+          className="rounded-full p-2.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
         >
-          {theme === 'dark' ? <Sun size={15} /> : <Moon size={15} />}
+          {theme === 'dark' ? <Sun size={17} /> : <Moon size={17} />}
         </button>
 
-        {/* Import Button */}
         <button
           onClick={handleImportClick}
           aria-label="Import photos"
-          className="flex items-center gap-1.5 rounded-lg bg-primary/10 hover:bg-primary/20 border border-primary/20 px-3 py-[6px] text-[12px] font-medium text-primary transition-colors"
+          className="flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-[14px] font-semibold text-primary-foreground shadow-[0_8px_24px_-8px_hsl(var(--primary)/0.7)] transition-all hover:brightness-110 active:scale-[0.97]"
         >
-          <FolderOpen size={13} />
+          <Plus size={16} strokeWidth={2.6} />
           <span className="hidden sm:inline">Import</span>
         </button>
       </div>

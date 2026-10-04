@@ -1,4 +1,4 @@
-# VisionArchive AI — Major Project
+# Cove
 
 A local-first AI photo & video manager: CLIP semantic search, InsightFace-based
 face detection/clustering, and FAISS vector search for photos (`cove/`), plus
@@ -18,7 +18,7 @@ video features currently live in their own Streamlit screen.
 | **Native** | Python 3.10+, Node.js 18+, [ffmpeg](https://ffmpeg.org/download.html) |
 
 > [!NOTE]
-> On first run the Docker build downloads ~600 MB of ML model weights. Subsequent
+> The ML model weights are ~700 MB in total (see "First-time model & data setup" below). Subsequent
 > starts reuse the cached `cove_models` volume and are much faster.
 
 ---
@@ -27,7 +27,7 @@ video features currently live in their own Streamlit screen.
 
 ```bash
 git clone <this-repo-url>
-cd Major-Project
+cd cove
 docker compose up
 ```
 
@@ -50,7 +50,7 @@ chmod +x start.sh
 
 `start.sh` will:
 - Create and populate `.venv` automatically if it doesn't exist
-- Auto-detect an NVIDIA GPU and set `VISION_FORCE_CPU` accordingly
+- Auto-detect an NVIDIA GPU and set `COVE_FORCE_CPU` accordingly
 - Start **cove-api** (port 8000), **video-api** (port 8001), and the **React frontend** (port 8080)
 - Wait until cove-api is healthy, then print a success banner
 - Capture all service logs to `.logs/`
@@ -77,11 +77,11 @@ manual Python/Node environment setup required.
 
 | Service      | What it is                                   | Port (host) | Container name               |
 |--------------|-----------------------------------------------|:-----------:|-------------------------------|
-| `frontend`   | React SPA + nginx (reverse-proxies `/api/cove` to `cove-api`) | **8080** | `major-project-frontend-1` |
-| `cove-api`   | FastAPI backend — face detection, CLIP search, indexing jobs | 8000 | `major-project-cove-api-1` |
-| `cove-ui`    | Streamlit UI for the same photo backend (alternate/dev UI)    | 8501 | `major-project-cove-ui-1`  |
-| `video-api`  | FastAPI backend for video indexing/search                    | 8001 | `major-project-video-api-1`|
-| `video-ui`   | Streamlit UI for video features                               | **8502** | `major-project-video-ui-1` |
+| `frontend`   | React SPA + nginx (reverse-proxies `/api/cove` to `cove-api`) | **8080** | `cove-frontend-1` |
+| `cove-api`   | FastAPI backend — face detection, CLIP search, indexing jobs | 8000 | `cove-cove-api-1` |
+| `cove-ui`    | Streamlit UI for the same photo backend (alternate/dev UI)    | 8501 | `cove-cove-ui-1`  |
+| `video-api`  | FastAPI backend for video indexing/search                    | 8001 | `cove-video-api-1`|
+| `video-ui`   | Streamlit UI for video features                               | **8502** | `cove-video-ui-1` |
 
 **The app you actually use day-to-day is `http://localhost:8080`.** Clicking
 "Videos" in its sidebar opens the `video-ui` Streamlit screen (port 8502) in a
@@ -97,7 +97,7 @@ new tab — video features aren't (yet) embedded in the React app itself.
 
 ```bash
 git clone <this-repo-url>
-cd Major-Project
+cd cove
 docker compose build
 ```
 
@@ -120,7 +120,7 @@ curl http://localhost:8080          # frontend
 ```
 
 `cove-api`'s `/health` should report `"status": "ok"` (or `"degraded"` if
-`VISION_SKIP_MODEL_LOAD` is set, or if the face/CLIP models below haven't been
+`COVE_SKIP_MODEL_LOAD` is set, or if the face/CLIP models below haven't been
 downloaded yet).
 
 ## 3. First-time model & data setup
@@ -133,9 +133,18 @@ only need downloading once, the first time you stand the stack up.
 docker compose exec cove-api sh -c "cd /app/cove && python3 pipeline/download_models.py"
 ```
 
-This fetches the CLIP ONNX models (~600 MB) into the shared `cove_models`
-volume. The InsightFace face-detection model (`buffalo_s`, ~130 MB) downloads
+This fetches the CLIP ViT-B/16 ONNX models (~590 MB, full precision) into the
+shared `cove_models` volume; interrupted downloads resume when you re-run it.
+The InsightFace face-detection model (`buffalo_s`, ~130 MB) downloads
 automatically into the same volume at `cove-api` startup.
+
+> [!NOTE]
+> ViT-B/16 replaced the earlier int8 ViT-B/32 because it is markedly more accurate
+> (COCO text→image Recall@1 39% → 51%, UCF101 video tagging top-1 58% → 70%) at the
+> cost of slower indexing on CPU. Embeddings from different CLIP models aren't
+> comparable, so when the model changes the app automatically rebuilds the photo
+> search index and re-analyses stored videos. To keep an existing legacy
+> `clip_image.onnx` / `clip_text.onnx` pair, set `COVE_CLIP_MODEL=b32`.
 
 `video-api` downloads its own models (InsightFace `buffalo_l` + a CLIP model
 via HuggingFace `transformers`) automatically on first use — no manual step,
@@ -180,6 +189,40 @@ Open **http://localhost:8080**:
 | **Indexing** | Real-time status of the background indexing job; manual "Start Indexing" trigger |
 | **Videos** | Opens the separate `video-ui` screen (port 8502) in a new tab |
 | **Settings** | Real system stats (GPU/CPU, photos indexed, people detected), theme |
+
+## Hardware: automatic detection and tuning
+
+The app adapts itself to the machine it runs on — nothing to configure.
+
+* **Detection** (`cove/config/hardware.py`): physical/logical CPU cores (respecting container CPU quotas and
+  affinity), RAM, and GPUs/NPUs of any vendor — NVIDIA (CUDA), AMD (ROCm / DirectML), Intel (OpenVINO /
+  DirectML), Apple Silicon (Core ML), Qualcomm (QNN) — plus which ONNX Runtime providers are installed.
+* **Benchmark & choose** (`cove/config/runtime.py`): on first start every candidate (each accelerator, the CPU at
+  physical-core and all-thread counts) is timed on the real CLIP model in an isolated subprocess and the fastest
+  wins; the result is cached per machine. A weak integrated GPU that is slower than the CPU is never picked, a
+  broken GPU driver can't crash the app, and if an accelerator fails to start the CPU is used.
+* **Live adaptation**: real throughput is tracked while the app works, and the number of video frames sent through
+  CLIP is scaled to it (about one frame per 3 s of video, capped by a ~2 s compute budget). Accuracy is flat from 16
+  down to ~4 frames per clip, so slow CPUs do less work for the same results and fast GPUs use more frames.
+* **Pipelining**: images are decoded in parallel threads and embedded in batches; for videos, face detection runs
+  alongside CLIP; face-model replicas each get a thread budget instead of every one grabbing every core.
+
+See what was chosen at `GET /api/cove/hardware` and `GET /api/video/hardware` (hardware found, the chosen
+configuration and the benchmark numbers). On the dev laptop used for testing (4-core i5-8250U) this made video
+analysis ~2.4x faster (3.9 → 1.6 s per video) and photo embedding 1.35x faster with unchanged accuracy.
+More threads do not help once the CPU's maths units are saturated (CLIP ViT-B/16 measured 3.7 img/s at 2 threads and
+4.0 at 8), which is why "CPU usage %" is not the goal — throughput is.
+
+For native (non-Docker) runs, `scripts/install_runtime.py` (run automatically by `start.sh` / `start.bat` when the
+venv is created) installs the matching ONNX Runtime build: `onnxruntime-gpu` (NVIDIA), `onnxruntime-directml`
+(any DirectX 12 GPU on Windows), `onnxruntime-openvino` (Intel on Linux), `onnxruntime-qnn` (Snapdragon), or the
+plain build (macOS has Core ML built in). Docker on Linux/WSL2 can only use NVIDIA GPUs (`docker-compose.gpu.yml`);
+AMD ROCm needs AMD's own wheel. Overrides: `COVE_FORCE_CPU=1`, `COVE_AUTOTUNE=0`, `COVE_ORT_THREADS=N`,
+`COVE_BATCH_SIZE=N`, `COVE_VIDEO_BUDGET_S=S`, `COVE_ORT_PACKAGE=<pip package>`.
+
+> [!NOTE]
+> Hardware paths other than CPU were verified by simulation (unit tests for NVIDIA, AMD, Apple, Intel, Qualcomm,
+> DirectML and container limits) and, on real hardware, the CPU and DirectML-on-Intel-UHD paths only.
 
 ## Local development (without full Docker)
 
@@ -241,7 +284,7 @@ React source changes.)
 - **`/api/cove/*` returns 502 through the frontend**: `cove-api` isn't up yet,
   or crashed — check `docker compose logs cove-api`.
 - **Health check shows `"status": "degraded"`**: models haven't loaded yet
-  (still downloading) or `VISION_SKIP_MODEL_LOAD` is set — see step 3.
+  (still downloading) or `COVE_SKIP_MODEL_LOAD` is set — see step 3.
 - **Permission denied writing into `cove/test_images/`**: the directory can
   end up root-owned since it's created by the container; fix from the host
   with `docker compose exec -u root cove-api chown -R $(id -u):$(id -g) /app/cove/test_images`.

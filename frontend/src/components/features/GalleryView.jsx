@@ -1,51 +1,50 @@
 /**
- * Virtualized unified media gallery — renders 100k+ photos and videos at 60fps.
- * Dynamic responsive columns via ResizeObserver, sticky date headers,
- * type filtering (All / Photos / Videos), person filtering support, and universal import.
+ * Virtualized unified media gallery - renders 100k+ photos and videos smoothly.
+ * Responsive columns measured from the container, date headings, type filtering (All / Photos / Videos),
+ * person filtering, and universal import.
  */
 import { useEffect, useRef, useMemo, useCallback, useState } from 'react';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Images, FolderOpen, Loader2, X, Film, Image as ImageIcon, Sparkles } from 'lucide-react';
+import { Plus, X, Film, Image as ImageIcon } from 'lucide-react';
 import { useAppStore } from '@/store/useAppStore';
-import { fetchImages, uploadImages, fetchPersonPhotos } from '@/lib/coveApi';
+import { fetchAllImages, uploadImages, fetchPersonPhotos } from '@/lib/coveApi';
 import { fetchVideos, uploadVideos, fetchPersonVideos } from '@/lib/videoApi';
 import { PhotoCard } from './PhotoCard';
 import { toast } from 'sonner';
 
-/** Derive column count and accurate item height from container width */
-function useGridDimensions(containerRef) {
+const GRID_GAP = 12;          // px between tiles, both directions
+const HEADER_ROW_HEIGHT = 62; // date heading row
+
+/** Derive column count and exact tile size from the scroll container's content width (padding excluded). */
+function useGridDimensions(el) {
   const [dim, setDim] = useState({ columns: 5, itemHeight: 200 });
 
   useEffect(() => {
-    const el = containerRef.current;
     if (!el) return;
 
-    const calc = (width) => {
-      let cols = 5;
-      if (width < 480)  cols = 2;
-      else if (width < 640)  cols = 3;
-      else if (width < 900)  cols = 4;
-      else if (width < 1280) cols = 5;
-      else cols = 6;
+    const calc = (contentWidth) => {
+      let cols;
+      if (contentWidth < 480)       cols = 2;
+      else if (contentWidth < 700)  cols = 3;
+      else if (contentWidth < 980)  cols = 4;
+      else if (contentWidth < 1300) cols = 5;
+      else if (contentWidth < 1700) cols = 6;
+      else                          cols = 7;
 
-      // Padding on left + right is px-5 (40px)
-      const contentWidth = Math.max(100, width - 40);
-      const gap = 4;
-      const itemWidth = Math.floor((contentWidth - (gap * (cols - 1))) / cols);
-      const itemHeight = Math.max(80, itemWidth);
-
-      setDim({ columns: cols, itemHeight });
+      const width = Math.max(100, contentWidth);
+      const itemWidth = Math.floor((width - GRID_GAP * (cols - 1)) / cols);
+      setDim({ columns: cols, itemHeight: Math.max(80, itemWidth) });
     };
 
-    const ro = new ResizeObserver(([entry]) => {
-      calc(entry.contentRect.width);
-    });
+    // contentRect is the content box (padding already excluded), which is exactly the grid's width
+    const ro = new ResizeObserver(([entry]) => calc(entry.contentRect.width));
     ro.observe(el);
-    calc(el.offsetWidth);
+    const cs = getComputedStyle(el);
+    calc(el.clientWidth - parseFloat(cs.paddingLeft || 0) - parseFloat(cs.paddingRight || 0));
 
     return () => ro.disconnect();
-  }, [containerRef]);
+  }, [el]);
 
   return dim;
 }
@@ -67,9 +66,11 @@ export function GalleryView() {
   const setVideoIndexingStatus = useAppStore((s) => s.setVideoIndexingStatus);
 
   const parentRef    = useRef(null);
+  const [gridEl, setGridEl] = useState(null); // state, not a ref: the grid mounts only after the loading/empty states
+  const setGridRef = useCallback((node) => { parentRef.current = node; setGridEl(node); }, []);
   const fileInputRef = useRef(null);
   const [loading, setLoading] = useState(false);
-  const { columns, itemHeight } = useGridDimensions(parentRef);
+  const { columns, itemHeight } = useGridDimensions(gridEl);
 
   const [personPhotos, setPersonPhotos] = useState(null);
 
@@ -78,7 +79,7 @@ export function GalleryView() {
     if (images.length > 0 && videos.length > 0) return;
     setLoading(true);
     Promise.all([
-      fetchImages(0, 1000).then(setImages).catch(() => []),
+      fetchAllImages().then(setImages).catch(() => []),
       fetchVideos().then(setVideos).catch(() => []),
     ]).finally(() => setLoading(false));
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -193,9 +194,16 @@ export function GalleryView() {
   const virtualizer = useVirtualizer({
     count: rows.length,
     getScrollElement: () => parentRef.current,
-    estimateSize: (index) => (rows[index]?.type === 'header' ? 44 : itemHeight + 4),
+    estimateSize: (index) => (rows[index]?.type === 'header' ? HEADER_ROW_HEIGHT : itemHeight + GRID_GAP),
     overscan: 8,
   });
+
+  // Row heights are estimates from the measured tile size; when the size or column count changes (first measurement,
+  // window resize, collapsing the sidebar) the virtualizer must forget its cached sizes, otherwise rows keep the
+  // first guess and end up overlapping their neighbours.
+  useEffect(() => {
+    virtualizer.measure();
+  }, [itemHeight, columns, virtualizer]);
 
   const handleSelect = useCallback(
     (id, shiftKey) => {
@@ -271,7 +279,7 @@ export function GalleryView() {
       });
 
       toast.success(`Imported ${files.length} item${files.length !== 1 ? 's' : ''}`);
-      fetchImages(0, 1000).then(setImages);
+      fetchAllImages().then(setImages);
       fetchVideos().then(setVideos);
     } catch (err) {
       setUploadState({
@@ -319,19 +327,27 @@ export function GalleryView() {
   };
 
   const formatDate = (dateStr) => {
-    if (dateStr === 'Recent') return 'Recent Media';
+    if (dateStr === 'Recent') return 'Recent';
     const d = new Date(dateStr);
     return isNaN(d.getTime())
       ? dateStr
       : d.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
   };
 
-  // Loading skeleton
+  // Loading: a faint outline of the grid, so the page doesn't jump when the photos arrive
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center h-full gap-3">
-        <Loader2 size={24} className="animate-spin text-primary" />
-        <p className="text-[13px] text-muted-foreground">Loading your library…</p>
+      <div className="flex h-full flex-col px-7 pt-8" aria-busy="true">
+        <div className="shimmer mb-8 h-9 w-48 rounded-xl" />
+        <div
+          className="grid flex-1 gap-3 overflow-hidden"
+          style={{ gridTemplateColumns: `repeat(${columns}, 1fr)`, gridAutoRows: `${itemHeight}px` }}
+        >
+          {Array.from({ length: columns * 3 }).map((_, i) => (
+            <div key={i} className="shimmer rounded-2xl" style={{ animationDelay: `${i * 60}ms` }} />
+          ))}
+        </div>
+        <p className="py-4 text-center text-[13px] text-muted-foreground">Opening your library…</p>
       </div>
     );
   }
@@ -339,7 +355,7 @@ export function GalleryView() {
   // Empty state
   if (images.length === 0 && videos.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center h-full gap-5">
+      <div className="flex h-full flex-col items-center justify-center gap-7 px-6">
         <input
           ref={fileInputRef}
           type="file"
@@ -348,25 +364,21 @@ export function GalleryView() {
           className="hidden"
           onChange={handleFileInputChange}
         />
-        <motion.div
-          className="h-16 w-16 rounded-2xl bg-muted/50 flex items-center justify-center"
-          animate={{ y: [0, -4, 0] }}
-          transition={{ repeat: Infinity, duration: 3, ease: 'easeInOut' }}
-        >
-          <Images size={28} strokeWidth={1.2} className="text-muted-foreground" />
+        <motion.div animate={{ y: [0, -5, 0] }} transition={{ repeat: Infinity, duration: 5, ease: 'easeInOut' }}>
+          <EmptyCove />
         </motion.div>
-        <div className="text-center space-y-1.5">
-          <h2 className="text-base font-medium text-foreground">No media in library</h2>
-          <p className="text-[13px] text-muted-foreground max-w-[280px]">
-            Import photos or videos to start exploring, organizing, and searching with AI
+        <div className="max-w-[420px] space-y-2 text-center">
+          <h2 className="font-display text-[30px] font-semibold leading-tight text-foreground">Your cove is empty</h2>
+          <p className="text-[15px] leading-relaxed text-muted-foreground">
+            Bring in photos and videos and Cove will sort them for you: searchable by what is in them, grouped by who is in them. All of it stays on this device.
           </p>
         </div>
         <button
           onClick={handleImportClick}
-          className="flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-[13px] font-medium text-primary-foreground hover:bg-primary/90 transition-colors shadow-md"
+          className="flex items-center gap-2 rounded-full bg-primary px-7 py-3.5 text-[15px] font-semibold text-primary-foreground shadow-[0_14px_36px_-10px_hsl(var(--primary)/0.8)] transition-all hover:brightness-110 active:scale-[0.97]"
         >
-          <FolderOpen size={14} />
-          Import Photos & Videos
+          <Plus size={18} strokeWidth={2.6} />
+          Import Photos &amp; Videos
         </button>
       </div>
     );
@@ -374,8 +386,23 @@ export function GalleryView() {
 
   const totalCount = images.length + videos.length;
 
+  const filterBtn = (id, label, Icon) => (
+    <button
+      key={id}
+      onClick={() => setLibraryFilter(id)}
+      className={`flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-[13px] font-medium transition-all ${
+        libraryFilter === id
+          ? 'bg-foreground text-background shadow-sm'
+          : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+      }`}
+    >
+      {Icon && <Icon size={13} />}
+      <span>{label}</span>
+    </button>
+  );
+
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex h-full flex-col">
       <input
         ref={fileInputRef}
         type="file"
@@ -384,82 +411,54 @@ export function GalleryView() {
         className="hidden"
         onChange={handleFileInputChange}
       />
-      {/* Header bar */}
-      <div className="flex items-center justify-between px-5 py-3 flex-shrink-0 border-b border-border/40 bg-surface/30 backdrop-blur-sm">
-        <div className="flex items-center gap-4">
-          <div className="flex items-baseline gap-2">
-            <h1 className="text-[15px] font-semibold text-foreground">Library</h1>
-            <span className="text-[11px] text-muted-foreground mono">
+
+      {/* Page header: serif title, count, type filter, person chip */}
+      <div className="flex flex-shrink-0 flex-wrap items-end justify-between gap-x-6 gap-y-4 px-7 pb-3 pt-7">
+        <div className="min-w-0">
+          <div className="flex items-baseline gap-3">
+            <h1 className="font-display text-[36px] font-semibold leading-none text-foreground">Library</h1>
+            <span className="tabular text-[14px] text-muted-foreground">
               {combinedMedia.length.toLocaleString()} items
             </span>
           </div>
 
-          {/* Unified Type Filters */}
-          <div className="flex items-center rounded-lg bg-muted/50 p-0.5 border border-border/60 text-xs">
-            <button
-              onClick={() => setLibraryFilter('all')}
-              className={`px-2.5 py-1 rounded-md font-medium transition-all ${
-                libraryFilter === 'all'
-                  ? 'bg-card text-foreground shadow-sm'
-                  : 'text-muted-foreground hover:text-foreground'
-              }`}
-            >
-              All ({totalCount})
-            </button>
-            <button
-              onClick={() => setLibraryFilter('photos')}
-              className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md font-medium transition-all ${
-                libraryFilter === 'photos'
-                  ? 'bg-card text-foreground shadow-sm'
-                  : 'text-muted-foreground hover:text-foreground'
-              }`}
-            >
-              <ImageIcon size={12} />
-              <span>Photos ({images.length})</span>
-            </button>
-            <button
-              onClick={() => setLibraryFilter('videos')}
-              className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md font-medium transition-all ${
-                libraryFilter === 'videos'
-                  ? 'bg-card text-foreground shadow-sm'
-                  : 'text-muted-foreground hover:text-foreground'
-              }`}
-            >
-              <Film size={12} />
-              <span>Videos ({videos.length})</span>
-            </button>
-          </div>
+          <div className="mt-4 flex flex-wrap items-center gap-3">
+            <div className="flex items-center gap-1 rounded-full border border-border/80 bg-card/60 p-1">
+              {filterBtn('all', `All (${totalCount})`)}
+              {filterBtn('photos', `Photos (${images.length})`, ImageIcon)}
+              {filterBtn('videos', `Videos (${videos.length})`, Film)}
+            </div>
 
-          {/* Active person filter pill */}
-          <AnimatePresence>
-            {selectedPersonFilter && (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.9 }}
-                className="flex items-center gap-1.5 rounded-full bg-primary/10 border border-primary/20 px-3 py-1 text-[11px] font-medium text-primary"
-              >
-                <span>Person: {selectedPersonFilter.name}</span>
-                <button
-                  onClick={() => setPersonFilter(null)}
-                  aria-label="Clear person filter"
-                  className="p-0.5 rounded-full hover:bg-primary/20 transition-colors"
+            <AnimatePresence>
+              {selectedPersonFilter && (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.9 }}
+                  className="flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 py-1.5 pl-4 pr-2 text-[13px] font-medium text-primary"
                 >
-                  <X size={12} />
-                </button>
-              </motion.div>
-            )}
-          </AnimatePresence>
+                  <span>Person: {selectedPersonFilter.name}</span>
+                  <button
+                    onClick={() => setPersonFilter(null)}
+                    aria-label="Clear person filter"
+                    className="rounded-full p-1 transition-colors hover:bg-primary/20"
+                  >
+                    <X size={13} />
+                  </button>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
           <AnimatePresence>
             {selectedImages.size > 0 && (
               <motion.span
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.9 }}
-                className="text-[11px] text-primary font-medium bg-primary/10 rounded-full px-2.5 py-0.5 border border-primary/20"
+                className="tabular rounded-full border border-primary/30 bg-primary/10 px-3.5 py-1.5 text-[13px] font-medium text-primary"
               >
                 {selectedImages.size} selected
               </motion.span>
@@ -468,19 +467,17 @@ export function GalleryView() {
           <button
             onClick={handleImportClick}
             aria-label="Import media into library"
-            className="flex items-center gap-1.5 rounded-lg bg-primary/10 hover:bg-primary/20 border border-primary/20 px-3 py-1.5 text-[12px] font-medium text-primary transition-colors"
+            className="flex items-center gap-2 rounded-full border border-border bg-card/70 px-4 py-2 text-[13px] font-medium text-foreground transition-colors hover:border-primary/50 hover:bg-card"
           >
-            <FolderOpen size={13} />
+            <Plus size={15} className="text-primary" />
             Import
           </button>
         </div>
       </div>
 
-      {/* Virtualized grid */}
-      <div ref={parentRef} className="flex-1 overflow-auto px-5 pb-5 pt-2">
-        <div
-          style={{ height: `${virtualizer.getTotalSize()}px`, position: 'relative', width: '100%' }}
-        >
+      {/* Virtualised grid */}
+      <div ref={setGridRef} className="flex-1 overflow-auto px-7 pb-10">
+        <div style={{ height: `${virtualizer.getTotalSize()}px`, position: 'relative', width: '100%' }}>
           {virtualizer.getVirtualItems().map((virtualRow) => {
             const row = rows[virtualRow.index];
             if (!row) return null;
@@ -494,11 +491,15 @@ export function GalleryView() {
                     top: 0,
                     left: 0,
                     width: '100%',
+                    height: `${HEADER_ROW_HEIGHT}px`,
                     transform: `translateY(${virtualRow.start}px)`,
                   }}
-                  className="pt-4 pb-2 text-[12px] font-semibold text-foreground/80 tracking-tight"
+                  className="flex items-end gap-4 pb-3"
                 >
-                  {formatDate(row.date)}
+                  <h2 className="whitespace-nowrap font-display text-[21px] font-medium italic text-foreground/90">
+                    {formatDate(row.date)}
+                  </h2>
+                  <div className="mb-2 h-px flex-1 bg-border/70" />
                 </div>
               );
             }
@@ -506,16 +507,18 @@ export function GalleryView() {
             return (
               <div
                 key={virtualRow.key}
+                data-index={virtualRow.index}
+                ref={virtualizer.measureElement}
                 style={{
                   position: 'absolute',
                   top: 0,
                   left: 0,
                   width: '100%',
-                  height: `${itemHeight}px`,
+                  paddingBottom: `${GRID_GAP}px`,
                   transform: `translateY(${virtualRow.start}px)`,
                   display: 'grid',
                   gridTemplateColumns: `repeat(${columns}, 1fr)`,
-                  gap: '4px',
+                  columnGap: `${GRID_GAP}px`,
                 }}
               >
                 {row.images.map((item) => (
@@ -532,5 +535,18 @@ export function GalleryView() {
         </div>
       </div>
     </div>
+  );
+}
+
+/** A small illustration for the empty library: a low sun over a bay, layered tide lines. */
+function EmptyCove() {
+  return (
+    <svg width="220" height="150" viewBox="0 0 220 150" fill="none" aria-hidden="true">
+      <circle cx="150" cy="52" r="42" fill="hsl(var(--primary))" opacity="0.12" />
+      <circle cx="150" cy="52" r="26" fill="hsl(var(--primary))" opacity="0.95" />
+      <path d="M0 96c26-12 52-12 78 0s52 12 78 0 52-12 66 0V150H0z" fill="hsl(var(--info))" opacity="0.22" />
+      <path d="M0 112c26-10 52-10 78 0s52 10 78 0 52-10 66 0V150H0z" fill="hsl(var(--info))" opacity="0.34" />
+      <path d="M0 128c26-8 52-8 78 0s52 8 78 0 52-8 66 0V150H0z" fill="hsl(var(--accent))" opacity="0.5" />
+    </svg>
   );
 }

@@ -34,7 +34,7 @@ export class ErrorBoundary extends React.Component {
           </div>
           <h1 className="text-xl font-bold text-foreground mb-2">Something went wrong</h1>
           <p className="text-[13px] text-muted-foreground max-w-md mb-2 leading-relaxed">
-            An unexpected error occurred in VisionArchive. The error has been logged. Please reload to continue.
+            An unexpected error occurred in Cove. The error has been logged. Please reload to continue.
           </p>
           {this.state.error?.message && (
             <code className="text-[11px] mono text-muted-foreground/70 bg-muted px-3 py-1.5 rounded-md mb-6 max-w-sm truncate block">
@@ -46,7 +46,7 @@ export class ErrorBoundary extends React.Component {
             className="flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-[13px] font-medium text-primary-foreground hover:bg-primary/90 transition-colors shadow-md"
           >
             <RefreshCw size={14} />
-            Reload VisionArchive
+            Reload Cove
           </button>
         </div>
       );

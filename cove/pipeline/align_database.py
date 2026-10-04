@@ -11,7 +11,7 @@ if _project_root not in sys.path:
 from config.vision_config import CONFIG
 
 def fix_database():
-    print("🔧 VISION ARCHIVE: Database Repair Tool")
+    print("🔧 COVE: Database Repair Tool")
     
     # 1. Look for vectors (Try both names)
     vector_candidates = [CONFIG.embeddings_file, CONFIG.vector_path]

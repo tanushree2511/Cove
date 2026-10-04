@@ -6,6 +6,7 @@ from typing import Optional
 from insightface.app import FaceAnalysis
 
 from config.vision_config import CONFIG, VisionConfig, get_logger
+from config.runtime import limit_face_model_threads
 
 logger = get_logger(__name__)
 
@@ -39,6 +40,11 @@ class AIEngine:
 
         if self.config.use_gpu:
             self._apply_gpu_options()
+        else:
+            self._limit_cpu_threads()
+
+    def _limit_cpu_threads(self):
+        limit_face_model_threads(self.app, self.config.runtime_profile)
 
     def _apply_gpu_options(self):
         try:

@@ -34,7 +34,13 @@ fn spawn_sidecar(
 ) {
     match app.shell().sidecar(name) {
         Ok(mut cmd) => {
-            cmd = cmd.env("VISION_PORT", port).env("TMPDIR", tmp_dir);
+            // PyInstaller one-file apps unpack to the temp dir: point every platform's variable at ours so the stale
+            // _MEI* cleanup in setup() actually covers it (TMPDIR is Unix, TEMP/TMP are Windows).
+            cmd = cmd
+                .env("COVE_PORT", port)
+                .env("TMPDIR", tmp_dir)
+                .env("TEMP", tmp_dir)
+                .env("TMP", tmp_dir);
             for (k, v) in extra_envs {
                 cmd = cmd.env(k, v);
             }
@@ -91,7 +97,7 @@ pub fn run() {
                 .build(),
         )
         .setup(move |app| {
-            log::info!("VisionArchive Desktop initializing...");
+            log::info!("Cove Desktop initializing...");
             app.manage(SidecarState(children_setup.clone()));
 
             // Resolve data + tmp dirs
@@ -107,7 +113,7 @@ pub fn run() {
             } else {
                 std::path::PathBuf::from(&home).join(".config")
             };
-            let data_dir = config_base.join("VisionArchive");
+            let data_dir = config_base.join("Cove");
             let tmp_dir = data_dir.join("tmp");
             let _ = std::fs::create_dir_all(&tmp_dir);
 
@@ -129,12 +135,24 @@ pub fn run() {
 
             let data_str = data_dir.to_string_lossy().to_string();
 
+            // The CLIP + face models are bundled once as a Tauri resource (<resource_dir>/models); both backends
+            // read them from there. In `tauri dev` the folder is absent and the backends fall back to ./models.
+            let model_str = app
+                .path()
+                .resource_dir()
+                .map(|d| d.join("models").to_string_lossy().to_string())
+                .unwrap_or_default();
+            let envs: Vec<(&str, &str)> = vec![
+                ("COVE_USER_DATA", data_str.as_str()),
+                ("COVE_MODEL_DIR", model_str.as_str()),
+            ];
+
             // Spawn cove-backend (photo API, port 8000)
             spawn_sidecar(
                 app,
                 "cove-backend",
                 "8000",
-                &[("VISION_USER_DATA", &data_str)],
+                &envs,
                 &tmp_dir,
                 children_setup.clone(),
             );
@@ -144,7 +162,7 @@ pub fn run() {
                 app,
                 "video-backend",
                 "8001",
-                &[("VISION_USER_DATA", &data_str)],
+                &envs,
                 &tmp_dir,
                 children_setup.clone(),
             );

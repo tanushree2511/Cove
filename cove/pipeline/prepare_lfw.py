@@ -98,9 +98,9 @@ def ensure_test_images(
     return _download_lfw_people(dest_dir)
 
 def main():
-    source_root = os.getenv("VISION_LFW_SOURCE", DEFAULT_SOURCE_ROOT)
+    source_root = os.getenv("COVE_LFW_SOURCE", DEFAULT_SOURCE_ROOT)
     dest_dir = DEFAULT_DEST_DIR
-    force_refresh = os.getenv("VISION_LFW_FORCE_REFRESH", "0").strip().lower() in {"1", "true", "yes", "on"}
+    force_refresh = os.getenv("COVE_LFW_FORCE_REFRESH", "0").strip().lower() in {"1", "true", "yes", "on"}
 
     os.makedirs(dest_dir, exist_ok=True)
     count = ensure_test_images(source_root, dest_dir, force=force_refresh)

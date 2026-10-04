@@ -1,21 +1,32 @@
 /**
- * Collapsible left sidebar — Linear.app / Arc Browser inspired.
- * Icon-only compact mode with spring animation, active indicator, and tooltips.
+ * Left navigation: the Cove wordmark, two groups of destinations, live indexing status, and a quiet reminder that
+ * everything stays on this device. Collapses to an icon rail.
  */
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Images, Users, Search, Activity, Settings,
-  ChevronsLeft, ChevronsRight, Sparkles, Film,
+  ChevronsLeft, ChevronsRight, Film, Lock,
 } from 'lucide-react';
 import { useAppStore } from '@/store/useAppStore';
+import { CoveMark } from '@/components/CoveMark';
 
-const NAV_ITEMS = [
-  { id: 'library',  label: 'Library',  icon: Images   },
-  { id: 'people',   label: 'People',   icon: Users    },
-  { id: 'video',    label: 'Videos',   icon: Film     },
-  { id: 'search',   label: 'Search',   icon: Search   },
-  { id: 'indexing', label: 'Indexing', icon: Activity },
-  { id: 'settings', label: 'Settings', icon: Settings },
+const GROUPS = [
+  {
+    label: 'Browse',
+    items: [
+      { id: 'library',  label: 'Library',  icon: Images },
+      { id: 'people',   label: 'People',   icon: Users  },
+      { id: 'video',    label: 'Videos',   icon: Film   },
+      { id: 'search',   label: 'Search',   icon: Search },
+    ],
+  },
+  {
+    label: 'Manage',
+    items: [
+      { id: 'indexing', label: 'Indexing', icon: Activity },
+      { id: 'settings', label: 'Settings', icon: Settings },
+    ],
+  },
 ];
 
 export function AppSidebar() {
@@ -26,11 +37,9 @@ export function AppSidebar() {
 
   return (
     <div className="flex h-full flex-col bg-sidebar select-none border-r border-sidebar-border">
-      {/* Logo header */}
-      <div className="flex h-[52px] items-center gap-2 px-3 flex-shrink-0">
-        <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary/10 flex-shrink-0 border border-primary/20">
-          <Sparkles size={14} className="text-primary" />
-        </div>
+      {/* Brand */}
+      <div className={`flex h-[72px] items-center flex-shrink-0 ${collapsed ? 'justify-center px-0' : 'gap-3 px-5'}`}>
+        <CoveMark size={34} className="flex-shrink-0 drop-shadow-[0_6px_14px_hsl(var(--primary)/0.35)]" />
         <AnimatePresence mode="wait">
           {!collapsed && (
             <motion.div
@@ -38,114 +47,123 @@ export function AppSidebar() {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -8 }}
               transition={{ duration: 0.15 }}
-              className="flex-1 min-w-0"
+              className="min-w-0 leading-none"
             >
-              <span className="text-[13px] font-semibold text-foreground tracking-tight">
-                VisionArchive
-              </span>
-              <span className="text-[10px] text-primary ml-1 font-bold">PRO</span>
+              <div className="font-display text-[26px] font-semibold tracking-tight text-foreground">Cove</div>
+              <div className="mt-1 text-[11px] text-muted-foreground">your photos &amp; videos, kept close</div>
             </motion.div>
           )}
         </AnimatePresence>
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 py-1.5 px-2 space-y-0.5" aria-label="Main navigation">
-        <AnimatePresence>
-          {!collapsed && (
-            <motion.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="px-2 pb-1.5 pt-1 text-[10px] font-medium uppercase tracking-widest text-muted-foreground/60"
-            >
-              Navigate
-            </motion.p>
-          )}
-        </AnimatePresence>
-
-        {NAV_ITEMS.map((item) => {
-          const isActive = activeView === item.id;
-          return (
-            <motion.button
-              key={item.id}
-              onClick={() => setActiveView(item.id)}
-              aria-label={item.label}
-              aria-current={isActive ? 'page' : undefined}
-              title={collapsed ? item.label : undefined}
-              className={`
-                relative flex w-full items-center gap-2.5 rounded-md px-2.5 py-[7px] text-[13px]
-                transition-colors duration-100
-                ${collapsed ? 'justify-center' : ''}
-                ${isActive
-                  ? 'text-foreground font-medium'
-                  : 'text-sidebar-foreground hover:text-foreground hover:bg-sidebar-accent/60'}
-              `}
-              whileTap={{ scale: 0.98 }}
-            >
-              {/* Active background pill */}
-              {isActive && (
-                <motion.div
-                  layoutId="sidebar-active-bg"
-                  className="absolute inset-0 rounded-md bg-sidebar-accent"
-                  transition={{ type: 'spring', stiffness: 500, damping: 35 }}
-                />
+      <nav className="flex-1 overflow-y-auto px-3 pb-2" aria-label="Main navigation">
+        {GROUPS.map((group) => (
+          <div key={group.label} className="mb-4">
+            <AnimatePresence>
+              {!collapsed && (
+                <motion.p
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="eyebrow px-3 pb-2 pt-3"
+                >
+                  {group.label}
+                </motion.p>
               )}
-              {/* Active left indicator bar */}
-              {isActive && (
-                <motion.div
-                  layoutId="sidebar-indicator"
-                  className="absolute -left-2 top-1/2 -translate-y-1/2 w-[3px] h-3.5 rounded-r-full bg-primary"
-                  transition={{ type: 'spring', stiffness: 500, damping: 35 }}
-                />
-              )}
+            </AnimatePresence>
+            {collapsed && <div className="mx-3 my-3 h-px bg-sidebar-border" />}
 
-              <item.icon
-                size={16}
-                strokeWidth={isActive ? 2 : 1.5}
-                className={`relative z-10 flex-shrink-0 ${isActive ? 'text-primary' : ''}`}
-              />
-
-              <AnimatePresence mode="wait">
-                {!collapsed && (
-                  <motion.span
-                    initial={{ opacity: 0, width: 0 }}
-                    animate={{ opacity: 1, width: 'auto' }}
-                    exit={{ opacity: 0, width: 0 }}
-                    transition={{ duration: 0.12 }}
-                    className="relative z-10 flex-1 flex items-center justify-between gap-1.5 truncate whitespace-nowrap"
+            <div className="space-y-1">
+              {group.items.map((item) => {
+                const isActive = activeView === item.id;
+                return (
+                  <motion.button
+                    key={item.id}
+                    onClick={() => setActiveView(item.id)}
+                    aria-label={item.label}
+                    aria-current={isActive ? 'page' : undefined}
+                    title={collapsed ? item.label : undefined}
+                    className={`
+                      relative flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-[14px]
+                      transition-colors duration-150
+                      ${collapsed ? 'justify-center' : ''}
+                      ${isActive
+                        ? 'text-foreground font-medium'
+                        : 'text-sidebar-foreground hover:text-foreground hover:bg-sidebar-accent/70'}
+                    `}
+                    whileTap={{ scale: 0.98 }}
                   >
-                    <span>{item.label}</span>
-                    {item.id === 'indexing' && (
-                      <IndexingNavBadge />
+                    {isActive && (
+                      <motion.div
+                        layoutId="sidebar-active-bg"
+                        className="absolute inset-0 rounded-xl bg-sidebar-accent ring-1 ring-inset ring-border/60"
+                        transition={{ type: 'spring', stiffness: 500, damping: 36 }}
+                      />
                     )}
-                  </motion.span>
-                )}
-              </AnimatePresence>
-            </motion.button>
-          );
-        })}
+                    {isActive && (
+                      <motion.div
+                        layoutId="sidebar-indicator"
+                        className="absolute -left-3 top-1/2 h-5 w-[3px] -translate-y-1/2 rounded-r-full bg-primary shadow-[0_0_12px_hsl(var(--primary)/0.8)]"
+                        transition={{ type: 'spring', stiffness: 500, damping: 36 }}
+                      />
+                    )}
+
+                    <item.icon
+                      size={19}
+                      strokeWidth={isActive ? 2.1 : 1.6}
+                      className={`relative z-10 flex-shrink-0 ${isActive ? 'text-primary' : ''}`}
+                    />
+
+                    <AnimatePresence mode="wait">
+                      {!collapsed && (
+                        <motion.span
+                          initial={{ opacity: 0, width: 0 }}
+                          animate={{ opacity: 1, width: 'auto' }}
+                          exit={{ opacity: 0, width: 0 }}
+                          transition={{ duration: 0.12 }}
+                          className="relative z-10 flex flex-1 items-center justify-between gap-1.5 truncate whitespace-nowrap"
+                        >
+                          <span>{item.label}</span>
+                          {item.id === 'indexing' && <IndexingNavBadge />}
+                        </motion.span>
+                      )}
+                    </AnimatePresence>
+                  </motion.button>
+                );
+              })}
+            </div>
+          </div>
+        ))}
       </nav>
 
       {/* Indexing mini-status */}
       <IndexingMini collapsed={collapsed} />
 
-      {/* Collapse toggle */}
-      <div className="p-2 flex-shrink-0 border-t border-sidebar-border/60">
+      {/* Footer: privacy note + collapse */}
+      <div className="flex-shrink-0 border-t border-sidebar-border/70 p-3">
+        <AnimatePresence>
+          {!collapsed && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="mb-2 flex items-start gap-2 rounded-xl px-3 py-2 text-[11.5px] leading-snug text-muted-foreground"
+            >
+              <Lock size={13} className="mt-0.5 flex-shrink-0 text-success" />
+              <span>Private by design. Your library never leaves this device.</span>
+            </motion.div>
+          )}
+        </AnimatePresence>
         <button
           onClick={toggleSidebar}
           aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-          className="flex w-full items-center justify-center gap-2 rounded-md p-1.5 text-muted-foreground hover:text-foreground hover:bg-sidebar-accent/60 transition-colors"
+          className="flex w-full items-center justify-center gap-2 rounded-xl p-2 text-muted-foreground transition-colors hover:bg-sidebar-accent/70 hover:text-foreground"
         >
-          {collapsed ? <ChevronsRight size={14} /> : <ChevronsLeft size={14} />}
+          {collapsed ? <ChevronsRight size={16} /> : <ChevronsLeft size={16} />}
           <AnimatePresence>
             {!collapsed && (
-              <motion.span
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="text-[11px]"
-              >
+              <motion.span initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="text-[12px]">
                 Collapse
               </motion.span>
             )}
@@ -166,9 +184,9 @@ function IndexingNavBadge() {
   if (!isPhotoActive && !isVideoActive) return null;
 
   return (
-    <span className="flex h-2 w-2 relative">
-      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75" />
-      <span className="relative inline-flex rounded-full h-2 w-2 bg-primary" />
+    <span className="relative flex h-2 w-2">
+      <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75" />
+      <span className="relative inline-flex h-2 w-2 rounded-full bg-primary" />
     </span>
   );
 }
@@ -183,7 +201,7 @@ function IndexingMini({ collapsed }) {
   if (!isPhotoActive && !isVideoActive) return null;
 
   const stage = isVideoActive
-    ? `Video AI (${videoStatus.current || 0}/${videoStatus.total || 1})`
+    ? `Analysing videos · ${videoStatus.current || 0}/${videoStatus.total || 1}`
     : (photoStatus.stage || 'indexing');
 
   const progress = isVideoActive
@@ -191,26 +209,20 @@ function IndexingMini({ collapsed }) {
     : (photoStatus.progress || 0);
 
   return (
-    <div className="mx-2 mb-1 rounded-md bg-sidebar-accent/50 p-2 border border-border/40">
-      <div className="flex items-center gap-2">
-        {/* Pulsing dot */}
-        <div className="relative h-1.5 w-1.5 flex-shrink-0">
+    <div className="mx-3 mb-3 rounded-xl border border-border/50 bg-sidebar-accent/60 p-3">
+      <div className="flex items-center gap-2.5">
+        <div className="relative h-2 w-2 flex-shrink-0">
           <span className="absolute inset-0 rounded-full bg-primary" />
-          <span className="absolute inset-0 rounded-full bg-primary animate-pulse" />
+          <span className="absolute inset-0 animate-pulse rounded-full bg-primary" />
         </div>
 
         <AnimatePresence>
           {!collapsed && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="flex-1 min-w-0"
-            >
-              <p className="text-[10px] text-muted-foreground capitalize truncate">{stage}</p>
-              <div className="mt-1 h-[3px] rounded-full bg-muted overflow-hidden">
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="min-w-0 flex-1">
+              <p className="truncate text-[11.5px] capitalize text-muted-foreground">{stage}</p>
+              <div className="mt-1.5 h-1 overflow-hidden rounded-full bg-muted">
                 <motion.div
-                  className="h-full bg-gradient-to-r from-primary to-accent rounded-full"
+                  className="h-full rounded-full bg-gradient-to-r from-primary to-accent"
                   animate={{ width: `${Math.max(5, progress)}%` }}
                   transition={{ duration: 0.6, ease: 'easeOut' }}
                 />

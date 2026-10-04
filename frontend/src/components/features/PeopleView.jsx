@@ -1,11 +1,11 @@
 /**
- * People view — unified face clusters from both photos and videos.
+ * People view - unified face clusters from both photos and videos.
  * Paginated, interactive avatars with inline renaming.
  * Clicking a person filters the unified library.
  */
 import { useEffect, useState, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Users, Loader2, ChevronLeft, ChevronRight, Edit2, Check, X, Film, Image as ImageIcon } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { Users, ChevronLeft, ChevronRight, Pencil, Check, X, Film, Image as ImageIcon } from 'lucide-react';
 import { useAppStore } from '@/store/useAppStore';
 import { fetchClusters, renamePerson } from '@/lib/coveApi';
 import { fetchAllVideoPersons, renameVideoPerson } from '@/lib/videoApi';
@@ -18,7 +18,8 @@ export function PeopleView() {
   const setActiveView   = useAppStore((s) => s.setActiveView);
 
   const [people, setPeople]       = useState([]);
-  const [total, setTotal]         = useState(0);
+  const [total, setTotal]         = useState(0);        // everyone: all photo clusters + all video people
+  const [photoTotal, setPhotoTotal] = useState(0);      // photo clusters only - this is what the pager pages over
   const [page, setPage]           = useState(0);
   const [loading, setLoading]     = useState(false);
   const [editingId, setEditingId] = useState(null);
@@ -41,10 +42,13 @@ export function PeopleView() {
         count: p.count ?? p.imageCount ?? p.photo_count ?? 1,
       }));
 
-      // Combine photo clusters with video people
-      const combined = [...photoPeople, ...videoPersons];
-      setPeople(combined);
-      setTotal(combined.length);
+      // The pager walks the photo clusters; video people are listed once, on the first page. (This used to count
+      // "this page's clusters + all video people" as the total, so a library with 666 clusters showed
+      // "286 people / 2 pages", repeated the video people on every page and made later pages unreachable.)
+      const serverPhotoTotal = photoResult.total ?? photoPeople.length;
+      setPeople(pageIndex === 0 ? [...photoPeople, ...videoPersons] : photoPeople);
+      setPhotoTotal(serverPhotoTotal);
+      setTotal(serverPhotoTotal + videoPersons.length);
       setPage(pageIndex);
     } catch (err) {
       toast.error(`Failed to load people: ${err?.message}`);
@@ -57,7 +61,7 @@ export function PeopleView() {
     loadPage(0);
   }, [loadPage]);
 
-  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+  const totalPages = Math.max(1, Math.ceil(photoTotal / PAGE_SIZE));
 
   const handlePersonClick = (cluster) => {
     if (editingId === cluster.id) return;
@@ -107,85 +111,92 @@ export function PeopleView() {
     }
   };
 
-  if (loading) {
+  if (loading && people.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center h-full gap-3">
-        <Loader2 size={24} className="animate-spin text-primary" />
-        <p className="text-[13px] text-muted-foreground">Loading people across photos and videos…</p>
+      <div className="flex h-full flex-col px-7 pt-8" aria-busy="true">
+        <div className="shimmer mb-8 h-9 w-40 rounded-xl" />
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8">
+          {Array.from({ length: 16 }).map((_, i) => (
+            <div key={i} className="shimmer h-[168px] rounded-3xl" style={{ animationDelay: `${i * 50}ms` }} />
+          ))}
+        </div>
       </div>
     );
   }
 
   if (!loading && total === 0) {
     return (
-      <div className="flex flex-col items-center justify-center h-full gap-5">
+      <div className="flex h-full flex-col items-center justify-center gap-6 px-6">
         <motion.div
-          className="h-16 w-16 rounded-2xl bg-muted/50 flex items-center justify-center"
-          animate={{ y: [0, -4, 0] }}
-          transition={{ repeat: Infinity, duration: 3, ease: 'easeInOut' }}
+          className="flex h-24 w-24 items-center justify-center rounded-full border border-border bg-card"
+          animate={{ y: [0, -5, 0] }}
+          transition={{ repeat: Infinity, duration: 5, ease: 'easeInOut' }}
         >
-          <Users size={28} strokeWidth={1.2} className="text-muted-foreground" />
+          <Users size={36} strokeWidth={1.2} className="text-primary" />
         </motion.div>
-        <div className="text-center space-y-1.5">
-          <h2 className="text-base font-medium text-foreground">No people found</h2>
-          <p className="text-[13px] text-muted-foreground">Import photos or videos with recognizable faces to discover and group people</p>
+        <div className="max-w-[400px] space-y-2 text-center">
+          <h2 className="font-display text-[28px] font-semibold text-foreground">No people yet</h2>
+          <p className="text-[15px] leading-relaxed text-muted-foreground">
+            When your photos and videos contain faces, Cove groups them by person here, on this device, without sending anything anywhere.
+          </p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="h-full flex flex-col">
+    <div className="flex h-full flex-col">
       {/* Header */}
-      <div className="flex items-center justify-between px-5 pt-5 pb-3 flex-shrink-0 border-b border-border/40">
-        <div className="flex items-baseline gap-2">
-          <h1 className="text-[15px] font-semibold text-foreground">People</h1>
-          <span className="text-[11px] text-muted-foreground mono">{total.toLocaleString()} people recognized</span>
+      <div className="flex flex-shrink-0 items-end justify-between gap-4 px-7 pb-4 pt-7">
+        <div>
+          <h1 className="font-display text-[36px] font-semibold leading-none text-foreground">People</h1>
+          <p className="tabular mt-2.5 text-[14px] text-muted-foreground">{total.toLocaleString()} people recognized</p>
         </div>
         {totalPages > 1 && (
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1 rounded-full border border-border/80 bg-card/60 p-1">
             <button
               onClick={() => loadPage(page - 1)}
               disabled={page === 0 || loading}
-              className="p-1.5 rounded-lg hover:bg-muted disabled:opacity-30 transition-colors"
+              aria-label="Previous page"
+              className="rounded-full p-2 transition-colors hover:bg-muted disabled:opacity-30"
             >
-              <ChevronLeft size={15} />
+              <ChevronLeft size={16} />
             </button>
-            <span className="text-[12px] text-muted-foreground mono">
+            <span className="mono tabular px-2 text-[12.5px] text-muted-foreground">
               {page + 1} / {totalPages}
             </span>
             <button
               onClick={() => loadPage(page + 1)}
               disabled={page >= totalPages - 1 || loading}
-              className="p-1.5 rounded-lg hover:bg-muted disabled:opacity-30 transition-colors"
+              aria-label="Next page"
+              className="rounded-full p-2 transition-colors hover:bg-muted disabled:opacity-30"
             >
-              <ChevronRight size={15} />
+              <ChevronRight size={16} />
             </button>
           </div>
         )}
       </div>
 
       {/* Grid */}
-      <div className="flex-1 overflow-auto px-5 py-5">
-        <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8 gap-5">
+      <div className="flex-1 overflow-auto px-7 pb-10 pt-2">
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-8">
           {people.map((cluster, i) => (
             <motion.div
               key={cluster.id}
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: Math.min(i * 0.015, 0.5), duration: 0.25, ease: [0.25, 0.1, 0.25, 1] }}
+              transition={{ delay: Math.min(i * 0.012, 0.4), duration: 0.28, ease: [0.2, 0.7, 0.2, 1] }}
               onClick={() => handlePersonClick(cluster)}
               role="button"
               tabIndex={0}
               aria-label={`Filter by ${cluster.name}, ${cluster.count} occurrences`}
-              className="flex flex-col items-center gap-2.5 cursor-pointer group text-left relative select-none"
+              className="group relative flex cursor-pointer select-none flex-col items-center gap-3 rounded-3xl border border-transparent bg-card/40 px-3 pb-4 pt-5 text-left transition-all duration-200 hover:border-border hover:bg-card focus-visible:border-primary"
             >
               {/* Avatar */}
               <motion.div
-                whileHover={{ scale: 1.06 }}
                 whileTap={{ scale: 0.96 }}
                 transition={{ type: 'spring', stiffness: 500, damping: 30 }}
-                className="relative h-20 w-20 rounded-full overflow-hidden bg-muted/60 ring-2 ring-transparent group-hover:ring-primary/50 transition-all duration-200 shadow-sm"
+                className="relative h-24 w-24 overflow-hidden rounded-full bg-muted ring-2 ring-border/70 ring-offset-4 ring-offset-transparent transition-all duration-300 group-hover:scale-105 group-hover:ring-primary"
               >
                 {cluster.thumbnail ? (
                   <img
@@ -199,25 +210,22 @@ export function PeopleView() {
                   />
                 ) : null}
                 <div
-                  className="h-full w-full items-center justify-center bg-muted text-muted-foreground font-semibold text-sm"
+                  className="font-display h-full w-full items-center justify-center bg-muted text-2xl font-semibold text-muted-foreground"
                   style={{ display: cluster.thumbnail ? 'none' : 'flex' }}
                 >
                   {cluster.name ? cluster.name.charAt(0).toUpperCase() : '?'}
                 </div>
-
-                {/* Source badge indicator */}
-                <div className="absolute bottom-0 right-0 p-1 bg-black/60 backdrop-blur-sm rounded-tl-md text-white">
-                  {cluster.sourceType === 'video' ? <Film size={10} /> : <ImageIcon size={10} />}
-                </div>
               </motion.div>
 
-              {/* Name & Count */}
-              <div className="w-full text-center px-1">
+              {/* where this person was found */}
+              <div className="absolute right-3 top-3 flex h-6 w-6 items-center justify-center rounded-full border border-border/70 bg-background/70 text-muted-foreground backdrop-blur-sm" title={cluster.sourceType === 'video' ? 'Found in videos' : 'Found in photos'}>
+                {cluster.sourceType === 'video' ? <Film size={11} /> : <ImageIcon size={11} />}
+              </div>
+
+              {/* Name & count */}
+              <div className="w-full px-1 text-center">
                 {editingId === cluster.id ? (
-                  <div
-                    className="flex items-center justify-center gap-1"
-                    onClick={(e) => e.stopPropagation()}
-                  >
+                  <div className="flex items-center justify-center gap-1" onClick={(e) => e.stopPropagation()}>
                     <input
                       type="text"
                       value={editName}
@@ -227,35 +235,28 @@ export function PeopleView() {
                         if (e.key === 'Escape') cancelEditing(e);
                       }}
                       autoFocus
-                      className="w-24 px-1.5 py-0.5 text-[11px] rounded border border-primary bg-background text-foreground text-center focus:outline-none"
+                      className="w-28 rounded-full border border-primary bg-background px-3 py-1 text-center text-[13px] text-foreground focus:outline-none"
                     />
-                    <button
-                      onClick={(e) => saveRename(e, cluster)}
-                      className="p-1 text-primary hover:bg-primary/10 rounded"
-                    >
-                      <Check size={12} />
+                    <button onClick={(e) => saveRename(e, cluster)} aria-label="Save name" className="rounded-full p-1.5 text-primary hover:bg-primary/10">
+                      <Check size={14} />
                     </button>
-                    <button
-                      onClick={cancelEditing}
-                      className="p-1 text-muted-foreground hover:bg-muted rounded"
-                    >
-                      <X size={12} />
+                    <button onClick={cancelEditing} aria-label="Cancel rename" className="rounded-full p-1.5 text-muted-foreground hover:bg-muted">
+                      <X size={14} />
                     </button>
                   </div>
                 ) : (
-                  <div className="flex items-center justify-center gap-1 group/name">
-                    <span className="text-[12px] font-medium text-foreground truncate max-w-[100px]">
-                      {cluster.name}
-                    </span>
+                  <div className="group/name flex items-center justify-center gap-1.5">
+                    <span className="max-w-[110px] truncate text-[14px] font-medium text-foreground">{cluster.name}</span>
                     <button
                       onClick={(e) => startEditing(e, cluster)}
-                      className="opacity-0 group-hover/name:opacity-100 hover:text-primary text-muted-foreground transition-opacity"
+                      aria-label={`Rename ${cluster.name}`}
+                      className="text-muted-foreground opacity-0 transition-opacity hover:text-primary group-hover/name:opacity-100 focus-visible:opacity-100"
                     >
-                      <Edit2 size={10} />
+                      <Pencil size={12} />
                     </button>
                   </div>
                 )}
-                <span className="text-[10px] text-muted-foreground mono block">
+                <span className="tabular mt-0.5 block text-[12px] text-muted-foreground">
                   {cluster.count} {cluster.count === 1 ? 'item' : 'items'}
                 </span>
               </div>

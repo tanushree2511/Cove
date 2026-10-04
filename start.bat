@@ -1,15 +1,15 @@
 @echo off
 :: ─────────────────────────────────────────────────────────────
-::  VisionArchive AI — Windows launcher
+::  Cove — Windows launcher
 ::  Usage: double-click or run in Command Prompt
 :: ─────────────────────────────────────────────────────────────
 setlocal enabledelayedexpansion
 
-title VisionArchive AI
+title Cove
 
 echo.
 echo  ╔══════════════════════════════════════════════╗
-echo  ║        VisionArchive AI — Starting up        ║
+echo  ║        Cove — Starting up        ║
 echo  ╚══════════════════════════════════════════════╝
 echo.
 
@@ -20,46 +20,56 @@ if "%SCRIPT_DIR:~-1%"=="\" set "SCRIPT_DIR=%SCRIPT_DIR:~0,-1%"
 
 :: ── 1. Virtualenv setup ───────────────────────────────────────
 if not exist "%SCRIPT_DIR%\.venv\" (
-    echo [VisionArchive] No .venv found — creating virtualenv...
+    echo [Cove] No .venv found — creating virtualenv...
     python -m venv "%SCRIPT_DIR%\.venv"
     if errorlevel 1 (
         echo [ERROR] Failed to create virtualenv. Is Python 3.10+ installed?
         pause
         exit /b 1
     )
-    echo [VisionArchive] Installing dependencies...
+    echo [Cove] Installing dependencies...
     "%SCRIPT_DIR%\.venv\Scripts\pip" install --upgrade pip -q
     "%SCRIPT_DIR%\.venv\Scripts\pip" install -r "%SCRIPT_DIR%\requirements.txt"
-    echo [VisionArchive] Virtualenv ready.
+    echo [Cove] Selecting the onnxruntime build for this PC...
+    "%SCRIPT_DIR%\.venv\Scripts\python" "%SCRIPT_DIR%\scripts\install_runtime.py"
+    echo [Cove] Virtualenv ready.
 ) else (
-    echo [VisionArchive] Using existing virtualenv at .venv
+    echo [Cove] Using existing virtualenv at .venv
 )
 
-:: ── 2. GPU setting (safe default for Windows) ─────────────────
-:: NVIDIA GPU detection on Windows is complex; default to CPU.
-:: Set VISION_FORCE_CPU=0 manually if you have a supported GPU.
-set "VISION_FORCE_CPU=1"
-set "VISION_USE_GPU=0"
-echo [VisionArchive] GPU: CPU mode (set VISION_FORCE_CPU=0 for GPU)
+:: ── Node.js: make sure npm is reachable (the installer's PATH entry is missing in some shells) ──
+where npm >nul 2>&1
+if errorlevel 1 (
+    if exist "%ProgramFiles%\nodejs\npm.cmd" (
+        set "PATH=%PATH%;%ProgramFiles%\nodejs"
+    ) else (
+        echo [ERROR] npm not found. Install Node.js from https://nodejs.org and re-run.
+        pause
+        exit /b 1
+    )
+)
+
+:: ── 2. Hardware ─────────────────────────────────────────────────
+:: The app detects the hardware itself (CPU cores, NVIDIA / AMD / Intel / Qualcomm GPUs and NPUs) and benchmarks the
+:: options on first start, keeping the fastest. Set COVE_FORCE_CPU=1 beforehand to disable accelerators.
+echo [Cove] Hardware: auto-detected at start-up (see http://localhost:8000/hardware)
 
 :: ── 3. Model and data directories ────────────────────────────
-set "VISION_MODEL_DIR=%SCRIPT_DIR%\models"
-set "VISION_USER_DATA=%APPDATA%\VisionArchive"
-if not exist "%VISION_USER_DATA%\" mkdir "%VISION_USER_DATA%"
-echo [VisionArchive] Model dir : %VISION_MODEL_DIR%
-echo [VisionArchive] User data : %VISION_USER_DATA%
+set "COVE_MODEL_DIR=%SCRIPT_DIR%\models"
+set "COVE_USER_DATA=%APPDATA%\Cove"
+if not exist "%COVE_USER_DATA%\" mkdir "%COVE_USER_DATA%"
+echo [Cove] Model dir : %COVE_MODEL_DIR%
+echo [Cove] User data : %COVE_USER_DATA%
 
 :: ── 4. Worker count ───────────────────────────────────────────
-set "VISION_AI_WORKERS=%NUMBER_OF_PROCESSORS%"
-echo [VisionArchive] AI workers: %VISION_AI_WORKERS%
 
 :: ── 5. Kill stale processes on required ports ─────────────────
-echo [VisionArchive] Freeing ports 8000 and 8001...
+echo [Cove] Freeing ports 8000 and 8001...
 
 for /f "tokens=5" %%a in ('netstat -aon 2^>nul ^| findstr ":8000 "') do (
     set "PID=%%a"
     if not "!PID!"=="0" (
-        echo [VisionArchive] Killing PID !PID! on port 8000
+        echo [Cove] Killing PID !PID! on port 8000
         taskkill /F /PID !PID! >nul 2>&1
     )
 )
@@ -67,7 +77,7 @@ for /f "tokens=5" %%a in ('netstat -aon 2^>nul ^| findstr ":8000 "') do (
 for /f "tokens=5" %%a in ('netstat -aon 2^>nul ^| findstr ":8001 "') do (
     set "PID=%%a"
     if not "!PID!"=="0" (
-        echo [VisionArchive] Killing PID !PID! on port 8001
+        echo [Cove] Killing PID !PID! on port 8001
         taskkill /F /PID !PID! >nul 2>&1
     )
 )
@@ -75,7 +85,7 @@ for /f "tokens=5" %%a in ('netstat -aon 2^>nul ^| findstr ":8001 "') do (
 for /f "tokens=5" %%a in ('netstat -aon 2^>nul ^| findstr ":8080 "') do (
     set "PID=%%a"
     if not "!PID!"=="0" (
-        echo [VisionArchive] Killing PID !PID! on port 8080
+        echo [Cove] Killing PID !PID! on port 8080
         taskkill /F /PID !PID! >nul 2>&1
     )
 )
@@ -84,27 +94,27 @@ for /f "tokens=5" %%a in ('netstat -aon 2^>nul ^| findstr ":8080 "') do (
 if not exist "%SCRIPT_DIR%\.logs\" mkdir "%SCRIPT_DIR%\.logs"
 
 :: ── 6. Start cove-api ─────────────────────────────────────────
-echo [VisionArchive] Starting cove-api   (port 8000)...
-start "cove-api" /B cmd /c "cd /d "%SCRIPT_DIR%\cove" && set VISION_FORCE_CPU=%VISION_FORCE_CPU%&& set VISION_MODEL_DIR=%VISION_MODEL_DIR%&& set VISION_AI_WORKERS=%VISION_AI_WORKERS%&& "..\..\.venv\Scripts\python" -m uvicorn api.server:app --host 0.0.0.0 --port 8000 > "..\..\.logs\cove-api.log" 2>&1"
+echo [Cove] Starting cove-api   (port 8000)...
+start "cove-api" /B cmd /c "cd /d "%SCRIPT_DIR%\cove" && set COVE_MODEL_DIR=%COVE_MODEL_DIR%&& "%SCRIPT_DIR%\.venv\Scripts\python" -m uvicorn api.server:app --host 0.0.0.0 --port 8000 > "%SCRIPT_DIR%\.logs\cove-api.log" 2>&1"
 
 :: ── 7. Start video-api ────────────────────────────────────────
-echo [VisionArchive] Starting video-api  (port 8001)...
-start "video-api" /B cmd /c "cd /d "%SCRIPT_DIR%\videoModules" && set VISION_FORCE_CPU=%VISION_FORCE_CPU%&& set VISION_MODEL_DIR=%VISION_MODEL_DIR%&& set VISION_AI_WORKERS=%VISION_AI_WORKERS%&& "..\..\.venv\Scripts\python" -m uvicorn api:app --host 0.0.0.0 --port 8001 > "..\..\.logs\video-api.log" 2>&1"
+echo [Cove] Starting video-api  (port 8001)...
+start "video-api" /B cmd /c "cd /d "%SCRIPT_DIR%\videoModules" && set COVE_MODEL_DIR=%COVE_MODEL_DIR%&& "%SCRIPT_DIR%\.venv\Scripts\python" -m uvicorn api:app --host 0.0.0.0 --port 8001 > "%SCRIPT_DIR%\.logs\video-api.log" 2>&1"
 
 :: ── 8. Start frontend ─────────────────────────────────────────
-echo [VisionArchive] Starting frontend   (port 8080)...
+echo [Cove] Starting frontend   (port 8080)...
 start "frontend" /B cmd /c "cd /d "%SCRIPT_DIR%\frontend" && npm run dev -- --port 8080 > "..\.logs\frontend.log" 2>&1"
 
 :: ── 9. Wait then open browser ─────────────────────────────────
-echo [VisionArchive] Waiting 5 seconds for services to initialise...
+echo [Cove] Waiting 5 seconds for services to initialise...
 timeout /t 5 /nobreak >nul
-echo [VisionArchive] Opening browser at http://localhost:8080
+echo [Cove] Opening browser at http://localhost:8080
 start http://localhost:8080
 
 :: ── 10. Instructions ──────────────────────────────────────────
 echo.
 echo  ╔══════════════════════════════════════════════╗
-echo  ║  ✅  VisionArchive is running!               ║
+echo  ║  ✅  Cove is running!               ║
 echo  ║                                              ║
 echo  ║  🌐  http://localhost:8080                   ║
 echo  ║                                              ║

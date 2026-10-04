@@ -71,7 +71,7 @@ def scan_worker(worker_id, file_queue, result_list, lock, pool, progress=None, p
 
 
 def main():
-    logger.info("🚀 Vision Archive: Auto-scaling pipeline")
+    logger.info("🚀 Cove: Auto-scaling pipeline")
 
     if not _has_images(IMG_FOLDER):
         logger.info("Image folder missing or empty (%s); preparing test images.", IMG_FOLDER)

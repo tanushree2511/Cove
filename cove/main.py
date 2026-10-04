@@ -1,5 +1,5 @@
 """
-Vision Archive AI - Main Entry Point
+Cove - Main Entry Point
 Run this file to show the CLI guidance and check component readiness.
 """
 from __future__ import annotations
@@ -25,7 +25,7 @@ def _print_section(title: str, lines: Iterable[str]) -> None:
 
 def show_commands() -> None:
     print("=" * 50)
-    print("  👁️  VISION ARCHIVE AI")
+    print("  👁️  COVE")
     print("=" * 50)
     print()
 
@@ -57,11 +57,12 @@ def show_commands() -> None:
 def show_status() -> None:
     face_models_dir = os.path.join(CONFIG.assets_dir, "buffalo_s")
     face_model_ready = os.path.exists(os.path.join(face_models_dir, "det_500m.onnx"))
-    clip_ready = all(os.path.exists(os.path.join(CONFIG.assets_dir, f)) for f in [
-        "clip_image.onnx",
-        "clip_text.onnx",
-        "tokenizer.json",
-    ])
+    def _has(*names):
+        return all(os.path.exists(os.path.join(CONFIG.assets_dir, f)) for f in names)
+
+    clip_ready = _has("tokenizer.json") and (
+        _has("clip_b16_image.onnx", "clip_b16_text.onnx") or _has("clip_image.onnx", "clip_text.onnx")
+    )
     db_ready = os.path.exists(CONFIG.people_db_path)
     search_index_ready = os.path.exists(CONFIG.search_index_path)
 
@@ -76,7 +77,7 @@ def show_status() -> None:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description='Vision Archive CLI entry point')
+    parser = argparse.ArgumentParser(description='Cove CLI entry point')
     parser.add_argument('command', nargs='?', choices=['help', 'status'], default='help')
     args = parser.parse_args()
 
