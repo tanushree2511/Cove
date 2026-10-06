@@ -8,7 +8,7 @@ from tokenizers import Tokenizer
 
 from config.vision_config import CONFIG, VisionConfig, get_logger
 from config.hardware import cpu_config
-from config.runtime import create_session
+from config.runtime import create_session, create_sessions
 
 logger = get_logger(__name__)
 
@@ -57,7 +57,10 @@ class SearchEngine:
 
         logger.info("Loading CLIP models (%s) from %s on %s (batch %d)", self.model_id, self.model_dir, image_cfg.name, self.batch_size)
         try:
-            self.img_session = create_session(image_model, image_cfg)
+            # `image_cfg.sessions` replicas of the image encoder work on different batches at the same time (data
+            # parallelism) so that every core stays busy; the benchmarked config says how many are worth having.
+            self.img_sessions = create_sessions(image_model, image_cfg)
+            self.img_session = self.img_sessions[0]
             self.txt_session = create_session(text_model, text_cfg)
             self.tokenizer = Tokenizer.from_file(tokenizer_path)
             self.tokenizer.enable_padding(length=77)
@@ -101,26 +104,25 @@ class SearchEngine:
         data = (np.array(img, dtype=np.float32) / 255.0 - _CLIP_MEAN) / _CLIP_STD
         return np.ascontiguousarray(np.transpose(data, (2, 0, 1)))
 
-    def _run_batch(self, batch: np.ndarray) -> np.ndarray:
-        t0 = time.perf_counter()
-        out = self.img_session.run(None, {self._img_input_name: batch})[0]
-        profile = self.config.runtime_profile
-        if profile is not None:   # feed real throughput back so the app adapts to load / thermal throttling
-            profile.observe_throughput(len(batch), time.perf_counter() - t0)
+    def _run_batch(self, batch: np.ndarray, session=None) -> np.ndarray:
+        out = (session or self.img_session).run(None, {self._img_input_name: batch})[0]
         out = out.reshape(len(batch), -1)
         return out / (np.linalg.norm(out, axis=1, keepdims=True) + 1e-6)
 
     def get_image_embeddings(self, images: List[Union[str, Image.Image]], batch_size: Optional[int] = None) -> List[Optional[np.ndarray]]:
         """L2-normalised 512-D CLIP vision embeddings for many images (None for any that fail to load).
 
-        Images are pre-processed in parallel threads (decode/resize is CPU work that would otherwise leave the
-        model idle) and fed to the model in batches - larger matrix products keep the hardware busier than
-        one-image-at-a-time calls."""
+        A small pipeline keeps every core busy: images are cut into batches; each batch is decoded/resized (in a pool of
+        pre-processing threads) and then run on whichever model replica is free, while other batches are being
+        pre-processed or run on the other replicas. With one replica this still overlaps the decoding of the next batch
+        with the inference of the current one; with several (see config/hardware.py `parallel_session_candidates`)
+        the CPU stays saturated instead of waiting on a single session's thread pool."""
         n = len(images)
         results: List[Optional[np.ndarray]] = [None] * n
         if n == 0:
             return results
         batch_size = max(1, batch_size or self.batch_size)
+        sessions = list(getattr(self, "img_sessions", None) or [self.img_session])
 
         def prep(i):
             try:
@@ -129,30 +131,61 @@ class SearchEngine:
                 logger.warning("Could not read image %s: %s", images[i] if isinstance(images[i], str) else "<frame>", exc)
                 return i, None
 
-        if n > 1:
-            from concurrent.futures import ThreadPoolExecutor
-            with ThreadPoolExecutor(max_workers=min(n, max(2, self.config.effective_workers))) as pool:
-                prepped = list(pool.map(prep, range(n)))
-        else:
-            prepped = [prep(0)]
-        ok = [(i, x) for i, x in prepped if x is not None]
-
-        step = batch_size if self._batching_ok else 1
-        for start in range(0, len(ok), step):
-            chunk = ok[start:start + step]
-            batch = np.stack([x for _, x in chunk])
-            try:
-                embs = self._run_batch(batch)
-            except Exception as exc:
-                if len(chunk) > 1:   # model may only accept batch size 1 -> degrade gracefully, once
-                    logger.warning("Batched CLIP inference failed (%s); switching to one image at a time", exc)
-                    self._batching_ok = False
-                    embs = np.concatenate([self._run_batch(x[None]) for _, x in chunk])
-                else:
+        started = time.perf_counter()
+        if n == 1:                                           # single image: no pipeline, lowest latency
+            i, x = prep(0)
+            if x is not None:
+                try:
+                    results[0] = self._run_batch(x[None], sessions[0])[0]
+                except Exception as exc:
                     logger.exception("Image encoding failed: %s", exc)
-                    continue
-            for (i, _), e in zip(chunk, embs):
+            return results
+
+        import queue
+        from concurrent.futures import ThreadPoolExecutor
+        free: "queue.Queue" = queue.Queue()                  # model replicas not currently running a batch
+        for s in sessions:
+            free.put(s)
+        step = batch_size if self._batching_ok else 1
+        groups = [list(range(s0, min(s0 + step, n))) for s0 in range(0, n, step)]
+        prep_workers = max(2, min(n, int(getattr(self.config, "effective_workers", 2) or 2)))
+
+        def run_group(prep_pool, idxs):
+            prepped = [r for r in prep_pool.map(prep, idxs) if r[1] is not None]
+            if not prepped:
+                return
+            batch = np.stack([x for _, x in prepped])
+            session = free.get()                              # waits only if every replica is busy
+            try:
+                try:
+                    embs = self._run_batch(batch, session)
+                except Exception as exc:
+                    if len(prepped) > 1:                     # model may only accept batch size 1 -> degrade gracefully, once
+                        logger.warning("Batched CLIP inference failed (%s); switching to one image at a time", exc)
+                        self._batching_ok = False
+                        embs = np.concatenate([self._run_batch(x[None], session) for _, x in prepped])
+                    else:
+                        logger.exception("Image encoding failed: %s", exc)
+                        return
+            finally:
+                free.put(session)
+            for (i, _), e in zip(prepped, embs):
                 results[i] = e
+
+        # replicas + 1 batches in flight: one is always being decoded while every replica is computing
+        def safe_group(prep_pool, idxs):
+            try:
+                run_group(prep_pool, idxs)
+            except Exception as exc:        # an unexpected failure in one batch leaves its images as None; the rest still finish
+                logger.exception("Embedding batch of %d images failed: %s", len(idxs), exc)
+
+        with ThreadPoolExecutor(max_workers=prep_workers) as prep_pool, \
+                ThreadPoolExecutor(max_workers=len(sessions) + 1) as batch_pool:
+            for f in [batch_pool.submit(safe_group, prep_pool, g) for g in groups]:
+                f.result()
+        profile = self.config.runtime_profile
+        if profile is not None and n >= batch_size:          # feed real wall-clock throughput back (adapts to load / thermal throttling)
+            profile.observe_throughput(n, time.perf_counter() - started)
         return results
 
     def get_image_embedding(self, image_input: Union[str, Image.Image]) -> Optional[np.ndarray]:

@@ -77,14 +77,19 @@ class HardwareInfo:
 
 @dataclass
 class RuntimeConfig:
-    """One way of running an ONNX model: which providers, how many threads, how big a batch."""
+    """One way of running an ONNX model: which providers, how many threads, how big a batch, how many parallel sessions."""
     name: str
     providers: List[str]
     provider_options: List[Dict]
-    intra_threads: int
+    intra_threads: int                              # threads PER session
     batch_size: int
     accelerator: bool = False                       # runs on a GPU/NPU rather than the CPU
     session_overrides: Dict[str, object] = field(default_factory=dict)   # e.g. DirectML wants mem-pattern off
+    sessions: int = 1                               # model replicas run side by side (data parallelism): keeps every core fed
+
+    @property
+    def total_threads(self) -> int:
+        return max(1, self.sessions) * max(1, self.intra_threads)
 
     def to_dict(self) -> Dict:
         return asdict(self)
@@ -154,9 +159,19 @@ def _cpu_name() -> str:
             if out:
                 return out
         elif system == "Windows":
-            out = _run(["powershell", "-NoProfile", "-Command", "(Get-CimInstance Win32_Processor | Select-Object -First 1).Name"]).strip()
+            # The registry answers instantly and always the same way. (A PowerShell/WMI query can time out on a busy PC, and the
+            # fallback name differs - which changed the tuning-cache key and triggered a surprise re-benchmark under load.)
+            try:
+                import winreg
+                with winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, r"HARDWARE\DESCRIPTION\System\CentralProcessor\0") as key:
+                    name = winreg.QueryValueEx(key, "ProcessorNameString")[0]
+                    if name and name.strip():
+                        return " ".join(name.split())
+            except Exception:
+                pass
+            out = _run(["powershell", "-NoProfile", "-Command", "(Get-CimInstance Win32_Processor | Select-Object -First 1).Name"], timeout=10).strip()
             if out:
-                return out
+                return " ".join(out.split())
     except Exception:
         pass
     return platform.processor() or platform.machine()
@@ -189,6 +204,48 @@ def classify_gpu(name: str) -> GPUInfo:
     elif vendor == "apple":
         integrated = True                                  # unified memory, but fast: handled by Core ML
     return GPUInfo(name=name.strip(), vendor=vendor, integrated=integrated)
+
+
+_VIRTUAL_ADAPTERS = ("microsoft basic", "remote display", "hyper-v", "virtual", "parsec", "citrix", "vmware svga")
+
+
+def _windows_gpus_from_registry() -> List[GPUInfo]:
+    """Display adapters from the registry display-class key: no process spawn, so no timeout under load and the same answer
+    every time (the PowerShell/WMI query this replaces could come back empty on a busy PC and change the tuning-cache key)."""
+    gpus: List[GPUInfo] = []
+    try:
+        import winreg
+        base = r"SYSTEM\CurrentControlSet\Control\Class\{4d36e968-e325-11ce-bfc1-08002be10318}"
+        with winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, base) as key:
+            index = 0
+            while True:
+                try:
+                    sub_name = winreg.EnumKey(key, index)
+                except OSError:
+                    break
+                index += 1
+                if not sub_name.isdigit():
+                    continue
+                try:
+                    with winreg.OpenKey(key, sub_name) as sk:
+                        name = str(winreg.QueryValueEx(sk, "DriverDesc")[0]).strip()
+                        mem = None
+                        try:
+                            raw = winreg.QueryValueEx(sk, "HardwareInformation.qwMemorySize")[0]
+                            mem = int.from_bytes(raw, "little") if isinstance(raw, (bytes, bytearray)) else int(raw)
+                        except Exception:
+                            pass
+                except OSError:
+                    continue
+                if not name or any(v in name.lower() for v in _VIRTUAL_ADAPTERS):
+                    continue
+                g = classify_gpu(name)
+                if mem and mem > 0:
+                    g.vram_mb = int(mem // (1024 * 1024))
+                gpus.append(g)
+    except Exception:
+        return []
+    return gpus
 
 
 def detect_gpus() -> List[GPUInfo]:
@@ -224,8 +281,9 @@ def detect_gpus() -> List[GPUInfo]:
         if os.path.exists("/dev/dxg"):   # WSL2 GPU paravirtualisation is present
             names.append("WSL2 GPU (dxg)")
     elif system == "Windows":
-        for line in _run(["powershell", "-NoProfile", "-Command",
-                          "Get-CimInstance Win32_VideoController | ForEach-Object { $_.Name + '|' + $_.AdapterRAM }"], timeout=5).splitlines():
+        names.extend(_windows_gpus_from_registry())
+        for line in ([] if names else _run(["powershell", "-NoProfile", "-Command",
+                          "Get-CimInstance Win32_VideoController | ForEach-Object { $_.Name + '|' + $_.AdapterRAM }"], timeout=15).splitlines()):
             name, _, ram = line.partition("|")
             if name.strip():
                 g = classify_gpu(name)
@@ -314,12 +372,51 @@ def detect_hardware(ort_providers: Optional[List[str]] = None) -> HardwareInfo:
 CPU = "CPUExecutionProvider"
 
 
-def cpu_config(name: str, threads: int, batch: int) -> RuntimeConfig:
+def cpu_config(name: str, threads: int, batch: int, sessions: int = 1) -> RuntimeConfig:
     return RuntimeConfig(name=name, providers=[CPU], provider_options=[{}], intra_threads=max(1, threads),
-                         batch_size=batch, accelerator=False)
+                         batch_size=batch, accelerator=False, sessions=max(1, sessions))
 
 
 _cpu_config = cpu_config
+
+SESSION_RAM_GB = 0.6          # approx. extra memory per additional CLIP image-encoder replica (weights + activations)
+MAX_PARALLEL_SESSIONS = 8
+MIN_PHYSICAL_CORES_FOR_REPLICAS = 6     # below this a single session already saturates the physical cores
+MAX_MULTI_SESSION_CANDIDATES = 4   # keeps the one-time start-up benchmark short on machines with many cores
+
+
+def parallel_session_candidates(hw: HardwareInfo) -> List[RuntimeConfig]:
+    """CPU configurations that run several model replicas side by side.
+
+    One session with N threads leaves cores idle: small matrix products stop scaling long before 8-16 threads, the
+    sessions' pre/post-processing is serial, and hyper-threads share their core's units. Several smaller sessions
+    working on different batches keep every core busy, at the price of one model copy of memory each. Which split is
+    fastest depends on the CPU (cache sizes, memory bandwidth, SMT), so these are only *candidates* - the start-up
+    benchmark measures them next to the single-session ones and keeps the fastest.
+
+    Generated from the topology, never hard-coded for one chip: for the physical and the logical core count it tries
+    2, 4 (and 8 on big machines) sessions of `cores // sessions` threads, within the machine's free memory."""
+    phys, logical = hw.usable_physical_cores, max(hw.usable_cores, 1)
+    if phys < MIN_PHYSICAL_CORES_FOR_REPLICAS or logical < 4:
+        # Measured on a 4-core / 8-thread laptop CPU: one 4-thread session already keeps every PHYSICAL core busy (Task Manager
+        # shows ~60% because the 4 hyper-thread siblings sit idle - they add nothing to AVX matrix maths), and 8 threads or
+        # 2-4 replicas were slower (-7%) or no faster. Replicas only pay off where one session's thread pool stops scaling.
+        return []
+    counts = [s for s in (2, 4, 8) if s <= min(phys, MAX_PARALLEL_SESSIONS)]
+    if phys >= 32:
+        counts.append(16)
+    avail = hw.ram_gb          # TOTAL (container-limited) RAM, not what happens to be free right now: the candidate list
+    cands, seen = [], set()    # is part of the tuning-cache key and must not change from one start-up to the next
+    for total in sorted({logical, phys}, reverse=True):                     # use-every-core splits first
+        for s in counts:
+            threads = max(1, total // s)
+            if s * threads < 2 or (s, threads) in seen:
+                continue
+            if avail and (s - 1) * SESSION_RAM_GB > 0.25 * avail:         # the extra replicas must not starve the rest of the app
+                continue
+            seen.add((s, threads))
+            cands.append(cpu_config(f"cpu-{s}x{threads}t", threads, 8, sessions=s))
+    return cands[:MAX_MULTI_SESSION_CANDIDATES]
 
 
 def candidate_configs(hw: HardwareInfo) -> List[RuntimeConfig]:
@@ -328,6 +425,16 @@ def candidate_configs(hw: HardwareInfo) -> List[RuntimeConfig]:
     avail = set(hw.ort_providers)
     vendors = {g.vendor for g in hw.gpus}
     discrete = [g for g in hw.gpus if not g.integrated]
+    # An INTEGRATED GPU (Intel UHD/Iris, AMD APU graphics) shares the CPU's power and thermal budget and its memory bandwidth, so
+    # it rarely beats the CPU it sits next to. Measured on a 15 W laptop (i5-8250U + UHD 620), same CLIP model, cool run:
+    #   CPU 4 threads 4.76 img/s | iGPU (DirectML) 2.35 | CPU + iGPU together 3.68 - and after a minute of heat 2.78 | 1.12 | 0.29.
+    # So integrated GPUs are not benchmarked by default (saves start-up time and keeps a flaky iGPU driver out of the picture);
+    # COVE_USE_IGPU=1 puts them back. Discrete GPUs, Apple Silicon and NPUs are unaffected.
+    use_igpu = os.getenv("COVE_USE_IGPU", "0").strip().lower() in ("1", "true", "yes", "on")
+
+    def gpu_ok(vendor: str) -> bool:
+        """A GPU of this vendor worth benchmarking: a discrete one, or an integrated one when asked for."""
+        return any(g.vendor == vendor and (not g.integrated or use_igpu) for g in hw.gpus)
     cands: List[RuntimeConfig] = []
     fallback = [CPU]
     fallback_opts = [{}]
@@ -345,7 +452,7 @@ def candidate_configs(hw: HardwareInfo) -> List[RuntimeConfig]:
         accel("nvidia-cuda", ["CUDAExecutionProvider"], [{"device_id": 0}], batch=32)
 
     # --- AMD: ROCm / MIGraphX (Linux) ---
-    if "amd" in vendors or not hw.gpus:
+    if gpu_ok("amd") or not hw.gpus:
         if "MIGraphXExecutionProvider" in avail:
             accel("amd-migraphx", ["MIGraphXExecutionProvider"], [{"device_id": 0}], batch=16)
         if "ROCMExecutionProvider" in avail:
@@ -362,15 +469,16 @@ def candidate_configs(hw: HardwareInfo) -> List[RuntimeConfig]:
 
     # --- Intel: OpenVINO drives the iGPU, Arc and NPU - and is often faster than plain ORT on Intel CPUs ---
     if "OpenVINOExecutionProvider" in avail:
-        if "intel" in vendors or not hw.gpus:
+        if gpu_ok("intel") or not hw.gpus:
             accel("intel-openvino-gpu", ["OpenVINOExecutionProvider"], [{"device_type": "GPU"}], batch=8)
-        accel("intel-openvino-auto", ["OpenVINOExecutionProvider"], [{"device_type": "AUTO"}], batch=8)
+        if gpu_ok("intel") or not hw.gpus:
+            accel("intel-openvino-auto", ["OpenVINOExecutionProvider"], [{"device_type": "AUTO"}], batch=8)
         cands.append(RuntimeConfig(name="intel-openvino-cpu", providers=["OpenVINOExecutionProvider"] + fallback,
                                    provider_options=[{"device_type": "CPU"}] + fallback_opts,
                                    intra_threads=hw.usable_physical_cores, batch_size=8))
 
     # --- DirectML: any DirectX 12 GPU on Windows (AMD, Intel, NVIDIA). Prefer a discrete adapter if there is one ---
-    if "DmlExecutionProvider" in avail and hw.system == "Windows":
+    if "DmlExecutionProvider" in avail and hw.system == "Windows" and (not hw.gpus or discrete or use_igpu):
         # DirectML requires memory-pattern optimisation off and sequential execution
         accel("directml", ["DmlExecutionProvider"], [{"device_id": 0}], batch=8,
               overrides={"enable_mem_pattern": False, "execution_mode": "sequential"})
@@ -380,6 +488,7 @@ def candidate_configs(hw: HardwareInfo) -> List[RuntimeConfig]:
     cpu_threads = sorted({phys, hw.usable_cores}) if hw.usable_cores != phys else [phys]
     for t in cpu_threads:
         cands.append(_cpu_config(f"cpu-{t}t", t, 8))
+    cands.extend(parallel_session_candidates(hw))           # data-parallel splits: measured, kept only if they win
     return cands
 
 
