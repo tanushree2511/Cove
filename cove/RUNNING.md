@@ -1,9 +1,6 @@
 # Running Cove
 
-This project has two runtime surfaces:
-
-- Streamlit UI: `ui/app.py`
-- FastAPI backend: `api/server.py`
+The photo backend is a FastAPI service (`api/server.py`, or `backend_main.py` for the packaged entry point). The UI is the React app in `../frontend` (see the root README and `../docs/`).
 
 The codebase also includes helper scripts (under `pipeline/`) to download models and build the local image indexes used by the UI.
 
@@ -15,7 +12,6 @@ cove/
   engines/   ai_engine.py, search_engine.py, cluster_engine.py,
              vector_storage.py, person_manager.py   - core AI/data engines
   api/       server.py                   - FastAPI sidecar
-  ui/        app.py, gallery.py, search_app.py       - Streamlit / CLI interfaces
   pipeline/  download_models.py, prepare_lfw.py, production_pipeline.py,
              reindex_search.py, tune_clustering.py, align_database.py,
              reset_data.py, rename_person.py, watcher.py   - one-off/batch scripts
@@ -25,7 +21,7 @@ cove/
   tests/     - pytest suite
 ```
 
-Modules across folders use package-qualified imports (e.g. `from config.vision_config import CONFIG`, `from engines.ai_engine import AIEngine`), so the `cove/` repository root itself must be on `PYTHONPATH` — see step 1 below. `main.py`, each entry-point script (`api/server.py`, `ui/*.py`, `pipeline/*.py`), and the test suite (`tests/conftest.py`) already bootstrap this themselves.
+Modules across folders use package-qualified imports (e.g. `from config.vision_config import CONFIG`, `from engines.ai_engine import AIEngine`), so the `cove/` repository root itself must be on `PYTHONPATH` — see step 1 below. `main.py`, each entry-point script (`api/server.py`, `pipeline/*.py`), and the test suite (`tests/conftest.py`) already bootstrap this themselves.
 
 ## Prerequisites
 
@@ -107,14 +103,6 @@ This creates the CLIP-based FAISS search index and vector cache.
 
 ## 7. Start the application
 
-### Streamlit UI
-
-```bash
-streamlit run ui/app.py
-```
-
-The UI is usually available at `http://localhost:8501`.
-
 ### FastAPI backend
 
 ```bash
@@ -142,8 +130,8 @@ Expected output when everything is ready:
 ## Common issues
 
 - If `pipeline/production_pipeline.py` reports a missing `test_images` folder, run `pipeline/prepare_lfw.py` first.
-- If `ui/app.py` starts but semantic search is unavailable, run `pipeline/reindex_search.py`.
-- If the UI starts without people data, run `pipeline/tune_clustering.py` after embeddings are built.
+- If the API starts but semantic search is unavailable, run `pipeline/reindex_search.py`.
+- If the app starts without people data, run `pipeline/tune_clustering.py` after embeddings are built.
 - If you need a fresh rebuild, remove generated data with `pipeline/reset_data.py` and then run the setup steps again.
 - `ModuleNotFoundError` on a package import like `config.vision_config` or `engines.ai_engine` usually means `PYTHONPATH` isn't set to the `cove/` root — see step 1.
 

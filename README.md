@@ -2,9 +2,11 @@
 
 A local-first AI photo & video manager: CLIP semantic search, InsightFace-based
 face detection/clustering, and FAISS vector search for photos (`cove/`), plus
-a separate face/video indexing pipeline for video libraries (`videoModules/`).
-A single React frontend (`frontend/`) ties the photo features together; the
-video features currently live in their own Streamlit screen.
+a face/video indexing and search pipeline for video libraries (`videoModules/`). One React frontend
+(`frontend/`) covers both, and it also ships as a Tauri desktop app (Windows installer built in CI).
+
+**Docs:** [Architecture](docs/ARCHITECTURE.md) · [API reference](docs/API.md) · [Configuration](docs/CONFIGURATION.md) ·
+[Development](docs/DEVELOPMENT.md) · [Technical report](TECHNICAL_REPORT.md)
 
 ---
 
@@ -79,13 +81,10 @@ manual Python/Node environment setup required.
 |--------------|-----------------------------------------------|:-----------:|-------------------------------|
 | `frontend`   | React SPA + nginx (reverse-proxies `/api/cove` to `cove-api`) | **8080** | `cove-frontend-1` |
 | `cove-api`   | FastAPI backend — face detection, CLIP search, indexing jobs | 8000 | `cove-cove-api-1` |
-| `cove-ui`    | Streamlit UI for the same photo backend (alternate/dev UI)    | 8501 | `cove-cove-ui-1`  |
 | `video-api`  | FastAPI backend for video indexing/search                    | 8001 | `cove-video-api-1`|
-| `video-ui`   | Streamlit UI for video features                               | **8502** | `cove-video-ui-1` |
 
-**The app you actually use day-to-day is `http://localhost:8080`.** Clicking
-"Videos" in its sidebar opens the `video-ui` Streamlit screen (port 8502) in a
-new tab — video features aren't (yet) embedded in the React app itself.
+**The app you use day-to-day is `http://localhost:8080`** (Library, People, Search, Videos, Indexing and
+Settings are all in the React app).
 
 ## Prerequisites
 
@@ -101,7 +100,7 @@ cd cove
 docker compose build
 ```
 
-This builds three images: `backend` (shared by `cove-api`/`cove-ui`/`video-api`/`video-ui`)
+This builds two images: `backend` (shared by `cove-api`/`video-api`)
 and `frontend` (the React SPA behind nginx). First build takes a while — it
 installs face-recognition/ML dependencies (torch, onnxruntime, insightface, etc.).
 
@@ -154,7 +153,7 @@ volumes, so recreating the container won't force a re-download.
 
 ### Add photos to the library
 
-Photos live in `cove/test_images/` (bind-mounted into `cove-api`/`cove-ui`, so
+Photos live in `cove/test_images/` (bind-mounted into `cove-api`, so
 you can drop files there directly from the host, or use the app's own upload):
 
 - **Easiest — via the UI**: open `http://localhost:8080`, use the **Import**
@@ -187,7 +186,7 @@ Open **http://localhost:8080**:
 | **People** | Face clusters detected across your library; click to filter Library by person |
 | **Search** | CLIP-powered natural-language photo search ("a man in a suit") |
 | **Indexing** | Real-time status of the background indexing job; manual "Start Indexing" trigger |
-| **Videos** | Opens the separate `video-ui` screen (port 8502) in a new tab |
+| **Videos** | Index, search and browse videos; video people and label corrections |
 | **Settings** | Real system stats (GPU/CPU, photos indexed, people detected), theme |
 
 ## Hardware: automatic detection and tuning
@@ -266,8 +265,8 @@ rebuild + recreate, not just a container restart:
 
 ```bash
 # Backend (cove/ or videoModules/) changes:
-docker compose build cove-api cove-ui video-api video-ui
-docker compose up -d cove-api cove-ui video-api video-ui
+docker compose build cove-api video-api
+docker compose up -d cove-api video-api
 
 # Frontend or nginx.conf changes:
 docker compose build frontend
@@ -290,17 +289,17 @@ React source changes.)
   with `docker compose exec -u root cove-api chown -R $(id -u):$(id -g) /app/cove/test_images`.
 - **Search/People return empty after adding photos**: indexing hasn't run yet
   — check the **Indexing** tab or `GET /index/status`.
-- **Port already in use**: another process is bound to 8000/8080/8501/8502/8001
+- **Port already in use**: another process is bound to 8000/8001/8080
   on the host; stop it or edit the `ports:` mappings in `docker-compose.yml`.
 
 ## Project structure
 
 ```
-cove/            Photo backend — FastAPI API, engines (face/CLIP/cluster),
-                  pipeline scripts, Streamlit UI, tests. See cove/RUNNING.md.
-videoModules/     Video backend — FastAPI API + Streamlit UI, own SQLite DB.
-frontend/         React (Vite) SPA — Library/People/Search/Indexing/Settings.
-nginx.conf        Reverse proxy config baked into the frontend image.
-docker-compose.yml Orchestrates all five services + persistent volumes.
-Dockerfile        Multi-stage build: frontend (nginx) + backend (Python/ML).
+cove/             Photo backend - FastAPI API, engines (face/CLIP/cluster), hardware tuning, pipeline scripts, tests
+videoModules/     Video backend - FastAPI API, frame sampling, zero-shot labelling, faces, SQLite store
+frontend/         React (Vite) SPA - Library/People/Search/Videos/Indexing/Settings; src-tauri/ = desktop shell
+scripts/          Runtime installer, backend/sidecar packaging
+docs/             Architecture, API, configuration, development guides
+nginx.conf        Reverse proxy baked into the frontend image
+docker-compose.yml  cove-api, video-api and frontend services + persistent volumes
 ```
