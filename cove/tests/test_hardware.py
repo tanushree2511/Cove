@@ -62,7 +62,7 @@ def test_detect_hardware_runs_here():
 # ------------------------------------------------------------------ candidates per vendor
 def test_cpu_only_machine():
     c = candidate_configs(machine())
-    assert names(c) == ["cpu-4t", "cpu-8t"]                     # physical cores and all hyper-threads are both tried
+    assert names(c) == ["cpu-4t", "cpu-8t"]                     # physical cores and all hyper-threads are both tried (no replicas on 4 cores)
     assert not any(x.accelerator for x in c)
 
 
@@ -106,7 +106,7 @@ def test_windows_directml_needs_sequential_no_mempattern():
 
 
 def test_intel_openvino_variants():
-    c = candidate_configs(machine(["Intel(R) UHD Graphics 620"], [CPU, "OpenVINOExecutionProvider"]))
+    c = candidate_configs(machine(["Intel(R) Arc(TM) A770 Graphics"], [CPU, "OpenVINOExecutionProvider"]))   # discrete: the GPU variants apply
     assert {"intel-openvino-gpu", "intel-openvino-auto", "intel-openvino-cpu"} <= set(names(c))
 
 
@@ -130,12 +130,19 @@ def test_every_candidate_ends_with_a_cpu_fallback():
         assert len(c.providers) == len(c.provider_options)
 
 
+@pytest.fixture(autouse=True)
+def _calm_cpu(monkeypatch):
+    """The start-up benchmark refuses to run on a busy CPU; these tests must not depend on the real machine's load."""
+    monkeypatch.setattr(rt, "_system_is_calm", lambda *a, **k: True)
+    monkeypatch.setenv("COVE_BENCH_ROUNDS", "1")        # these tests count one benchmark call per candidate
+
+
 # ------------------------------------------------------------------ autotune
 def test_autotune_picks_the_fastest_and_skips_failures(monkeypatch):
     hw = machine(["NVIDIA GeForce RTX 4070"], [CPU, "CUDAExecutionProvider"])
     cands = candidate_configs(hw)
     speeds = {"nvidia-cuda": {"error": "driver crashed"}, "cpu-4t": {"ips": 4.0}, "cpu-8t": {"ips": 3.5}}
-    monkeypatch.setattr(rt, "_bench_candidate", lambda cfg, path: speeds[cfg.name])
+    monkeypatch.setattr(rt, "_bench_candidate", lambda cfg, path: speeds.get(cfg.name, {"ips": 1.0}))
     p = rt._autotune(hw, cands, "model.onnx")
     assert p.config.name == "cpu-4t" and p.source == "benchmark"
     assert p.images_per_second == 4.0
@@ -144,7 +151,7 @@ def test_autotune_picks_the_fastest_and_skips_failures(monkeypatch):
 def test_autotune_prefers_gpu_when_it_is_actually_faster(monkeypatch):
     hw = machine(["NVIDIA GeForce RTX 4070"], [CPU, "CUDAExecutionProvider"])
     speeds = {"nvidia-cuda": {"ips": 180.0}, "cpu-4t": {"ips": 4.0}, "cpu-8t": {"ips": 3.5}}
-    monkeypatch.setattr(rt, "_bench_candidate", lambda cfg, path: speeds[cfg.name])
+    monkeypatch.setattr(rt, "_bench_candidate", lambda cfg, path: speeds.get(cfg.name, {"ips": 1.0}))
     assert rt._autotune(hw, candidate_configs(hw), "m").config.name == "nvidia-cuda"
 
 
@@ -167,11 +174,12 @@ def test_profile_is_cached_between_runs(monkeypatch, tmp_path):
 
     monkeypatch.setattr(rt, "_profile", None)
     first = rt.get_runtime_profile(model_path=str(model))
+    n_first = len(calls)
     assert first.source == "benchmark" and calls == ["cpu-4t", "cpu-8t"]
 
     monkeypatch.setattr(rt, "_profile", None)       # "restart the app"
     second = rt.get_runtime_profile(model_path=str(model))
-    assert second.source == "cache" and second.config.name == "cpu-4t" and len(calls) == 2
+    assert second.source == "cache" and second.config.name == "cpu-4t" and len(calls) == n_first
 
 
 def test_force_cpu_never_uses_an_accelerator(monkeypatch, tmp_path):
@@ -257,7 +265,7 @@ def test_autotune_breaks_near_ties_toward_fewer_threads_and_accelerators(monkeyp
 
     hw = machine(["NVIDIA GeForce RTX 4070"], [CPU, "CUDAExecutionProvider"])
     speeds = {"nvidia-cuda": {"ips": 4.4}, "cpu-4t": {"ips": 4.5}, "cpu-8t": {"ips": 4.3}}
-    monkeypatch.setattr(rt, "_bench_candidate", lambda cfg, path: speeds[cfg.name])
+    monkeypatch.setattr(rt, "_bench_candidate", lambda cfg, path: speeds.get(cfg.name, {"ips": 1.0}))
     assert rt._autotune(hw, candidate_configs(hw), "m").config.name == "nvidia-cuda"     # tie -> keep the CPU free
 
 

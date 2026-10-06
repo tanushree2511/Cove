@@ -14,9 +14,14 @@ Environment overrides:
     COVE_ORT_THREADS=N                    force the intra-op thread count
     COVE_BATCH_SIZE=N                     force the CLIP batch size
     COVE_ENABLE_TRT=1                     also consider TensorRT (slow first start)
+    COVE_USE_IGPU=1                       also benchmark integrated GPUs (off by default: they share the CPU's power budget and rarely win)
+    COVE_BENCH_BUDGET_S=N                 wall-clock limit for the start-up benchmark (default 300)
+    COVE_CPU_MODE=max                     only CPU layouts that load every logical core (default 'auto' = fastest measured)
+    COVE_BENCH_ROUNDS=N                   interleaved benchmark rounds per candidate (default 2)
 
 This file doubles as the benchmark worker: `python runtime.py --bench '<json>'`.
 """
+import contextlib
 import json
 import os
 import subprocess
@@ -78,6 +83,21 @@ def create_session(model_path: str, cfg: Optional[RuntimeConfig] = None, threads
         return ort.InferenceSession(model_path, sess_options=so, providers=["CPUExecutionProvider"])
 
 
+def create_sessions(model_path: str, cfg: Optional[RuntimeConfig] = None) -> list:
+    """`cfg.sessions` independent InferenceSessions of the same model (data-parallel replicas; one for GPUs / single-session CPU)."""
+    cfg = cfg or get_runtime_profile().config
+    wanted = max(1, int(getattr(cfg, "sessions", 1) or 1))
+    sessions = [create_session(model_path, cfg)]                  # the first one must exist (create_session already falls back to the CPU)
+    for _ in range(wanted - 1):
+        try:
+            sessions.append(create_session(model_path, cfg))
+        except Exception as exc:                                  # out of memory, a driver hiccup...: run with the replicas we have
+            if logger:
+                logger.warning("Could only create %d of %d model replicas (%s); continuing with fewer", len(sessions), wanted, exc)
+            break
+    return sessions
+
+
 def limit_face_model_threads(face_app, profile: Optional["RuntimeProfile"] = None) -> None:
     """InsightFace creates its ONNX sessions with default threading, i.e. one thread per core *per model*. With
     several engines running at once that oversubscribes the CPU (threads fight over the same cores, which is
@@ -123,8 +143,12 @@ class RuntimeProfile:
         hw = self.hardware
         if self.accelerated:
             vram = max([g.vram_mb or 0 for g in hw.gpus if not g.integrated] or [0])
-            return 2 if 0 < vram < 4096 else 4
-        return max(1, min(4, hw.usable_cores // 2))
+            n = 2 if 0 < vram < 4096 else 4
+        else:
+            n = max(1, min(4, hw.usable_cores // 2))
+        if hw.ram_gb:                                   # every replica holds its own copy of the face models: low-RAM machines get fewer
+            n = 1 if hw.ram_gb < 4 else min(n, 2) if hw.ram_gb < 6 else n
+        return max(1, n)
 
     @property
     def face_threads(self) -> int:
@@ -178,9 +202,11 @@ class RuntimeProfile:
     def describe(self) -> str:
         hw = self.hardware
         gpus = ", ".join(f"{g.name}{' (integrated)' if g.integrated else ''}" for g in hw.gpus) or "none"
+        threads = (f"{self.config.sessions}x{self.config.intra_threads}" if self.config.sessions > 1
+                   else str(self.config.intra_threads))
         return (f"hardware: {hw.cpu_name or hw.machine} | {hw.physical_cores}C/{hw.logical_cores}T "
                 f"(usable {hw.usable_cores}) | {hw.ram_gb:.1f} GB RAM | GPU: {gpus} || runtime: {self.config.name} "
-                f"[{self.source}] threads={self.config.intra_threads} batch={self.clip_batch_size}")
+                f"[{self.source}] threads={threads} batch={self.clip_batch_size}")
 
 
 _profile: Optional[RuntimeProfile] = None
@@ -229,23 +255,68 @@ def _bench_candidate(cfg: RuntimeConfig, model_path: str) -> Dict:
         return {"error": str(exc)[:200]}
 
 
+BENCH_ROUNDS = 2                  # candidates are measured in this many interleaved rounds (A B C, A B C ...)
+BENCH_BUDGET_S = 300.0            # stop measuring after this long (only once at least one candidate has a result)
+BASELINE_MARGIN = 1.10            # a non-default CPU layout must beat the default one by 10% to be worth switching to
+
+
 def _autotune(hw: HardwareInfo, cands: List[RuntimeConfig], model_path: str) -> RuntimeProfile:
+    """Measure every candidate and pick the fastest, robustly.
+
+    A laptop CPU throttles within a minute of sustained load (measured here: -40% between a cool and a hot run), so timing
+    candidates one after another favours whichever ran first. Interleaving the candidates over several rounds spreads that drift
+    evenly across all of them, and the average is what gets compared."""
+    rounds = max(1, int(os.getenv("COVE_BENCH_ROUNDS", BENCH_ROUNDS)))
+    deadline = time.time() + float(os.getenv("COVE_BENCH_BUDGET_S", BENCH_BUDGET_S))
+    samples: Dict[str, List[Dict]] = {c.name: [] for c in cands}
+    errors: Dict[str, str] = {}
+    ordered = sorted(cands, key=lambda c: c.accelerator)          # CPU layouts first: they always work, accelerators may hang
+    over_budget = False
+    for _ in range(rounds):
+        for cfg in ordered:
+            if cfg.name in errors:
+                continue
+            if time.time() >= deadline and any(samples.values()):
+                over_budget = True
+                break
+            res = _bench_candidate(cfg, model_path)
+            if "ips" in res:
+                samples[cfg.name].append(res)
+            else:
+                errors[cfg.name] = res.get("error", "no result")
+        if over_budget:
+            if logger:
+                logger.warning("Start-up benchmark hit its time budget; using the candidates measured so far")
+            break
     results, measured = [], []
     for cfg in cands:
-        res = _bench_candidate(cfg, model_path)
-        results.append({"name": cfg.name, **res})
+        runs = samples[cfg.name]
+        if runs and cfg.name not in errors:
+            ips = sum(r["ips"] for r in runs) / len(runs)
+            util = [r["cpu_percent"] for r in runs if r.get("cpu_percent") is not None]
+            entry = {"name": cfg.name, "ips": round(ips, 3), "runs": [r["ips"] for r in runs], "providers": runs[0].get("providers")}
+            if util:
+                entry["cpu_percent"] = round(sum(util) / len(util), 1)
+            results.append(entry)
+            measured.append((cfg, ips))
+        else:
+            results.append({"name": cfg.name, "error": errors.get(cfg.name, "no result")})
         if logger:
-            logger.info("autotune %-22s %s", cfg.name, f"{res['ips']:.2f} img/s" if "ips" in res else f"skipped ({res.get('error')})")
-        if "ips" in res:
-            measured.append((cfg, res["ips"]))
+            logger.info("autotune %-22s %s", cfg.name, f"{results[-1]['ips']:.2f} img/s" if "ips" in results[-1] else f"skipped ({results[-1]['error']})")
     if not measured:
         return RuntimeProfile(heuristic_choice(hw, cands), hw, "heuristic", results)
 
     # Anything within 5% of the fastest counts as a tie (benchmark noise). Break ties in favour of an accelerator
-    # (it leaves the CPU free for decoding / face detection), then the configuration using the fewest threads.
+    # (it leaves the CPU free for decoding / face detection), then the configuration using the fewest threads and
+    # replicas in total (less memory, less heat) - so a multi-session split is only chosen when it is clearly faster.
     top = max(ips for _, ips in measured)
     ties = [cfg for cfg, ips in measured if ips >= 0.95 * top]
-    best = sorted(ties, key=lambda c: (not c.accelerator, c.intra_threads))[0]
+    best = sorted(ties, key=lambda c: (not c.accelerator, c.total_threads, c.sessions))[0]
+    # Replicas cost memory and heat: leave the plain single-session default only for a clear (10%) win on the CPU.
+    base = next((c for c, _ in measured if not c.accelerator and c.sessions == 1), None)
+    if base is not None and not best.accelerator and best is not base:
+        if dict((c.name, i) for c, i in measured)[best.name] < BASELINE_MARGIN * dict((c.name, i) for c, i in measured)[base.name]:
+            best = base
     return RuntimeProfile(best, hw, "benchmark", results)
 
 
@@ -259,6 +330,86 @@ def _model_path() -> Optional[str]:
         return None
 
 
+def _load_cached_profile(cache_file: str, key: Dict, cands: List[RuntimeConfig], hw: HardwareInfo) -> Optional[RuntimeProfile]:
+    try:
+        with open(cache_file) as f:
+            data = json.load(f)
+        if data.get("key") == key:
+            chosen = next((c for c in cands if c.name == data.get("chosen")), None)
+            if chosen:
+                return RuntimeProfile(chosen, hw, "cache", data.get("results", []))
+    except Exception:
+        pass
+    return None
+
+
+def _store_profile(cache_file: str, key: Dict, profile: RuntimeProfile, hw: HardwareInfo) -> None:
+    try:
+        os.makedirs(os.path.dirname(cache_file), exist_ok=True)
+        tmp = cache_file + ".tmp"
+        with open(tmp, "w") as f:
+            json.dump({"key": key, "chosen": profile.config.name, "results": profile.results, "hardware": hw.to_dict()}, f, indent=1)
+        os.replace(tmp, cache_file)
+    except Exception:
+        pass
+
+
+def _system_is_calm(limit_percent: float = 35.0, wait_s: float = 20.0) -> bool:
+    """True once overall CPU use is low enough for a fair benchmark (waits up to `wait_s` for a short burst to pass)."""
+    try:
+        import psutil
+    except Exception:
+        return True
+    deadline = time.time() + wait_s
+    while True:
+        try:
+            if psutil.cpu_percent(interval=1.0) <= limit_percent:
+                return True
+        except Exception:
+            return True                                              # cannot tell: do not block the benchmark
+        if time.time() >= deadline:
+            return False
+
+
+@contextlib.contextmanager
+def _benchmark_lock(cache_file: str, wait_s: float = 900.0, stale_s: float = 1200.0):
+    """Cross-process mutex (an exclusively-created file). Yields True if we hold it; a stale or unobtainable lock never blocks forever."""
+    lock = cache_file + ".lock"
+    held = False
+    t0 = time.time()
+    try:
+        os.makedirs(os.path.dirname(lock), exist_ok=True)
+    except OSError:
+        pass
+    while True:
+        try:
+            fd = os.open(lock, os.O_CREAT | os.O_EXCL | os.O_WRONLY)
+            os.write(fd, str(os.getpid()).encode())
+            os.close(fd)
+            held = True
+            break
+        except FileExistsError:
+            try:
+                if time.time() - os.path.getmtime(lock) > stale_s:
+                    os.remove(lock)               # left behind by a crashed process
+                    continue
+            except OSError:
+                pass
+            if time.time() - t0 > wait_s:
+                break
+            time.sleep(1.0)
+        except OSError:
+            break
+    try:
+        yield held
+    finally:
+        if held:
+            try:
+                os.remove(lock)
+            except OSError:
+                pass
+
+
 def get_runtime_profile(model_path: Optional[str] = None, refresh: bool = False) -> RuntimeProfile:
     """The (cached) best runtime configuration for this machine."""
     global _profile
@@ -270,6 +421,12 @@ def get_runtime_profile(model_path: Optional[str] = None, refresh: bool = False)
         cands = _apply_overrides(candidate_configs(hw))
         if _truthy("COVE_FORCE_CPU", False) or not _truthy("COVE_USE_GPU", True):
             cands = [c for c in cands if not c.accelerator]
+        if os.getenv("COVE_CPU_MODE", "auto").strip().lower() == "max":
+            # "Use every logical core": only CPU layouts that load all of them. Not the default - on SMT CPUs the extra
+            # hyper-threads usually add heat, not speed (see config/hardware.py) - but it is what some users want.
+            full = [c for c in cands if not c.accelerator and c.total_threads >= hw.usable_cores]
+            if full:
+                cands = full
         model_path = model_path or _model_path()
 
         if len(cands) == 1 or model_path is None or not _truthy("COVE_AUTOTUNE", True):
@@ -278,25 +435,22 @@ def get_runtime_profile(model_path: Optional[str] = None, refresh: bool = False)
             cache_file = _cache_path()
             key = {"v": CACHE_VERSION, "sig": hw.signature(), "model": os.path.basename(model_path),
                    "model_size": os.path.getsize(model_path), "cands": [c.name for c in cands]}
-            cached = None
-            try:
-                with open(cache_file) as f:
-                    data = json.load(f)
-                if data.get("key") == key:
-                    cached = next((c for c in cands if c.name == data.get("chosen")), None)
-                    if cached:
-                        _profile = RuntimeProfile(cached, hw, "cache", data.get("results", []))
-            except Exception:
-                pass
+            _profile = _load_cached_profile(cache_file, key, cands, hw)
             if _profile is None:
-                _profile = _autotune(hw, cands, model_path)
-                try:
-                    os.makedirs(os.path.dirname(cache_file), exist_ok=True)
-                    with open(cache_file, "w") as f:
-                        json.dump({"key": key, "chosen": _profile.config.name, "results": _profile.results,
-                                   "hardware": hw.to_dict()}, f, indent=1)
-                except Exception:
-                    pass
+                # Only ONE process benchmarks at a time (the photo and video services start together and would otherwise
+                # time each other's candidates); the others wait here and then simply read the winner's cache.
+                with _benchmark_lock(cache_file) as _owner:
+                    _profile = _load_cached_profile(cache_file, key, cands, hw)
+                    if _profile is None:
+                        if _system_is_calm():
+                            _profile = _autotune(hw, cands, model_path)
+                            _store_profile(cache_file, key, _profile, hw)
+                        else:
+                            # Timings taken while other work hogs the CPU favour the GPU/iGPU unfairly and, once cached, would
+                            # keep the app on a slower configuration for good. Use the safe heuristic and benchmark next time.
+                            if logger:
+                                logger.warning("CPU is busy - skipping the start-up benchmark (nothing is cached; it will run on a quieter start)")
+                            _profile = RuntimeProfile(heuristic_choice(hw, cands), hw, "heuristic-busy")
 
         if logger:
             logger.info("Runtime profile - %s", _profile.describe())
@@ -326,15 +480,40 @@ def _bench_main(payload: str) -> None:
         b = cfg.batch_size
         x = np.random.rand(b, 3, h, w).astype("float32")
         feed = {inp.name: x}
-        sess.run(None, feed)                                  # warm-up (kernel compile / graph optimisation)
-        n, t0 = 0, time.perf_counter()
-        while True:
-            sess.run(None, feed)
-            n += 1
-            elapsed = time.perf_counter() - t0
-            if elapsed >= spec["seconds"] and n >= 2:
-                break
-        print(json.dumps({"ips": round(n * b / elapsed, 3), "providers": used}))
+        # Data-parallel candidates run `cfg.sessions` replicas at the same time, exactly as the app does at run time.
+        sessions = [sess] + [ort.InferenceSession(spec["model"], sess_options=make_session_options(cfg),
+                                                  providers=cfg.providers, provider_options=cfg.provider_options)
+                             for _ in range(max(1, int(getattr(cfg, "sessions", 1) or 1)) - 1)]
+        for s_ in sessions:
+            s_.run(None, feed)                                # warm-up (kernel compile / graph optimisation)
+        counts = [0] * len(sessions)
+        t0 = time.perf_counter()
+        stop_at = t0 + spec["seconds"]
+
+        def loop(i):
+            while True:
+                sessions[i].run(None, feed)
+                counts[i] += 1
+                if time.perf_counter() >= stop_at and counts[i] >= 2:
+                    return
+
+        try:                                                   # how busy the whole CPU really was while the candidate ran
+            import psutil
+            psutil.cpu_percent(interval=None)
+        except Exception:
+            psutil = None
+        if len(sessions) == 1:
+            loop(0)
+        else:
+            workers = [threading.Thread(target=loop, args=(i,)) for i in range(len(sessions))]
+            for t_ in workers:
+                t_.start()
+            for t_ in workers:
+                t_.join()
+        elapsed = time.perf_counter() - t0
+        util = psutil.cpu_percent(interval=None) if psutil else None
+        print(json.dumps({"ips": round(sum(counts) * b / elapsed, 3), "providers": used,
+                          "cpu_percent": round(util, 1) if util is not None else None}))
     except Exception as exc:
         print(json.dumps({"error": f"{type(exc).__name__}: {exc}"[:200]}))
 
