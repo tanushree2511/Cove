@@ -1,0 +1,315 @@
+{
+ "primary_5000_queries": {
+  "queries": 5000,
+  "gallery": 5000,
+  "CLIP baseline (single prompt)": {
+   "R@1": 0.316,
+   "R@5": 0.5506,
+   "R@10": 0.6614,
+   "MRR": 0.43049078426564674,
+   "mAP": 0.43049078426564674,
+   "median_rank": 4.0,
+   "n_queries": 5000
+  },
+  "Ours (prompt ensemble)": {
+   "R@1": 0.314,
+   "R@5": 0.5534,
+   "R@10": 0.6624,
+   "MRR": 0.42850144951558566,
+   "mAP": 0.42850144951558566,
+   "median_rank": 4.0,
+   "n_queries": 5000
+  },
+  "paired_bootstrap_95CI_ours_minus_baseline": {
+   "R@1": [
+    -0.007805000000000027,
+    0.0040000000000000036
+   ],
+   "R@5": [
+    -0.002805000000000024,
+    0.00880000000000003
+   ],
+   "R@10": [
+    -0.0048000000000000265,
+    0.00660000000000005
+   ]
+  },
+  "by_category": {
+   "objects": {
+    "queries": 3777,
+    "baseline": {
+     "R@1": 0.32750860471273496,
+     "R@5": 0.5687053216838761,
+     "R@10": 0.6796399258670903,
+     "MRR": 0.4447813448892426,
+     "mAP": 0.4447813448892426,
+     "median_rank": 4.0,
+     "n_queries": 3777
+    },
+    "ours": {
+     "R@1": 0.3227429176595181,
+     "R@5": 0.5673815197246492,
+     "R@10": 0.678051363516018,
+     "MRR": 0.4403802092043916,
+     "mAP": 0.4403802092043916,
+     "median_rank": 4.0,
+     "n_queries": 3777
+    }
+   },
+   "scenes": {
+    "queries": 1934,
+    "baseline": {
+     "R@1": 0.26680455015511895,
+     "R@5": 0.4891416752843847,
+     "R@10": 0.6059979317476732,
+     "MRR": 0.3785400922677087,
+     "mAP": 0.3785400922677087,
+     "median_rank": 6.0,
+     "n_queries": 1934
+    },
+    "ours": {
+     "R@1": 0.2642192347466391,
+     "R@5": 0.48965873836608065,
+     "R@10": 0.6008273009307136,
+     "MRR": 0.3732811207138624,
+     "mAP": 0.3732811207138624,
+     "median_rank": 6.0,
+     "n_queries": 1934
+    }
+   },
+   "activities": {
+    "queries": 3043,
+    "baseline": {
+     "R@1": 0.3026618468616497,
+     "R@5": 0.5435425566874794,
+     "R@10": 0.6562602694709169,
+     "MRR": 0.41926891662748755,
+     "mAP": 0.41926891662748755,
+     "median_rank": 4.0,
+     "n_queries": 3043
+    },
+    "ours": {
+     "R@1": 0.3059480775550444,
+     "R@5": 0.5465001643115347,
+     "R@10": 0.6602037463029905,
+     "MRR": 0.42112569189634586,
+     "mAP": 0.42112569189634586,
+     "median_rank": 4.0,
+     "n_queries": 3043
+    }
+   },
+   "people": {
+    "queries": 2167,
+    "baseline": {
+     "R@1": 0.2861098292570374,
+     "R@5": 0.5145362251961236,
+     "R@10": 0.6169820027688048,
+     "MRR": 0.3973370590217088,
+     "mAP": 0.3973370590217088,
+     "median_rank": 5.0,
+     "n_queries": 2167
+    },
+    "ours": {
+     "R@1": 0.2874942316566682,
+     "R@5": 0.5191508998615597,
+     "R@10": 0.628518689432395,
+     "MRR": 0.4000754053841776,
+     "mAP": 0.4000754053841776,
+     "median_rank": 5.0,
+     "n_queries": 2167
+    }
+   },
+   "other (no keyword match)": {
+    "queries": 144,
+    "baseline": {
+     "R@1": 0.3402777777777778,
+     "R@5": 0.5833333333333334,
+     "R@10": 0.6875,
+     "MRR": 0.45967580189190976,
+     "mAP": 0.45967580189190976,
+     "median_rank": 3.0,
+     "n_queries": 144
+    },
+    "ours": {
+     "R@1": 0.3541666666666667,
+     "R@5": 0.5972222222222222,
+     "R@10": 0.6805555555555556,
+     "MRR": 0.4596723127180245,
+     "mAP": 0.4596723127180245,
+     "median_rank": 3.0,
+     "n_queries": 144
+    }
+   }
+  }
+ },
+ "examples": {
+  "ensemble_fixes_baseline": [
+   {
+    "caption": "Cat lethargically on comfy computer chair looking relaxed.",
+    "relevant_image": "000000519764.jpg",
+    "rank_baseline": 2,
+    "rank_ours": 1,
+    "ours_top3": [
+     "000000519764.jpg",
+     "000000264441.jpg",
+     "000000106389.jpg"
+    ]
+   },
+   {
+    "caption": "A man riding a motorcycle while eating food.",
+    "relevant_image": "000000031817.jpg",
+    "rank_baseline": 2,
+    "rank_ours": 1,
+    "ours_top3": [
+     "000000031817.jpg",
+     "000000579902.jpg",
+     "000000050145.jpg"
+    ]
+   },
+   {
+    "caption": "a man that is on a snowy trail",
+    "relevant_image": "000000128112.jpg",
+    "rank_baseline": 2,
+    "rank_ours": 1,
+    "ours_top3": [
+     "000000128112.jpg",
+     "000000266409.jpg",
+     "000000496409.jpg"
+    ]
+   },
+   {
+    "caption": "Bartender opening a bottle of wine while patron waits patiently",
+    "relevant_image": "000000025394.jpg",
+    "rank_baseline": 3,
+    "rank_ours": 1,
+    "ours_top3": [
+     "000000025394.jpg",
+     "000000146155.jpg",
+     "000000541773.jpg"
+    ]
+   }
+  ],
+  "both_succeed": [
+   {
+    "caption": "A classroom of small children eating pizza.",
+    "relevant_image": "000000122962.jpg",
+    "rank_baseline": 1,
+    "rank_ours": 1,
+    "ours_top3": [
+     "000000122962.jpg",
+     "000000201426.jpg",
+     "000000473237.jpg"
+    ]
+   },
+   {
+    "caption": "Several breakfast foods are on top of a refrigerator.",
+    "relevant_image": "000000554838.jpg",
+    "rank_baseline": 1,
+    "rank_ours": 1,
+    "ours_top3": [
+     "000000554838.jpg",
+     "000000226984.jpg",
+     "000000512330.jpg"
+    ]
+   }
+  ],
+  "both_fail_top10": [
+   {
+    "caption": "A white toilet sitting in a bathroom next to a tiled wall.",
+    "relevant_image": "000000557258.jpg",
+    "rank_baseline": 52,
+    "rank_ours": 60,
+    "ours_top3": [
+     "000000180792.jpg",
+     "000000232649.jpg",
+     "000000234413.jpg"
+    ]
+   },
+   {
+    "caption": "A man with a bald head wearing a pair of glases.",
+    "relevant_image": "000000506933.jpg",
+    "rank_baseline": 17,
+    "rank_ours": 16,
+    "ours_top3": [
+     "000000443426.jpg",
+     "000000244496.jpg",
+     "000000120420.jpg"
+    ]
+   },
+   {
+    "caption": "Two plastic containers next to a banana on a table.",
+    "relevant_image": "000000113589.jpg",
+    "rank_baseline": 57,
+    "rank_ours": 36,
+    "ours_top3": [
+     "000000290619.jpg",
+     "000000482719.jpg",
+     "000000279769.jpg"
+    ]
+   },
+   {
+    "caption": "A man riding skis down a snow covered ski slope.",
+    "relevant_image": "000000090956.jpg",
+    "rank_baseline": 11,
+    "rank_ours": 17,
+    "ours_top3": [
+     "000000301563.jpg",
+     "000000099242.jpg",
+     "000000426376.jpg"
+    ]
+   }
+  ],
+  "ensemble_regresses": [
+   {
+    "caption": "The two teens are playing video games in the rec center.",
+    "relevant_image": "000000091500.jpg",
+    "rank_baseline": 1,
+    "rank_ours": 2,
+    "ours_top3": [
+     "000000215259.jpg",
+     "000000091500.jpg",
+     "000000182155.jpg"
+    ]
+   },
+   {
+    "caption": "A wedding cake with fresh flower sitting on a table.",
+    "relevant_image": "000000495448.jpg",
+    "rank_baseline": 1,
+    "rank_ours": 3,
+    "ours_top3": [
+     "000000556873.jpg",
+     "000000453040.jpg",
+     "000000495448.jpg"
+    ]
+   },
+   {
+    "caption": "A pink and green marker, next to another object.",
+    "relevant_image": "000000546826.jpg",
+    "rank_baseline": 1,
+    "rank_ours": 2,
+    "ours_top3": [
+     "000000076731.jpg",
+     "000000546826.jpg",
+     "000000344909.jpg"
+    ]
+   },
+   {
+    "caption": "A man takes a picture of himself eating food.",
+    "relevant_image": "000000334309.jpg",
+    "rank_baseline": 1,
+    "rank_ours": 2,
+    "ours_top3": [
+     "000000350148.jpg",
+     "000000334309.jpg",
+     "000000045550.jpg"
+    ]
+   }
+  ]
+ },
+ "example_counts": {
+  "ensemble_fixes_baseline(ours r1, baseline not)": 113,
+  "ensemble_regresses(baseline r1, ours not)": 123,
+  "both_fail_top10": 1569,
+  "both_r1": 1457
+ }
+}

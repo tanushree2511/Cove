@@ -1,0 +1,172 @@
+{
+ "top_confusions": [
+  [
+   "hammer throw",
+   "throwing discus",
+   9
+  ],
+  [
+   "cricket shot",
+   "cricket bowling",
+   8
+  ],
+  [
+   "handstand walking",
+   "handstand pushups",
+   8
+  ],
+  [
+   "boxing punching bag",
+   "boxing speed bag",
+   7
+  ],
+  [
+   "still rings gymnastics",
+   "uneven bars gymnastics",
+   7
+  ],
+  [
+   "balance beam",
+   "uneven bars gymnastics",
+   6
+  ],
+  [
+   "playing basketball",
+   "basketball dunk",
+   6
+  ],
+  [
+   "javelin throw",
+   "hammer throw",
+   6
+  ],
+  [
+   "kayaking",
+   "rafting",
+   6
+  ],
+  [
+   "playing daf",
+   "playing tabla",
+   6
+  ],
+  [
+   "body weight squats",
+   "doing lunges",
+   5
+  ],
+  [
+   "horse riding",
+   "horse running",
+   5
+  ]
+ ],
+ "lowest_accuracy_classes": [
+  [
+   "BalanceBeam",
+   0.0
+  ],
+  [
+   "BodyWeightSquats",
+   0.0
+  ],
+  [
+   "FrisbeeCatch",
+   0.0
+  ],
+  [
+   "HandstandWalking",
+   0.0
+  ],
+  [
+   "Shotput",
+   0.0
+  ],
+  [
+   "StillRings",
+   0.0
+  ],
+  [
+   "HammerThrow",
+   0.1
+  ],
+  [
+   "Nunchucks",
+   0.1
+  ],
+  [
+   "RopeClimbing",
+   0.1
+  ],
+  [
+   "CricketShot",
+   0.2
+  ]
+ ],
+ "lowest_ap_queries": [
+  [
+   "PlayingDaf",
+   0.024686901636507837
+  ],
+  [
+   "BasketballDunk",
+   0.052665016328737144
+  ],
+  [
+   "HandstandWalking",
+   0.07119445575772236
+  ],
+  [
+   "BoxingSpeedBag",
+   0.0907518127791157
+  ],
+  [
+   "CricketBowling",
+   0.09977706898497504
+  ],
+  [
+   "LongJump",
+   0.11680066878276596
+  ],
+  [
+   "Punch",
+   0.119434316716257
+  ],
+  [
+   "FrisbeeCatch",
+   0.13889784306885533
+  ]
+ ],
+ "queries_with_no_hit_in_top10": [
+  "BasketballDunk",
+  "BoxingSpeedBag",
+  "FrisbeeCatch",
+  "HandstandWalking",
+  "LongJump",
+  "PlayingDaf"
+ ],
+ "highest_ap_queries": [
+  [
+   "BabyCrawling",
+   1.0
+  ],
+  [
+   "BlowingCandles",
+   1.0
+  ],
+  [
+   "Biking",
+   1.0
+  ],
+  [
+   "Billiards",
+   1.0
+  ],
+  [
+   "BoxingPunchingBag",
+   1.0
+  ]
+ ],
+ "classes_perfect_top1": 36,
+ "classes": 101
+}

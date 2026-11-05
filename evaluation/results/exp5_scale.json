@@ -1,0 +1,66 @@
+{
+ "runs": {
+  "1000": {
+   "items": 1000,
+   "server_startup_s": 22.838927745819092,
+   "photo_bytes": 92167600,
+   "initial_index_s": 473.0395004749298,
+   "initial_index_status": "completed",
+   "faces_indexed": 620,
+   "clip_indexed": 1000,
+   "peak_rss_mb_initial_indexing": 1057.828125,
+   "idle_rss_mb_after_startup": 0.0,
+   "items_per_second": 2.113988364599582,
+   "index_storage_bytes": 6824478,
+   "search": {
+    "n": 100,
+    "mean_ms": 470.9405349972076,
+    "median_ms": 461.937450003461,
+    "p95_ms": 569.3324049920193
+   },
+   "search_peak_rss_mb": 1058.53125,
+   "faiss": {
+    "vectors": 1000,
+    "single_query_qps": 3694.9302972368328,
+    "batch1024_qps": 33512.349484343984,
+    "single_query_ms": 0.2706410999817308
+   },
+   "noop_pass_s": 1.0215339660644531,
+   "incremental_100_s": 47.241230964660645,
+   "incremental_peak_rss_mb": 1080.2265625,
+   "after_incremental_clip": 1100,
+   "full_reindex_n_plus_100_s": 525.0959265232086,
+   "full_reindex_peak_rss_mb": 1059.15234375
+  },
+  "5000": {
+   "items": 5000,
+   "server_startup_s": 22.816235303878784,
+   "photo_bytes": 447839216,
+   "initial_index_s": 2331.095414876938,
+   "initial_index_status": "completed",
+   "faces_indexed": 3149,
+   "clip_indexed": 5000,
+   "peak_rss_mb_initial_indexing": 1133.2109375,
+   "idle_rss_mb_after_startup": 0.0,
+   "items_per_second": 2.14491434717354,
+   "index_storage_bytes": 34279271,
+   "search": {
+    "n": 100,
+    "mean_ms": 391.0927100016852,
+    "median_ms": 391.19799999753013,
+    "p95_ms": 471.15036500326823
+   },
+   "search_peak_rss_mb": 1087.6171875,
+   "faiss": {
+    "vectors": 5000,
+    "single_query_qps": 659.1702312379356,
+    "batch1024_qps": 16084.670717035951,
+    "single_query_ms": 1.5170588000037242
+   },
+   "noop_pass_s": 1.0175366401672363,
+   "incremental_100_s": 53.42108869552612,
+   "incremental_peak_rss_mb": 1152.23046875,
+   "after_incremental_clip": 5100
+  }
+ }
+}

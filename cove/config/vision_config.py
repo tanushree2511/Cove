@@ -107,6 +107,22 @@ def _resolve_user_data_dir(target: str) -> str:
     return target
 
 
+def _resolve_face_model(assets_dir: str, requested: str) -> str:
+    """Use the requested face model only if its ONNX file exists, else fall back to the buffalo_s recogniser."""
+    requested = (requested or "buffalo_s").strip().lower()
+    if requested == "buffalo_s":
+        return requested
+    try:
+        from engines.face_recognizer import model_path
+    except ImportError:          # imported as a package (cove.config...) in some entry points
+        try:
+            from ..engines.face_recognizer import model_path   # type: ignore
+        except Exception:
+            return "buffalo_s"
+    path = model_path(assets_dir, requested)
+    return requested if path and os.path.isfile(path) else "buffalo_s"
+
+
 def _has_required_assets(models_path: str) -> bool:
     if not os.path.isdir(models_path):
         return False
@@ -174,12 +190,17 @@ class VisionConfig:
         self.det_size = _parse_tuple(os.getenv("COVE_DET_SIZE", "320,320"), (320, 320))
         self.skip_model_load = _parse_bool(os.getenv("COVE_SKIP_MODEL_LOAD", None), False)
         self.ai_workers = int(os.getenv("COVE_AI_WORKERS", "")) if os.getenv("COVE_AI_WORKERS") else None
+        # Face-recognition model. EdgeFace-S is the default when its file is present (models/edgeface/); otherwise the
+        # buffalo_s recogniser. Embeddings from different models are not comparable, so each model keeps its own
+        # face index files (buffalo_s keeps the original names, so existing libraries keep working).
+        self.face_model = _resolve_face_model(self.assets_dir, os.getenv("COVE_FACE_RECOGNIZER", "edgeface_s"))
+        _face_sfx = "" if self.face_model == "buffalo_s" else f"_{self.face_model}"
         self.vector_path = os.path.join(self.user_data_dir, os.getenv("COVE_IMAGE_VECTOR_PATH", "image_vectors.npy"))
-        self.faiss_index_path = os.path.join(self.user_data_dir, os.getenv("COVE_FAISS_INDEX", "faiss_index.bin"))
+        self.faiss_index_path = os.path.join(self.user_data_dir, os.getenv("COVE_FAISS_INDEX", f"faiss_index{_face_sfx}.bin"))
         self.search_index_path = os.path.join(self.user_data_dir, os.getenv("COVE_FAISS_SEARCH_INDEX", "faiss_search_index.bin"))
         self.people_db_path = os.path.join(self.user_data_dir, os.getenv("COVE_PEOPLE_DB_PATH", "people_db.json"))
-        self.paths_file = os.path.join(self.user_data_dir, os.getenv("COVE_PATHS_FILE", "paths.json"))
-        self.embeddings_file = os.path.join(self.user_data_dir, os.getenv("COVE_EMBEDDINGS_FILE", "embeddings.npy"))
+        self.paths_file = os.path.join(self.user_data_dir, os.getenv("COVE_PATHS_FILE", f"paths{_face_sfx}.json"))
+        self.embeddings_file = os.path.join(self.user_data_dir, os.getenv("COVE_EMBEDDINGS_FILE", f"embeddings{_face_sfx}.npy"))
         self.image_cache = os.path.join(self.user_data_dir, os.getenv("COVE_IMAGE_CACHE", "image_cache.json"))
 
         self._migrate_cache()

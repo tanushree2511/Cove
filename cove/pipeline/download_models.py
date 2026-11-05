@@ -25,6 +25,11 @@ FILES = {
     "tokenizer.json":      f"{_REPO}/tokenizer.json",
 }
 
+# Face recogniser: EdgeFace-S (Idiap, CC BY-NC-SA 4.0) as ONNX. The detector stays the InsightFace buffalo_s SCRFD.
+from engines.face_recognizer import EDGEFACE_DIR, FACE_MODELS  # noqa: E402
+for _name, (_file, _url) in FACE_MODELS.items():
+    FILES[f"{EDGEFACE_DIR}/{_file}"] = _url
+
 OUTPUT_DIR = CONFIG.assets_dir
 CHUNK = 1 << 20
 MAX_ATTEMPTS = 20

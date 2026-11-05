@@ -1,0 +1,14 @@
+{
+ "mbf": {
+  "1thread_batch1": 33.42679388887417,
+  "allcores_batch32": 22.739377430550828,
+  "params_M": 3.400448,
+  "file_MB": 13.616099
+ },
+ "edgeface_s": {
+  "1thread_batch1": 14.833077283940467,
+  "allcores_batch32": 13.958009151792794,
+  "params_M": 3.65252,
+  "file_MB": 14.805497
+ }
+}

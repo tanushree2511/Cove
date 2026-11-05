@@ -7,6 +7,7 @@ from insightface.app import FaceAnalysis
 
 from config.vision_config import CONFIG, VisionConfig, get_logger
 from config.runtime import limit_face_model_threads
+from engines.face_recognizer import install_recognizer
 
 logger = get_logger(__name__)
 
@@ -37,6 +38,10 @@ class AIEngine:
         
         det_size = (800, 800) if self.config.use_gpu else self.config.det_size
         self.app.prepare(ctx_id=self.config.ctx_id, det_size=det_size)
+        # Swap in the configured recogniser (EdgeFace-S by default; same detector and alignment). Falls back to
+        # buffalo_s' own recogniser when the file is missing, matching CONFIG.face_model (which picks the index files).
+        self.face_model = install_recognizer(self.app, self.config.assets_dir, self.config.face_model,
+                                             self.config.providers, logger)
 
         if self.config.use_gpu:
             self._apply_gpu_options()

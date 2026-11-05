@@ -23,7 +23,8 @@ if _project_root not in sys.path:
     sys.path.insert(0, _project_root)
 
 from engines.ai_engine import AIEnginePool
-from engines.cluster_engine import ClusterEngine
+from engines.stable_cluster import StableIncrementalClusterer
+from config.face_clustering import clustering_config
 from engines.person_manager import PersonManager
 from engines.search_engine import SearchEngine, LEGACY_MODEL_ID
 from engines.vector_storage import VectorStorage
@@ -764,7 +765,10 @@ def _run_clustering_stage():
     )
 
     try:
-        labels = ClusterEngine(min_cluster_size=1).fit_predict(embeddings)
+        # Order-stable clustering (engines/stable_cluster.py): the people found depend only on WHICH photos are in the
+        # library, never on the order they were uploaded/indexed in. Thresholds are tuned per face model.
+        cfg = clustering_config(CONFIG.face_model)
+        labels = StableIncrementalClusterer(dim=embeddings.shape[1], **cfg).fit_predict(np.asarray(embeddings, dtype='float32'))
         indexing_job.update(progress=75, message='Saving people database…')
         PersonManager().save_people(labels, face_paths, overwrite=True)
         unique_clusters = len(set(l for l in labels if l != -1))

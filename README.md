@@ -137,6 +137,19 @@ shared `cove_models` volume; interrupted downloads resume when you re-run it.
 The InsightFace face-detection model (`buffalo_s`, ~130 MB) downloads
 automatically into the same volume at `cove-api` startup.
 
+The same script also fetches the **EdgeFace-S** face-recognition model
+(`models/edgeface/edgeface_s_gamma_05.onnx`, ~15 MB), which Cove uses by default
+to turn each detected face into an embedding. On identical face crops it is about
+2x faster on CPU than the `buffalo_s` recogniser with equal or better cross-age and
+cross-pose accuracy (`evaluation/exp13_*`). If the file is missing, Cove falls back
+to the `buffalo_s` recogniser; `COVE_FACE_RECOGNIZER=buffalo_s` forces it. Each
+recogniser keeps its own face index, so switching re-indexes faces once. EdgeFace
+weights are CC BY-NC-SA 4.0 (non-commercial), like the InsightFace models.
+
+People are grouped with an **order-stable incremental clusterer**
+(`cove/engines/stable_cluster.py`): the people found depend only on which photos
+are in the library, never on the order they were added (see `paper/v2/`).
+
 > [!NOTE]
 > ViT-B/16 replaced the earlier int8 ViT-B/32 because it is markedly more accurate
 > (COCO text→image Recall@1 39% → 51%, UCF101 video tagging top-1 58% → 70%) at the

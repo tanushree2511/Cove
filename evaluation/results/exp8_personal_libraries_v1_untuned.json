@@ -1,0 +1,1297 @@
+{
+ "n_libraries": 30,
+ "n_orders": 20,
+ "config": {
+  "link": 0.4,
+  "m": 3,
+  "merge": 0.35,
+  "qpct": null,
+  "qmin": null
+ },
+ "summary": {
+  "First-Leader (single pass)": {
+   "F1_mean": {
+    "mean": 0.9891491454590956,
+    "worst": 0.9801711516397857
+   },
+   "F1_min": {
+    "mean": 0.9710909252836567,
+    "worst": 0.9438634617797872
+   },
+   "F1_spread": {
+    "mean": 0.024773803818953756,
+    "worst": 0.056136538220212806
+   },
+   "ARI_mean": {
+    "mean": 0.9897445830273635,
+    "worst": 0.9750621185839199
+   },
+   "ARI_min": {
+    "mean": 0.9466713637995615,
+    "worst": 0.7919701087022534
+   },
+   "ARI_spread": {
+    "mean": 0.050645947247507844,
+    "worst": 0.20802989129774663
+   },
+   "agree_mean": {
+    "mean": 0.9867844381560451,
+    "worst": 0.9697224280408602
+   },
+   "agree_min": {
+    "mean": 0.9391342486149983,
+    "worst": 0.7559191103303298
+   }
+  },
+  "Two-stage (current Cove, 0.45/0.40)": {
+   "F1_mean": {
+    "mean": 0.9951999029508202,
+    "worst": 0.9886878060118652
+   },
+   "F1_min": {
+    "mean": 0.9936210999859266,
+    "worst": 0.9842163084972693
+   },
+   "F1_spread": {
+    "mean": 0.002781584606334242,
+    "worst": 0.009080562004848636
+   },
+   "ARI_mean": {
+    "mean": 0.9964495197785239,
+    "worst": 0.9881574340229815
+   },
+   "ARI_min": {
+    "mean": 0.9948741383451185,
+    "worst": 0.9833438272419537
+   },
+   "ARI_spread": {
+    "mean": 0.002483763915952312,
+    "worst": 0.008474050938223843
+   },
+   "agree_mean": {
+    "mean": 0.9989465667238839,
+    "worst": 0.9961710483729389
+   },
+   "agree_min": {
+    "mean": 0.9969337109869546,
+    "worst": 0.9897175513917271
+   }
+  },
+  "Ours: order-stable incremental": {
+   "F1_mean": {
+    "mean": 0.9969773554390872,
+    "worst": 0.9775702831624885
+   },
+   "F1_min": {
+    "mean": 0.9969773554390872,
+    "worst": 0.9775702831624885
+   },
+   "F1_spread": {
+    "mean": 0.0,
+    "worst": 0.0
+   },
+   "ARI_mean": {
+    "mean": 0.9957227850480239,
+    "worst": 0.9272033087292165
+   },
+   "ARI_min": {
+    "mean": 0.995722785048024,
+    "worst": 0.9272033087292166
+   },
+   "ARI_spread": {
+    "mean": 0.0,
+    "worst": 0.0
+   },
+   "agree_mean": {
+    "mean": 1.0,
+    "worst": 1.0
+   },
+   "agree_min": {
+    "mean": 1.0,
+    "worst": 1.0
+   }
+  },
+  "Agglomerative (batch reference)": {
+   "F1_mean": {
+    "mean": 0.995871735438369,
+    "worst": 0.9880716741987012
+   },
+   "ARI_mean": {
+    "mean": 0.9970853290458623,
+    "worst": 0.989339091382628
+   }
+  }
+ },
+ "libraries": [
+  {
+   "library": 0,
+   "faces": 634,
+   "people": 140,
+   "First-Leader (single pass)": {
+    "F1_mean": 0.9925545610926367,
+    "F1_min": 0.984503252342792,
+    "F1_spread": 0.012439822658253608,
+    "ARI_mean": 0.9900466196395135,
+    "ARI_min": 0.9778018009331337,
+    "ARI_spread": 0.017136034449915627,
+    "agree_mean": 0.9912818863764182,
+    "agree_min": 0.9720827527882878
+   },
+   "Two-stage (current Cove, 0.45/0.40)": {
+    "F1_mean": 0.996489772927676,
+    "F1_min": 0.9939157327139423,
+    "F1_spread": 0.0030273422871033295,
+    "ARI_mean": 0.9944278238677636,
+    "ARI_min": 0.9914463430813194,
+    "ARI_spread": 0.0034914923017299593,
+    "agree_mean": 0.9991013570062366,
+    "agree_min": 0.9965083565100392
+   },
+   "Ours: order-stable incremental": {
+    "F1_mean": 0.9969430750010456,
+    "F1_min": 0.9969430750010456,
+    "F1_spread": 0.0,
+    "ARI_mean": 0.9949378353830491,
+    "ARI_min": 0.9949378353830494,
+    "ARI_spread": 0.0,
+    "agree_mean": 1.0,
+    "agree_min": 1.0
+   },
+   "Agglomerative (batch reference)": {
+    "F1_mean": 0.9969430750010456,
+    "ARI_mean": 0.9949378353830494
+   }
+  },
+  {
+   "library": 1,
+   "faces": 649,
+   "people": 77,
+   "First-Leader (single pass)": {
+    "F1_mean": 0.9820048176511931,
+    "F1_min": 0.9680163533713482,
+    "F1_spread": 0.020186787943590856,
+    "ARI_mean": 0.9837328108337724,
+    "ARI_min": 0.9498191678223697,
+    "ARI_spread": 0.04137213922490468,
+    "agree_mean": 0.9848679480761904,
+    "agree_min": 0.9304210745886917
+   },
+   "Two-stage (current Cove, 0.45/0.40)": {
+    "F1_mean": 0.9886878060118652,
+    "F1_min": 0.9872821534938291,
+    "F1_spread": 0.002757947188006704,
+    "ARI_mean": 0.9914273141748586,
+    "ARI_min": 0.9907439211429917,
+    "ARI_spread": 0.0013410616152523813,
+    "agree_mean": 0.9991730151763218,
+    "agree_min": 0.9984018744219095
+   },
+   "Ours: order-stable incremental": {
+    "F1_mean": 0.9942324771378969,
+    "F1_min": 0.9942324771378972,
+    "F1_spread": 0.0,
+    "ARI_mean": 0.9942492730785633,
+    "ARI_min": 0.9942492730785635,
+    "ARI_spread": 0.0,
+    "agree_mean": 1.0,
+    "agree_min": 1.0
+   },
+   "Agglomerative (batch reference)": {
+    "F1_mean": 0.9880716741987012,
+    "ARI_mean": 0.9911274171641631
+   }
+  },
+  {
+   "library": 2,
+   "faces": 1314,
+   "people": 150,
+   "First-Leader (single pass)": {
+    "F1_mean": 0.9880104588678469,
+    "F1_min": 0.9593270676078587,
+    "F1_spread": 0.03798729115813371,
+    "ARI_mean": 0.992996163764144,
+    "ARI_min": 0.9484003291445617,
+    "ARI_spread": 0.050827555640480804,
+    "agree_mean": 0.9884760671280949,
+    "agree_min": 0.944332396509248
+   },
+   "Two-stage (current Cove, 0.45/0.40)": {
+    "F1_mean": 0.9979276752113659,
+    "F1_min": 0.9956364283868344,
+    "F1_spread": 0.0029300489580638134,
+    "ARI_mean": 0.998858486707808,
+    "ARI_min": 0.9971711069105273,
+    "ARI_spread": 0.0024650278782808455,
+    "agree_mean": 0.9986811267126317,
+    "agree_min": 0.9964606144235584
+   },
+   "Ours: order-stable incremental": {
+    "F1_mean": 1.0,
+    "F1_min": 1.0,
+    "F1_spread": 0.0,
+    "ARI_mean": 1.0,
+    "ARI_min": 1.0,
+    "ARI_spread": 0.0,
+    "agree_mean": 1.0,
+    "agree_min": 1.0
+   },
+   "Agglomerative (batch reference)": {
+    "F1_mean": 0.9992928248925638,
+    "ARI_mean": 0.9998566872434624
+   }
+  },
+  {
+   "library": 3,
+   "faces": 678,
+   "people": 133,
+   "First-Leader (single pass)": {
+    "F1_mean": 0.9816326093087631,
+    "F1_min": 0.964629275925781,
+    "F1_spread": 0.026969086656716046,
+    "ARI_mean": 0.9760372266664067,
+    "ARI_min": 0.9415854500902583,
+    "ARI_spread": 0.05256211558358359,
+    "agree_mean": 0.9697224280408602,
+    "agree_min": 0.9341707339986086
+   },
+   "Two-stage (current Cove, 0.45/0.40)": {
+    "F1_mean": 0.9928533003482146,
+    "F1_min": 0.9911053256259594,
+    "F1_spread": 0.0034198674351048064,
+    "ARI_mean": 0.9929381847227298,
+    "ARI_min": 0.9901421857397034,
+    "ARI_spread": 0.003802432190708749,
+    "agree_mean": 0.9987379779073474,
+    "agree_min": 0.9955803134562489
+   },
+   "Ours: order-stable incremental": {
+    "F1_mean": 0.9985739024141795,
+    "F1_min": 0.9985739024141795,
+    "F1_spread": 0.0,
+    "ARI_mean": 0.9981234039461322,
+    "ARI_min": 0.9981234039461324,
+    "ARI_spread": 0.0,
+    "agree_mean": 1.0,
+    "agree_min": 1.0
+   },
+   "Agglomerative (batch reference)": {
+    "F1_mean": 0.992657831016669,
+    "ARI_mean": 0.9929287320343316
+   }
+  },
+  {
+   "library": 4,
+   "faces": 1061,
+   "people": 127,
+   "First-Leader (single pass)": {
+    "F1_mean": 0.9861757159848038,
+    "F1_min": 0.9766696394184666,
+    "F1_spread": 0.019577719542146377,
+    "ARI_mean": 0.9931449736187725,
+    "ARI_min": 0.9895076894796064,
+    "ARI_spread": 0.009427169955664838,
+    "agree_mean": 0.9927843579193248,
+    "agree_min": 0.988914246530101
+   },
+   "Two-stage (current Cove, 0.45/0.40)": {
+    "F1_mean": 0.9951009789179539,
+    "F1_min": 0.9939212369546494,
+    "F1_spread": 0.0025860625866380715,
+    "ARI_mean": 0.9980204633654302,
+    "ARI_min": 0.9976704769951238,
+    "ARI_spread": 0.0008377639015205718,
+    "agree_mean": 0.9995446837991686,
+    "agree_min": 0.999096315721545
+   },
+   "Ours: order-stable incremental": {
+    "F1_mean": 0.999088078991227,
+    "F1_min": 0.9990880789912266,
+    "F1_spread": 0.0,
+    "ARI_mean": 0.9995250313385279,
+    "ARI_min": 0.9995250313385279,
+    "ARI_spread": 0.0,
+    "agree_mean": 1.0,
+    "agree_min": 1.0
+   },
+   "Agglomerative (batch reference)": {
+    "F1_mean": 0.9943980111323476,
+    "ARI_mean": 0.9977691018218836
+   }
+  },
+  {
+   "library": 5,
+   "faces": 551,
+   "people": 96,
+   "First-Leader (single pass)": {
+    "F1_mean": 0.9949608083412936,
+    "F1_min": 0.990439322762402,
+    "F1_spread": 0.006302411784794959,
+    "ARI_mean": 0.9959546524648489,
+    "ARI_min": 0.9928253027305568,
+    "ARI_spread": 0.004211284762393408,
+    "agree_mean": 0.9980669252022513,
+    "agree_min": 0.9929628258144597
+   },
+   "Two-stage (current Cove, 0.45/0.40)": {
+    "F1_mean": 0.9957222624097607,
+    "F1_min": 0.9950426143181366,
+    "F1_spread": 0.0016991202290603802,
+    "ARI_mean": 0.9963541783118133,
+    "ARI_min": 0.9958992388577225,
+    "ARI_spread": 0.0011373486352277418,
+    "agree_mean": 0.9994253326534382,
+    "agree_min": 0.9988626375432629
+   },
+   "Ours: order-stable incremental": {
+    "F1_mean": 0.9967417345471968,
+    "F1_min": 0.996741734547197,
+    "F1_spread": 0.0,
+    "ARI_mean": 0.9970365874929502,
+    "ARI_min": 0.9970365874929502,
+    "ARI_spread": 0.0,
+    "agree_mean": 1.0,
+    "agree_min": 1.0
+   },
+   "Agglomerative (batch reference)": {
+    "F1_mean": 0.996741734547197,
+    "ARI_mean": 0.9970365874929502
+   }
+  },
+  {
+   "library": 6,
+   "faces": 389,
+   "people": 79,
+   "First-Leader (single pass)": {
+    "F1_mean": 0.995599196698814,
+    "F1_min": 0.9751599548362816,
+    "F1_spread": 0.024840045163718405,
+    "ARI_mean": 0.9943947877369729,
+    "ARI_min": 0.9272615928816333,
+    "ARI_spread": 0.07273840711836665,
+    "agree_mean": 0.98913719859237,
+    "agree_min": 0.916191874448291
+   },
+   "Two-stage (current Cove, 0.45/0.40)": {
+    "F1_mean": 1.0,
+    "F1_min": 1.0,
+    "F1_spread": 0.0,
+    "ARI_mean": 1.0,
+    "ARI_min": 1.0,
+    "ARI_spread": 0.0,
+    "agree_mean": 1.0,
+    "agree_min": 1.0
+   },
+   "Ours: order-stable incremental": {
+    "F1_mean": 1.0,
+    "F1_min": 1.0,
+    "F1_spread": 0.0,
+    "ARI_mean": 1.0,
+    "ARI_min": 1.0,
+    "ARI_spread": 0.0,
+    "agree_mean": 1.0,
+    "agree_min": 1.0
+   },
+   "Agglomerative (batch reference)": {
+    "F1_mean": 1.0,
+    "ARI_mean": 1.0
+   }
+  },
+  {
+   "library": 7,
+   "faces": 410,
+   "people": 106,
+   "First-Leader (single pass)": {
+    "F1_mean": 0.9969279287896142,
+    "F1_min": 0.9868846226953051,
+    "F1_spread": 0.01311537730469492,
+    "ARI_mean": 0.9926859072583557,
+    "ARI_min": 0.9670284916090796,
+    "ARI_spread": 0.032971508390920445,
+    "agree_mean": 0.9879019750931953,
+    "agree_min": 0.9648102320295735
+   },
+   "Two-stage (current Cove, 0.45/0.40)": {
+    "F1_mean": 0.9998888888888888,
+    "F1_min": 0.9977777777777778,
+    "F1_spread": 0.0022222222222222365,
+    "ARI_mean": 0.9999419141985928,
+    "ARI_min": 0.9988382839718584,
+    "ARI_spread": 0.001161716028141635,
+    "agree_mean": 0.9998838283971858,
+    "agree_min": 0.9988382839718584
+   },
+   "Ours: order-stable incremental": {
+    "F1_mean": 1.0,
+    "F1_min": 1.0,
+    "F1_spread": 0.0,
+    "ARI_mean": 1.0,
+    "ARI_min": 1.0,
+    "ARI_spread": 0.0,
+    "agree_mean": 1.0,
+    "agree_min": 1.0
+   },
+   "Agglomerative (batch reference)": {
+    "F1_mean": 1.0,
+    "ARI_mean": 1.0
+   }
+  },
+  {
+   "library": 8,
+   "faces": 584,
+   "people": 97,
+   "First-Leader (single pass)": {
+    "F1_mean": 0.9943805602508344,
+    "F1_min": 0.981969340695653,
+    "F1_spread": 0.018030659304346996,
+    "ARI_mean": 0.9901150972964251,
+    "ARI_min": 0.9629906525368405,
+    "ARI_spread": 0.037009347463159536,
+    "agree_mean": 0.9831622723806601,
+    "agree_min": 0.949206235519878
+   },
+   "Two-stage (current Cove, 0.45/0.40)": {
+    "F1_mean": 0.9988002704240436,
+    "F1_min": 0.9951160295760567,
+    "F1_spread": 0.004883970423943285,
+    "ARI_mean": 0.9989531449568396,
+    "ARI_min": 0.9928582168643245,
+    "ARI_spread": 0.0071417831356754835,
+    "agree_mean": 0.9988495610260465,
+    "agree_min": 0.9928582168643245
+   },
+   "Ours: order-stable incremental": {
+    "F1_mean": 0.9775702831624885,
+    "F1_min": 0.9775702831624885,
+    "F1_spread": 0.0,
+    "ARI_mean": 0.9272033087292165,
+    "ARI_min": 0.9272033087292166,
+    "ARI_spread": 0.0,
+    "agree_mean": 1.0,
+    "agree_min": 1.0
+   },
+   "Agglomerative (batch reference)": {
+    "F1_mean": 1.0,
+    "ARI_mean": 1.0
+   }
+  },
+  {
+   "library": 9,
+   "faces": 788,
+   "people": 157,
+   "First-Leader (single pass)": {
+    "F1_mean": 0.9906840459541316,
+    "F1_min": 0.9816657688237732,
+    "F1_spread": 0.013775360778399581,
+    "ARI_mean": 0.9961173483710514,
+    "ARI_min": 0.9912672555872588,
+    "ARI_spread": 0.007049945622081166,
+    "agree_mean": 0.9962188764710344,
+    "agree_min": 0.9902066584729372
+   },
+   "Two-stage (current Cove, 0.45/0.40)": {
+    "F1_mean": 0.994815822931393,
+    "F1_min": 0.9930949181931289,
+    "F1_spread": 0.0034585719171871254,
+    "ARI_mean": 0.9979302133492658,
+    "ARI_min": 0.9972256222665721,
+    "ARI_spread": 0.0013558831715613229,
+    "agree_mean": 0.9990742287825443,
+    "agree_min": 0.9978482496399644
+   },
+   "Ours: order-stable incremental": {
+    "F1_mean": 1.0,
+    "F1_min": 1.0,
+    "F1_spread": 0.0,
+    "ARI_mean": 1.0,
+    "ARI_min": 1.0,
+    "ARI_spread": 0.0,
+    "agree_mean": 1.0,
+    "agree_min": 1.0
+   },
+   "Agglomerative (batch reference)": {
+    "F1_mean": 0.9961783439490446,
+    "ARI_mean": 0.9988126690348343
+   }
+  },
+  {
+   "library": 10,
+   "faces": 546,
+   "people": 77,
+   "First-Leader (single pass)": {
+    "F1_mean": 0.9861906198632578,
+    "F1_min": 0.9654466563788129,
+    "F1_spread": 0.02585910061993124,
+    "ARI_mean": 0.990203345724107,
+    "ARI_min": 0.9340048514481989,
+    "ARI_spread": 0.06111676889994544,
+    "agree_mean": 0.9896949090765277,
+    "agree_min": 0.9295319504093477
+   },
+   "Two-stage (current Cove, 0.45/0.40)": {
+    "F1_mean": 0.9907038428242261,
+    "F1_min": 0.988480450195707,
+    "F1_spread": 0.004994699584776829,
+    "ARI_mean": 0.9947412889222438,
+    "ARI_min": 0.9936995839806022,
+    "ARI_spread": 0.002415311459362135,
+    "agree_mean": 0.9987839896472871,
+    "agree_min": 0.9972977015730288
+   },
+   "Ours: order-stable incremental": {
+    "F1_mean": 0.9967117988394587,
+    "F1_min": 0.9967117988394585,
+    "F1_spread": 0.0,
+    "ARI_mean": 0.9976014992482378,
+    "ARI_min": 0.997601499248238,
+    "ARI_spread": 0.0,
+    "agree_mean": 1.0,
+    "agree_min": 1.0
+   },
+   "Agglomerative (batch reference)": {
+    "F1_mean": 0.9911504424778762,
+    "ARI_mean": 0.9950506044455647
+   }
+  },
+  {
+   "library": 11,
+   "faces": 1227,
+   "people": 158,
+   "First-Leader (single pass)": {
+    "F1_mean": 0.9942400619502972,
+    "F1_min": 0.9600728955037422,
+    "F1_spread": 0.039927104496257804,
+    "ARI_mean": 0.9931188353053082,
+    "ARI_min": 0.9344497904368623,
+    "ARI_spread": 0.06555020956313773,
+    "agree_mean": 0.9873152589922256,
+    "agree_min": 0.9275290459882584
+   },
+   "Two-stage (current Cove, 0.45/0.40)": {
+    "F1_mean": 0.9987683568976671,
+    "F1_min": 0.9976006235476779,
+    "F1_spread": 0.002399376452322133,
+    "ARI_mean": 0.9991322411885971,
+    "ARI_min": 0.9975430968522053,
+    "ARI_spread": 0.0024569031477946757,
+    "agree_mean": 0.9989202014968118,
+    "agree_min": 0.9959184201672467
+   },
+   "Ours: order-stable incremental": {
+    "F1_mean": 1.0,
+    "F1_min": 1.0,
+    "F1_spread": 0.0,
+    "ARI_mean": 1.0,
+    "ARI_min": 1.0,
+    "ARI_spread": 0.0,
+    "agree_mean": 1.0,
+    "agree_min": 1.0
+   },
+   "Agglomerative (batch reference)": {
+    "F1_mean": 0.9992106717183675,
+    "ARI_mean": 0.9996562107325735
+   }
+  },
+  {
+   "library": 12,
+   "faces": 435,
+   "people": 110,
+   "First-Leader (single pass)": {
+    "F1_mean": 0.9941302395528693,
+    "F1_min": 0.9782679208563088,
+    "F1_spread": 0.01950490765148638,
+    "ARI_mean": 0.9934291733472739,
+    "ARI_min": 0.9804084001337855,
+    "ARI_spread": 0.016531999326515612,
+    "agree_mean": 0.9934051642946868,
+    "agree_min": 0.9689003145215358
+   },
+   "Two-stage (current Cove, 0.45/0.40)": {
+    "F1_mean": 0.9977728285077951,
+    "F1_min": 0.9977728285077951,
+    "F1_spread": 0.0,
+    "ARI_mean": 0.996940399460301,
+    "ARI_min": 0.9969403994603011,
+    "ARI_spread": 0.0,
+    "agree_mean": 1.0,
+    "agree_min": 1.0
+   },
+   "Ours: order-stable incremental": {
+    "F1_mean": 0.9977728285077951,
+    "F1_min": 0.9977728285077951,
+    "F1_spread": 0.0,
+    "ARI_mean": 0.996940399460301,
+    "ARI_min": 0.9969403994603011,
+    "ARI_spread": 0.0,
+    "agree_mean": 1.0,
+    "agree_min": 1.0
+   },
+   "Agglomerative (batch reference)": {
+    "F1_mean": 0.9977728285077951,
+    "ARI_mean": 0.9969403994603011
+   }
+  },
+  {
+   "library": 13,
+   "faces": 736,
+   "people": 106,
+   "First-Leader (single pass)": {
+    "F1_mean": 0.9908816940498155,
+    "F1_min": 0.9740404250376005,
+    "F1_spread": 0.0222311628671914,
+    "ARI_mean": 0.9938062616126633,
+    "ARI_min": 0.9445744157629002,
+    "ARI_spread": 0.054155470580062315,
+    "agree_mean": 0.9907902426350729,
+    "agree_min": 0.9372024909661713
+   },
+   "Two-stage (current Cove, 0.45/0.40)": {
+    "F1_mean": 0.99420885255534,
+    "F1_min": 0.992409621803493,
+    "F1_spread": 0.002643737241194488,
+    "ARI_mean": 0.9976405801524624,
+    "ARI_min": 0.9944263510885163,
+    "ARI_spread": 0.003979348085430434,
+    "agree_mean": 0.998730529279868,
+    "agree_min": 0.9956438277179446
+   },
+   "Ours: order-stable incremental": {
+    "F1_mean": 0.9962715879047922,
+    "F1_min": 0.9962715879047919,
+    "F1_spread": 0.0,
+    "ARI_mean": 0.9987298863429629,
+    "ARI_min": 0.9987298863429626,
+    "ARI_spread": 0.0,
+    "agree_mean": 1.0,
+    "agree_min": 1.0
+   },
+   "Agglomerative (batch reference)": {
+    "F1_mean": 0.9962715879047919,
+    "ARI_mean": 0.9987298863429626
+   }
+  },
+  {
+   "library": 14,
+   "faces": 1421,
+   "people": 161,
+   "First-Leader (single pass)": {
+    "F1_mean": 0.9891812654768524,
+    "F1_min": 0.9700558146850051,
+    "F1_spread": 0.023990173472079768,
+    "ARI_mean": 0.9927942251616433,
+    "ARI_min": 0.9325078864201679,
+    "ARI_spread": 0.0661163308441527,
+    "agree_mean": 0.9882112858043653,
+    "agree_min": 0.9153106749462897
+   },
+   "Two-stage (current Cove, 0.45/0.40)": {
+    "F1_mean": 0.9944598812153881,
+    "F1_min": 0.9928717358845455,
+    "F1_spread": 0.003278570924552082,
+    "ARI_mean": 0.9980297586310677,
+    "ARI_min": 0.996476112745597,
+    "ARI_spread": 0.002489762252739669,
+    "agree_mean": 0.9986909929352737,
+    "agree_min": 0.9964058834263173
+   },
+   "Ours: order-stable incremental": {
+    "F1_mean": 0.9970396478734169,
+    "F1_min": 0.9970396478734168,
+    "F1_spread": 0.0,
+    "ARI_mean": 0.9991728691636357,
+    "ARI_min": 0.9991728691636356,
+    "ARI_spread": 0.0,
+    "agree_mean": 1.0,
+    "agree_min": 1.0
+   },
+   "Agglomerative (batch reference)": {
+    "F1_mean": 0.9949144127073384,
+    "ARI_mean": 0.9988002588526962
+   }
+  },
+  {
+   "library": 15,
+   "faces": 894,
+   "people": 144,
+   "First-Leader (single pass)": {
+    "F1_mean": 0.989216226056082,
+    "F1_min": 0.9757842108417706,
+    "F1_spread": 0.020334856946492064,
+    "ARI_mean": 0.9894650045110318,
+    "ARI_min": 0.9687933383694338,
+    "ARI_spread": 0.02850334973064028,
+    "agree_mean": 0.9862002888531837,
+    "agree_min": 0.9631300350913273
+   },
+   "Two-stage (current Cove, 0.45/0.40)": {
+    "F1_mean": 0.9956690813500995,
+    "F1_min": 0.9926199570041612,
+    "F1_spread": 0.0053743799472310005,
+    "ARI_mean": 0.9952491378034052,
+    "ARI_min": 0.9911378676183119,
+    "ARI_spread": 0.007161661991528123,
+    "agree_mean": 0.9964123023714243,
+    "agree_min": 0.9904444483837829
+   },
+   "Ours: order-stable incremental": {
+    "F1_mean": 0.9979943369513924,
+    "F1_min": 0.9979943369513922,
+    "F1_spread": 0.0,
+    "ARI_mean": 0.9982995296098404,
+    "ARI_min": 0.99829952960984,
+    "ARI_spread": 0.0,
+    "agree_mean": 1.0,
+    "agree_min": 1.0
+   },
+   "Agglomerative (batch reference)": {
+    "F1_mean": 0.9969063248892258,
+    "ARI_mean": 0.996794552731952
+   }
+  },
+  {
+   "library": 16,
+   "faces": 862,
+   "people": 125,
+   "First-Leader (single pass)": {
+    "F1_mean": 0.9840498025403035,
+    "F1_min": 0.9728423561259357,
+    "F1_spread": 0.022973942278572967,
+    "ARI_mean": 0.9825391550041758,
+    "ARI_min": 0.9668181457851023,
+    "ARI_spread": 0.031766890859305175,
+    "agree_mean": 0.9742992221945268,
+    "agree_min": 0.9559781219659084
+   },
+   "Two-stage (current Cove, 0.45/0.40)": {
+    "F1_mean": 0.9973337149828685,
+    "F1_min": 0.9955609810231938,
+    "F1_spread": 0.0033052634808572456,
+    "ARI_mean": 0.9974123524427055,
+    "ARI_min": 0.9955061582202237,
+    "ARI_spread": 0.0028819438184851665,
+    "agree_mean": 0.9989452446231978,
+    "agree_min": 0.9969169072280047
+   },
+   "Ours: order-stable incremental": {
+    "F1_mean": 0.9989279971413257,
+    "F1_min": 0.9989279971413257,
+    "F1_spread": 0.0,
+    "ARI_mean": 0.999529136277084,
+    "ARI_min": 0.9995291362770841,
+    "ARI_spread": 0.0,
+    "agree_mean": 1.0,
+    "agree_min": 1.0
+   },
+   "Agglomerative (batch reference)": {
+    "F1_mean": 0.998866244504051,
+    "ARI_mean": 0.9983881020387089
+   }
+  },
+  {
+   "library": 17,
+   "faces": 716,
+   "people": 87,
+   "First-Leader (single pass)": {
+    "F1_mean": 0.9839678024576992,
+    "F1_min": 0.9619361320598745,
+    "F1_spread": 0.03304022727818701,
+    "ARI_mean": 0.9922603335420008,
+    "ARI_min": 0.9780798007025163,
+    "ARI_spread": 0.020455006181473445,
+    "agree_mean": 0.9910039195553048,
+    "agree_min": 0.9789690948513727
+   },
+   "Two-stage (current Cove, 0.45/0.40)": {
+    "F1_mean": 0.9926338868684429,
+    "F1_min": 0.9908617894220002,
+    "F1_spread": 0.0027355529907183707,
+    "ARI_mean": 0.9970323536596816,
+    "ARI_min": 0.995897471069601,
+    "ARI_spread": 0.0017522534774973009,
+    "agree_mean": 0.9993057363745949,
+    "agree_min": 0.9982477296269838
+   },
+   "Ours: order-stable incremental": {
+    "F1_mean": 0.9949763593380615,
+    "F1_min": 0.9949763593380615,
+    "F1_spread": 0.0,
+    "ARI_mean": 0.9985348068839895,
+    "ARI_min": 0.9985348068839898,
+    "ARI_spread": 0.0,
+    "agree_mean": 1.0,
+    "agree_min": 1.0
+   },
+   "Agglomerative (batch reference)": {
+    "F1_mean": 0.9935973424127186,
+    "ARI_mean": 0.9976497245470983
+   }
+  },
+  {
+   "library": 18,
+   "faces": 573,
+   "people": 165,
+   "First-Leader (single pass)": {
+    "F1_mean": 0.9918548388461523,
+    "F1_min": 0.9438634617797872,
+    "F1_spread": 0.056136538220212806,
+    "ARI_mean": 0.985386316772461,
+    "ARI_min": 0.7919701087022534,
+    "ARI_spread": 0.20802989129774663,
+    "agree_mean": 0.9713914951247824,
+    "agree_min": 0.7559191103303298
+   },
+   "Two-stage (current Cove, 0.45/0.40)": {
+    "F1_mean": 0.9977174711674512,
+    "F1_min": 0.9949467529755689,
+    "F1_spread": 0.005053247024431107,
+    "ARI_mean": 0.9976488986104801,
+    "ARI_min": 0.9950201020326208,
+    "ARI_spread": 0.004979897967379188,
+    "agree_mean": 0.9978332746367222,
+    "agree_min": 0.9950201020326208
+   },
+   "Ours: order-stable incremental": {
+    "F1_mean": 1.0,
+    "F1_min": 1.0,
+    "F1_spread": 0.0,
+    "ARI_mean": 1.0,
+    "ARI_min": 1.0,
+    "ARI_spread": 0.0,
+    "agree_mean": 1.0,
+    "agree_min": 1.0
+   },
+   "Agglomerative (batch reference)": {
+    "F1_mean": 1.0,
+    "ARI_mean": 1.0
+   }
+  },
+  {
+   "library": 19,
+   "faces": 1307,
+   "people": 146,
+   "First-Leader (single pass)": {
+    "F1_mean": 0.9953050258600799,
+    "F1_min": 0.991647480641402,
+    "F1_spread": 0.0062393099840729604,
+    "ARI_mean": 0.9987815146961749,
+    "ARI_min": 0.9980551361926829,
+    "ARI_spread": 0.0013419880036042997,
+    "agree_mean": 0.9992225377873757,
+    "agree_min": 0.998081912964789
+   },
+   "Two-stage (current Cove, 0.45/0.40)": {
+    "F1_mean": 0.997181341054028,
+    "F1_min": 0.9964131555032083,
+    "F1_spread": 0.0014736351222666144,
+    "ARI_mean": 0.9991356690628923,
+    "ARI_min": 0.9989373661360333,
+    "ARI_spread": 0.00045975806025388977,
+    "agree_mean": 0.9998902058404415,
+    "agree_min": 0.9995402416452083
+   },
+   "Ours: order-stable incremental": {
+    "F1_mean": 0.997886790625475,
+    "F1_min": 0.9978867906254749,
+    "F1_spread": 0.0,
+    "ARI_mean": 0.9993971241962875,
+    "ARI_min": 0.9993971241962872,
+    "ARI_spread": 0.0,
+    "agree_mean": 1.0,
+    "agree_min": 1.0
+   },
+   "Agglomerative (batch reference)": {
+    "F1_mean": 0.9971426758798482,
+    "ARI_mean": 0.999109818426461
+   }
+  },
+  {
+   "library": 20,
+   "faces": 958,
+   "people": 153,
+   "First-Leader (single pass)": {
+    "F1_mean": 0.995711275536955,
+    "F1_min": 0.9678247667388171,
+    "F1_spread": 0.030154263748848442,
+    "ARI_mean": 0.9946234878637441,
+    "ARI_min": 0.9238042437396236,
+    "ARI_spread": 0.07481164376743354,
+    "agree_mean": 0.992027638635683,
+    "agree_min": 0.9229287800874258
+   },
+   "Two-stage (current Cove, 0.45/0.40)": {
+    "F1_mean": 0.9979790304876657,
+    "F1_min": 0.9979790304876656,
+    "F1_spread": 0.0,
+    "ARI_mean": 0.998615887507057,
+    "ARI_min": 0.9986158875070571,
+    "ARI_spread": 0.0,
+    "agree_mean": 1.0,
+    "agree_min": 1.0
+   },
+   "Ours: order-stable incremental": {
+    "F1_mean": 0.9979790304876657,
+    "F1_min": 0.9979790304876656,
+    "F1_spread": 0.0,
+    "ARI_mean": 0.998615887507057,
+    "ARI_min": 0.9986158875070571,
+    "ARI_spread": 0.0,
+    "agree_mean": 1.0,
+    "agree_min": 1.0
+   },
+   "Agglomerative (batch reference)": {
+    "F1_mean": 0.9979790304876656,
+    "ARI_mean": 0.9986158875070571
+   }
+  },
+  {
+   "library": 21,
+   "faces": 835,
+   "people": 137,
+   "First-Leader (single pass)": {
+    "F1_mean": 0.9867161198282167,
+    "F1_min": 0.9475305970878594,
+    "F1_spread": 0.04507650555894771,
+    "ARI_mean": 0.9850880649100462,
+    "ARI_min": 0.8116484417942015,
+    "ARI_spread": 0.1855969375550256,
+    "agree_mean": 0.9750804169545042,
+    "agree_min": 0.8093353379157576
+   },
+   "Two-stage (current Cove, 0.45/0.40)": {
+    "F1_mean": 0.9926152967657865,
+    "F1_min": 0.9901268492147395,
+    "F1_spread": 0.004493411828210059,
+    "ARI_mean": 0.9958903034170234,
+    "ARI_min": 0.9920750163168511,
+    "ARI_spread": 0.00579761630074016,
+    "agree_mean": 0.9968203186300899,
+    "agree_min": 0.9897175513917271
+   },
+   "Ours: order-stable incremental": {
+    "F1_mean": 0.9978523150780113,
+    "F1_min": 0.9978523150780115,
+    "F1_spread": 0.0,
+    "ARI_mean": 0.9989373374020094,
+    "ARI_min": 0.9989373374020095,
+    "ARI_spread": 0.0,
+    "agree_mean": 1.0,
+    "agree_min": 1.0
+   },
+   "Agglomerative (batch reference)": {
+    "F1_mean": 0.993104823903277,
+    "ARI_mean": 0.9974022591705716
+   }
+  },
+  {
+   "library": 22,
+   "faces": 762,
+   "people": 151,
+   "First-Leader (single pass)": {
+    "F1_mean": 0.9866522912932154,
+    "F1_min": 0.9683839906810818,
+    "F1_spread": 0.024131122326755627,
+    "ARI_mean": 0.9877920934483854,
+    "ARI_min": 0.9186694312335887,
+    "ARI_spread": 0.07667701744620026,
+    "agree_mean": 0.9856992197970125,
+    "agree_min": 0.911159256865013
+   },
+   "Two-stage (current Cove, 0.45/0.40)": {
+    "F1_mean": 0.9923784287951177,
+    "F1_min": 0.9903704368564799,
+    "F1_spread": 0.003622565981991288,
+    "ARI_mean": 0.9945209851304769,
+    "ARI_min": 0.9931334787884474,
+    "ARI_spread": 0.0026236872109255405,
+    "agree_mean": 0.9980646934446491,
+    "agree_min": 0.9956266409499298
+   },
+   "Ours: order-stable incremental": {
+    "F1_mean": 0.997485674190153,
+    "F1_min": 0.9974856741901532,
+    "F1_spread": 0.0,
+    "ARI_mean": 0.9976526778499301,
+    "ARI_min": 0.9976526778499298,
+    "ARI_spread": 0.0,
+    "agree_mean": 1.0,
+    "agree_min": 1.0
+   },
+   "Agglomerative (batch reference)": {
+    "F1_mean": 0.9922249852814164,
+    "ARI_mean": 0.9942668276004681
+   }
+  },
+  {
+   "library": 23,
+   "faces": 623,
+   "people": 108,
+   "First-Leader (single pass)": {
+    "F1_mean": 0.9807327126745047,
+    "F1_min": 0.9574343396491342,
+    "F1_spread": 0.03801572606606096,
+    "ARI_mean": 0.979940175192119,
+    "ARI_min": 0.9292973957147582,
+    "ARI_spread": 0.06558543137961936,
+    "agree_mean": 0.9763415944964136,
+    "agree_min": 0.9240216744837266
+   },
+   "Two-stage (current Cove, 0.45/0.40)": {
+    "F1_mean": 0.9942889723401921,
+    "F1_min": 0.9923944546865139,
+    "F1_spread": 0.0030556110286812377,
+    "ARI_mean": 0.993703543881735,
+    "ARI_min": 0.9917162212376388,
+    "ARI_spread": 0.00316660585673878,
+    "agree_mean": 0.9985333205720818,
+    "agree_min": 0.9953887549071913
+   },
+   "Ours: order-stable incremental": {
+    "F1_mean": 0.9954500657151953,
+    "F1_min": 0.9954500657151951,
+    "F1_spread": 0.0,
+    "ARI_mean": 0.9948828270943778,
+    "ARI_min": 0.9948828270943776,
+    "ARI_spread": 0.0,
+    "agree_mean": 1.0,
+    "agree_min": 1.0
+   },
+   "Agglomerative (batch reference)": {
+    "F1_mean": 0.9954500657151951,
+    "ARI_mean": 0.9948828270943776
+   }
+  },
+  {
+   "library": 24,
+   "faces": 820,
+   "people": 119,
+   "First-Leader (single pass)": {
+    "F1_mean": 0.9925914384374573,
+    "F1_min": 0.9843404405909936,
+    "F1_spread": 0.01565955940900643,
+    "ARI_mean": 0.9956628563996606,
+    "ARI_min": 0.9908044144584642,
+    "ARI_spread": 0.009195585541535767,
+    "agree_mean": 0.9948245755026344,
+    "agree_min": 0.989894531542117
+   },
+   "Two-stage (current Cove, 0.45/0.40)": {
+    "F1_mean": 0.9988081048867701,
+    "F1_min": 0.99880810488677,
+    "F1_spread": 0.0,
+    "ARI_mean": 0.999294820370376,
+    "ARI_min": 0.9992948203703759,
+    "ARI_spread": 0.0,
+    "agree_mean": 1.0,
+    "agree_min": 1.0
+   },
+   "Ours: order-stable incremental": {
+    "F1_mean": 1.0,
+    "F1_min": 1.0,
+    "F1_spread": 0.0,
+    "ARI_mean": 1.0,
+    "ARI_min": 1.0,
+    "ARI_spread": 0.0,
+    "agree_mean": 1.0,
+    "agree_min": 1.0
+   },
+   "Agglomerative (batch reference)": {
+    "F1_mean": 0.99880810488677,
+    "ARI_mean": 0.9992948203703759
+   }
+  },
+  {
+   "library": 25,
+   "faces": 885,
+   "people": 156,
+   "First-Leader (single pass)": {
+    "F1_mean": 0.9849929889912866,
+    "F1_min": 0.9718616513384242,
+    "F1_spread": 0.02203542297808625,
+    "ARI_mean": 0.9920427484229817,
+    "ARI_min": 0.9820762814784836,
+    "ARI_spread": 0.015754566934677916,
+    "agree_mean": 0.990933565757939,
+    "agree_min": 0.9781105182810436
+   },
+   "Two-stage (current Cove, 0.45/0.40)": {
+    "F1_mean": 0.9939794470270998,
+    "F1_min": 0.9926287396955705,
+    "F1_spread": 0.0031613985539763467,
+    "ARI_mean": 0.9974126229936756,
+    "ARI_min": 0.9968314986158471,
+    "ARI_spread": 0.0013712192444921278,
+    "agree_mean": 0.999520411681124,
+    "agree_min": 0.9983148955025198
+   },
+   "Ours: order-stable incremental": {
+    "F1_mean": 0.9958032023883987,
+    "F1_min": 0.9958032023883988,
+    "F1_spread": 0.0,
+    "ARI_mean": 0.998185709185002,
+    "ARI_min": 0.9981857091850022,
+    "ARI_spread": 0.0,
+    "agree_mean": 1.0,
+    "agree_min": 1.0
+   },
+   "Agglomerative (batch reference)": {
+    "F1_mean": 0.9946862060176487,
+    "ARI_mean": 0.9976154471352506
+   }
+  },
+  {
+   "library": 26,
+   "faces": 408,
+   "people": 134,
+   "First-Leader (single pass)": {
+    "F1_mean": 0.9801711516397857,
+    "F1_min": 0.9589924345940204,
+    "F1_spread": 0.03430443590809751,
+    "ARI_mean": 0.9750621185839199,
+    "ARI_min": 0.8709511028595928,
+    "ARI_spread": 0.12086677532058476,
+    "agree_mean": 0.971296352863528,
+    "agree_min": 0.8503071713356402
+   },
+   "Two-stage (current Cove, 0.45/0.40)": {
+    "F1_mean": 0.9890852171882243,
+    "F1_min": 0.9842163084972693,
+    "F1_spread": 0.009080562004848636,
+    "ARI_mean": 0.9881574340229815,
+    "ARI_min": 0.9833438272419537,
+    "ARI_spread": 0.008474050938223843,
+    "agree_mean": 0.9961710483729389,
+    "agree_min": 0.9908375242857151
+   },
+   "Ours: order-stable incremental": {
+    "F1_mean": 0.9976250921300467,
+    "F1_min": 0.9976250921300467,
+    "F1_spread": 0.0,
+    "ARI_mean": 0.9952693722112956,
+    "ARI_min": 0.9952693722112953,
+    "ARI_spread": 0.0,
+    "agree_mean": 1.0,
+    "agree_min": 1.0
+   },
+   "Agglomerative (batch reference)": {
+    "F1_mean": 0.9901823281907433,
+    "ARI_mean": 0.989339091382628
+   }
+  },
+  {
+   "library": 27,
+   "faces": 657,
+   "people": 124,
+   "First-Leader (single pass)": {
+    "F1_mean": 0.9875813400160578,
+    "F1_min": 0.9687888380595131,
+    "F1_spread": 0.026098432080958966,
+    "ARI_mean": 0.9846905427181255,
+    "ARI_min": 0.9497412034978483,
+    "ARI_spread": 0.046421247558637635,
+    "agree_mean": 0.9795593280570065,
+    "agree_min": 0.926190200592162
+   },
+   "Two-stage (current Cove, 0.45/0.40)": {
+    "F1_mean": 0.9956422639011191,
+    "F1_min": 0.9956422639011192,
+    "F1_spread": 0.0,
+    "ARI_mean": 0.9962222045680977,
+    "ARI_min": 0.9962222045680976,
+    "ARI_spread": 0.0,
+    "agree_mean": 1.0,
+    "agree_min": 1.0
+   },
+   "Ours: order-stable incremental": {
+    "F1_mean": 0.9977688769848688,
+    "F1_min": 0.997768876984869,
+    "F1_spread": 0.0,
+    "ARI_mean": 0.9982644581757188,
+    "ARI_min": 0.9982644581757188,
+    "ARI_spread": 0.0,
+    "agree_mean": 1.0,
+    "agree_min": 1.0
+   },
+   "Agglomerative (batch reference)": {
+    "F1_mean": 0.9963515104928449,
+    "ARI_mean": 0.9974846581028028
+   }
+  },
+  {
+   "library": 28,
+   "faces": 501,
+   "people": 82,
+   "First-Leader (single pass)": {
+    "F1_mean": 0.9868301357704204,
+    "F1_min": 0.9664556154204266,
+    "F1_spread": 0.026231832922171017,
+    "ARI_mean": 0.9869730099272441,
+    "ARI_min": 0.9652536160178836,
+    "ARI_spread": 0.027838729865400036,
+    "agree_mean": 0.9902294336409496,
+    "agree_min": 0.9672764494995545
+   },
+   "Two-stage (current Cove, 0.45/0.40)": {
+    "F1_mean": 0.9913446687601175,
+    "F1_min": 0.9908970755659575,
+    "F1_spread": 0.00179037277664007,
+    "ARI_mean": 0.9917660542766239,
+    "ARI_min": 0.991323957074404,
+    "ARI_spread": 0.0017683888088796396,
+    "agree_mean": 0.9993036203490929,
+    "agree_min": 0.9982358382177022
+   },
+   "Ours: order-stable incremental": {
+    "F1_mean": 0.9926874483425975,
+    "F1_min": 0.9926874483425976,
+    "F1_spread": 0.0,
+    "ARI_mean": 0.9930923458832837,
+    "ARI_min": 0.9930923458832837,
+    "ARI_spread": 0.0,
+    "agree_mean": 1.0,
+    "agree_min": 1.0
+   },
+   "Agglomerative (batch reference)": {
+    "F1_mean": 0.9926874483425976,
+    "ARI_mean": 0.9930923458832837
+   }
+  },
+  {
+   "library": 29,
+   "faces": 681,
+   "people": 121,
+   "First-Leader (single pass)": {
+    "F1_mean": 0.9905466299916286,
+    "F1_min": 0.9778931319595293,
+    "F1_spread": 0.018044927460399873,
+    "ARI_mean": 0.9934526400275734,
+    "ARI_min": 0.979745176423201,
+    "ARI_spread": 0.017757068558066025,
+    "agree_mean": 0.9943867593772306,
+    "agree_min": 0.9809517551121022
+   },
+   "Two-stage (current Cove, 0.45/0.40)": {
+    "F1_mean": 0.993139622878048,
+    "F1_min": 0.9931396228780481,
+    "F1_spread": 0.0,
+    "ARI_mean": 0.9960873335987287,
+    "ARI_min": 0.9960873335987284,
+    "ARI_spread": 0.0,
+    "agree_mean": 1.0,
+    "agree_min": 1.0
+   },
+   "Ours: order-stable incremental": {
+    "F1_mean": 0.9959380594199289,
+    "F1_min": 0.9959380594199292,
+    "F1_spread": 0.0,
+    "ARI_mean": 0.9975022449812669,
+    "ARI_min": 0.997502244981267,
+    "ARI_spread": 0.0,
+    "agree_mean": 1.0,
+    "agree_min": 1.0
+   },
+   "Agglomerative (batch reference)": {
+    "F1_mean": 0.9945615340933343,
+    "ARI_mean": 0.9969771193760634
+   }
+  }
+ ]
+}

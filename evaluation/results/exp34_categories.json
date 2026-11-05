@@ -1,0 +1,324 @@
+{
+ "overall": {
+  "Middle frame (baseline)": {
+   "mAP": 0.6464599225286569,
+   "Hit@10": 0.9702970297029703,
+   "Recall@10": 0.5970297029702969,
+   "action_top1": 0.693
+  },
+  "Uniform 14 frames": {
+   "mAP": 0.7053581082313194,
+   "Hit@10": 0.9504950495049505,
+   "Recall@10": 0.6475247524752474,
+   "action_top1": 0.748
+  },
+  "Ours: filtered keyframes": {
+   "mAP": 0.6924923818194838,
+   "Hit@10": 0.9504950495049505,
+   "Recall@10": 0.6386138613861386,
+   "action_top1": 0.74
+  },
+  "Ours deployed": {
+   "mAP": 0.6905320890104725,
+   "Hit@10": 0.9405940594059405,
+   "Recall@10": 0.6376237623762375,
+   "action_top1": 0.735
+  }
+ },
+ "by_type": {
+  "Human-object interaction": {
+   "queries": 20,
+   "videos": 195,
+   "Middle frame (baseline)": {
+    "mAP": 0.715296412887502,
+    "Hit@10": 1.0,
+    "Recall@10": 0.65,
+    "action_top1": 0.7692307692307693
+   },
+   "Uniform 14 frames": {
+    "mAP": 0.7968802898998913,
+    "Hit@10": 1.0,
+    "Recall@10": 0.72,
+    "action_top1": 0.8205128205128205
+   },
+   "Ours: filtered keyframes": {
+    "mAP": 0.7758920761380625,
+    "Hit@10": 1.0,
+    "Recall@10": 0.7150000000000001,
+    "action_top1": 0.7948717948717948
+   },
+   "Ours deployed": {
+    "mAP": 0.7776464823701289,
+    "Hit@10": 1.0,
+    "Recall@10": 0.7150000000000001,
+    "action_top1": 0.7897435897435897
+   }
+  },
+  "Body motion only": {
+   "queries": 16,
+   "videos": 155,
+   "Middle frame (baseline)": {
+    "mAP": 0.6590234322535031,
+    "Hit@10": 1.0,
+    "Recall@10": 0.6125,
+    "action_top1": 0.632258064516129
+   },
+   "Uniform 14 frames": {
+    "mAP": 0.6806408432992176,
+    "Hit@10": 0.9375,
+    "Recall@10": 0.6375,
+    "action_top1": 0.6451612903225806
+   },
+   "Ours: filtered keyframes": {
+    "mAP": 0.6769340012788112,
+    "Hit@10": 0.9375,
+    "Recall@10": 0.63125,
+    "action_top1": 0.6580645161290323
+   },
+   "Ours deployed": {
+    "mAP": 0.6687226778093731,
+    "Hit@10": 0.9375,
+    "Recall@10": 0.63125,
+    "action_top1": 0.6580645161290323
+   }
+  },
+  "Human-human interaction": {
+   "queries": 5,
+   "videos": 50,
+   "Middle frame (baseline)": {
+    "mAP": 0.7525526812368918,
+    "Hit@10": 1.0,
+    "Recall@10": 0.72,
+    "action_top1": 0.82
+   },
+   "Uniform 14 frames": {
+    "mAP": 0.768037810527069,
+    "Hit@10": 1.0,
+    "Recall@10": 0.72,
+    "action_top1": 0.86
+   },
+   "Ours: filtered keyframes": {
+    "mAP": 0.785717897902041,
+    "Hit@10": 1.0,
+    "Recall@10": 0.74,
+    "action_top1": 0.86
+   },
+   "Ours deployed": {
+    "mAP": 0.7796437088061129,
+    "Hit@10": 1.0,
+    "Recall@10": 0.7200000000000001,
+    "action_top1": 0.86
+   }
+  },
+  "Playing musical instruments": {
+   "queries": 10,
+   "videos": 100,
+   "Middle frame (baseline)": {
+    "mAP": 0.769793049779764,
+    "Hit@10": 0.9,
+    "Recall@10": 0.6900000000000001,
+    "action_top1": 0.86
+   },
+   "Uniform 14 frames": {
+    "mAP": 0.7915668823101658,
+    "Hit@10": 0.9,
+    "Recall@10": 0.6900000000000001,
+    "action_top1": 0.88
+   },
+   "Ours: filtered keyframes": {
+    "mAP": 0.7834077057122404,
+    "Hit@10": 0.9,
+    "Recall@10": 0.6799999999999999,
+    "action_top1": 0.87
+   },
+   "Ours deployed": {
+    "mAP": 0.7755291703555248,
+    "Hit@10": 0.9,
+    "Recall@10": 0.6900000000000001,
+    "action_top1": 0.86
+   }
+  },
+  "Sports": {
+   "queries": 50,
+   "videos": 500,
+   "Middle frame (baseline)": {
+    "mAP": 0.5796291019521234,
+    "Hit@10": 0.96,
+    "Recall@10": 0.54,
+    "action_top1": 0.636
+   },
+   "Uniform 14 frames": {
+    "mAP": 0.6531490352968192,
+    "Hit@10": 0.94,
+    "Recall@10": 0.606,
+    "action_top1": 0.714
+   },
+   "Ours: filtered keyframes": {
+    "mAP": 0.6366055694782604,
+    "Hit@10": 0.94,
+    "Recall@10": 0.5920000000000001,
+    "action_top1": 0.706
+   },
+   "Ours deployed": {
+    "mAP": 0.6367547650023873,
+    "Hit@10": 0.92,
+    "Recall@10": 0.5900000000000001,
+    "action_top1": 0.7
+   }
+  }
+ },
+ "examples": [
+  {
+   "kind": "success",
+   "query": "athlete doing high jump",
+   "class": "HighJump",
+   "rank_ours": 1,
+   "rank_middle": 2,
+   "ours_top3": [
+    {
+     "video": "v_HighJump_g05_c02.avi",
+     "class": "HighJump",
+     "relevant": true
+    },
+    {
+     "video": "v_StillRings_g03_c02.avi",
+     "class": "StillRings",
+     "relevant": false
+    },
+    {
+     "video": "v_PoleVault_g01_c04.avi",
+     "class": "PoleVault",
+     "relevant": false
+    }
+   ]
+  },
+  {
+   "kind": "success",
+   "query": "athlete throwing a hammer",
+   "class": "HammerThrow",
+   "rank_ours": 1,
+   "rank_middle": 2,
+   "ours_top3": [
+    {
+     "video": "v_HammerThrow_g04_c07.avi",
+     "class": "HammerThrow",
+     "relevant": true
+    },
+    {
+     "video": "v_Shotput_g07_c02.avi",
+     "class": "Shotput",
+     "relevant": false
+    },
+    {
+     "video": "v_HammerThrow_g06_c06.avi",
+     "class": "HammerThrow",
+     "relevant": true
+    }
+   ]
+  },
+  {
+   "kind": "success",
+   "query": "scalp massage",
+   "class": "HeadMassage",
+   "rank_ours": 1,
+   "rank_middle": 2,
+   "ours_top3": [
+    {
+     "video": "v_HeadMassage_g02_c04.avi",
+     "class": "HeadMassage",
+     "relevant": true
+    },
+    {
+     "video": "v_Haircut_g02_c04.avi",
+     "class": "Haircut",
+     "relevant": false
+    },
+    {
+     "video": "v_HeadMassage_g07_c03.avi",
+     "class": "HeadMassage",
+     "relevant": true
+    }
+   ]
+  },
+  {
+   "kind": "failure",
+   "query": "daf performance",
+   "class": "PlayingDaf",
+   "rank_ours": 86,
+   "rank_middle": 43,
+   "ours_top3": [
+    {
+     "video": "v_PizzaTossing_g07_c04.avi",
+     "class": "PizzaTossing",
+     "relevant": false
+    },
+    {
+     "video": "v_HulaHoop_g06_c03.avi",
+     "class": "HulaHoop",
+     "relevant": false
+    },
+    {
+     "video": "v_UnevenBars_g05_c04.avi",
+     "class": "UnevenBars",
+     "relevant": false
+    }
+   ]
+  },
+  {
+   "kind": "failure",
+   "query": "a basketball player dunking",
+   "class": "BasketballDunk",
+   "rank_ours": 30,
+   "rank_middle": 42,
+   "ours_top3": [
+    {
+     "video": "v_Basketball_g04_c01.avi",
+     "class": "Basketball",
+     "relevant": false
+    },
+    {
+     "video": "v_Basketball_g03_c02.avi",
+     "class": "Basketball",
+     "relevant": false
+    },
+    {
+     "video": "v_Basketball_g01_c07.avi",
+     "class": "Basketball",
+     "relevant": false
+    }
+   ]
+  },
+  {
+   "kind": "failure",
+   "query": "walking on hands",
+   "class": "HandstandWalking",
+   "rank_ours": 16,
+   "rank_middle": 10,
+   "ours_top3": [
+    {
+     "video": "v_TrampolineJumping_g07_c04.avi",
+     "class": "TrampolineJumping",
+     "relevant": false
+    },
+    {
+     "video": "v_JumpRope_g01_c03.avi",
+     "class": "JumpRope",
+     "relevant": false
+    },
+    {
+     "video": "v_TrampolineJumping_g07_c03.avi",
+     "class": "TrampolineJumping",
+     "relevant": false
+    }
+   ]
+  }
+ ],
+ "counts": {
+  "queries": 101,
+  "ours_first_hit_at_1": 81,
+  "middle_first_hit_at_1": 81,
+  "ours_fixes_middle": 5,
+  "middle_beats_ours_at_1": 5,
+  "no_relevant_in_top10_ours": 6
+ }
+}

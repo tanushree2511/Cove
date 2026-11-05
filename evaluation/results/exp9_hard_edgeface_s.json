@@ -1,0 +1,190 @@
+{
+ "config": {
+  "link": 0.5,
+  "m": 2,
+  "merge": 0.45,
+  "qpct": null,
+  "qmin": null,
+  "v4": {
+   "link": 0.6,
+   "m": 1,
+   "attach": 0.45,
+   "merge": 0.5,
+   "qpct": null,
+   "qmin": null
+  },
+  "v5": {
+   "link": 0.6,
+   "m": 1,
+   "attach": 0.5,
+   "merge": 0.55,
+   "qpct": null,
+   "qmin": null
+  },
+  "v2": {
+   "link": 0.5,
+   "m": 1,
+   "attach": 0.35,
+   "merge": 0.45,
+   "qpct": null,
+   "qmin": null
+  }
+ },
+ "detection_rate": {
+  "clean": 1.0,
+  "lowres": 0.9998499849984999,
+  "blur": 1.0,
+  "jpeg": 0.9993999399939995,
+  "dark": 0.9992499249924992,
+  "occlude": 0.9951995199519952
+ },
+ "lookalike_mean_centroid_sim_top7": 0.20493876934051514,
+ "calfw_detection_rate": 0.9999178577295876,
+ "cplfw_detection_rate": 0.9890968406593407,
+ "table": {
+  "A:blur": {
+   "Ours (a: pose+age+library rule)": {
+    "F1": 0.9944876874993819,
+    "F1_worst": 0.9889336093035758,
+    "ARI": 0.9944458216097176,
+    "ARI_worst": 0.9861224877172413,
+    "F1_spread_max": 0.0
+   },
+   "Ours (b: library-ARI rule)": {
+    "F1": 0.9947077039184378,
+    "F1_worst": 0.9846178253851833,
+    "ARI": 0.9958939553966176,
+    "ARI_worst": 0.9844139537043172,
+    "F1_spread_max": 0.0
+   }
+  },
+  "A:clean": {
+   "Ours (a: pose+age+library rule)": {
+    "F1": 0.9962788831956,
+    "F1_worst": 0.9775702831624885,
+    "ARI": 0.9951012286377439,
+    "ARI_worst": 0.9272033087292166,
+    "F1_spread_max": 0.0
+   },
+   "Ours (b: library-ARI rule)": {
+    "F1": 0.9969782758470171,
+    "F1_worst": 0.9775702831624885,
+    "ARI": 0.9956566612369794,
+    "ARI_worst": 0.9272033087292166,
+    "F1_spread_max": 0.0
+   }
+  },
+  "A:dark": {
+   "Ours (a: pose+age+library rule)": {
+    "F1": 0.9938721636246558,
+    "F1_worst": 0.9768522211638175,
+    "ARI": 0.9934699907029022,
+    "ARI_worst": 0.9294068423836954,
+    "F1_spread_max": 0.0
+   },
+   "Ours (b: library-ARI rule)": {
+    "F1": 0.9937622531918984,
+    "F1_worst": 0.977049845298298,
+    "ARI": 0.9933396007442338,
+    "ARI_worst": 0.9277583605852441,
+    "F1_spread_max": 0.0
+   }
+  },
+  "A:jpeg": {
+   "Ours (a: pose+age+library rule)": {
+    "F1": 0.9911227689504174,
+    "F1_worst": 0.9745213858428474,
+    "ARI": 0.9909585950729322,
+    "ARI_worst": 0.923763710140979,
+    "F1_spread_max": 0.0
+   },
+   "Ours (b: library-ARI rule)": {
+    "F1": 0.9902042847768485,
+    "F1_worst": 0.9787315442306761,
+    "ARI": 0.9925704196904361,
+    "ARI_worst": 0.9810432315893399,
+    "F1_spread_max": 0.0
+   }
+  },
+  "A:lowres": {
+   "Ours (a: pose+age+library rule)": {
+    "F1": 0.9862757971080726,
+    "F1_worst": 0.9680573942946911,
+    "ARI": 0.988663205194604,
+    "ARI_worst": 0.9631503706461187,
+    "F1_spread_max": 0.0
+   },
+   "Ours (b: library-ARI rule)": {
+    "F1": 0.9769405809744871,
+    "F1_worst": 0.9592631428355262,
+    "ARI": 0.9833865250189898,
+    "ARI_worst": 0.9585128037281376,
+    "F1_spread_max": 0.0
+   }
+  },
+  "A:mixed": {
+   "Ours (a: pose+age+library rule)": {
+    "F1": 0.9823569599906239,
+    "F1_worst": 0.9673835695045627,
+    "ARI": 0.983899992052414,
+    "ARI_worst": 0.9449088733660755,
+    "F1_spread_max": 0.0
+   },
+   "Ours (b: library-ARI rule)": {
+    "F1": 0.9739460573848343,
+    "F1_worst": 0.9533066240871962,
+    "ARI": 0.9784245906306706,
+    "ARI_worst": 0.9432616911116333,
+    "F1_spread_max": 0.0
+   }
+  },
+  "A:occlude": {
+   "Ours (a: pose+age+library rule)": {
+    "F1": 0.930900530882608,
+    "F1_worst": 0.8538269313797804,
+    "ARI": 0.9013250945312092,
+    "ARI_worst": 0.6803876076546698,
+    "F1_spread_max": 0.0
+   },
+   "Ours (b: library-ARI rule)": {
+    "F1": 0.9496041435795528,
+    "F1_worst": 0.8793766587439059,
+    "ARI": 0.9287036205496731,
+    "ARI_worst": 0.7159939185356539,
+    "F1_spread_max": 0.0
+   }
+  },
+  "C:calfw": {
+   "Ours (a: pose+age+library rule)": {
+    "F1": 0.9451376451588241,
+    "F1_worst": 0.9451376451588241,
+    "ARI": 0.9098813116577856,
+    "ARI_worst": 0.9098813116577856,
+    "F1_spread_max": 0.0
+   },
+   "Ours (b: library-ARI rule)": {
+    "F1": 0.9489050752646381,
+    "F1_worst": 0.9489050752646381,
+    "ARI": 0.9245344241680049,
+    "ARI_worst": 0.9245344241680049,
+    "F1_spread_max": 0.0
+   }
+  },
+  "C:cplfw": {
+   "Ours (a: pose+age+library rule)": {
+    "F1": 0.851952966976187,
+    "F1_worst": 0.851952966976187,
+    "ARI": 0.714610993318805,
+    "ARI_worst": 0.714610993318805,
+    "F1_spread_max": 0.0
+   },
+   "Ours (b: library-ARI rule)": {
+    "F1": 0.8536384998837745,
+    "F1_worst": 0.8536384998837745,
+    "ARI": 0.7478060359156059,
+    "ARI_worst": 0.7478060359156059,
+    "F1_spread_max": 0.0
+   }
+  }
+ }
+}
