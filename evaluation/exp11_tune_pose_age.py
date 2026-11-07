@@ -24,7 +24,7 @@ be_nice()
 import exp10_tune_robust as e10  # noqa: E402
 from exp1_cluster import evaluate  # noqa: E402
 from exp7_order_stability import stable  # noqa: E402
-from exp9_hard import SUFFIX, load_set  # noqa: E402
+from exp9_hard import SUFFIX, TAG, load_set  # noqa: E402
 
 PAIRSETS = {"agedb": ("tune_agedb", "agedb_30"), "cfpfp": ("tune_cfpfp", "cfp_fp")}
 # COVE_GRID_SHIFT moves every similarity threshold by a constant, for recognisers whose cosine scale differs from
@@ -33,6 +33,11 @@ SHIFT = float(os.environ.get("COVE_GRID_SHIFT", "0"))
 GRID = [dict(link=round(l + SHIFT, 3), m=m, attach=round(a + SHIFT, 3), merge=round(g + SHIFT, 3), qpct=None, qmin=None)
         for l in (0.40, 0.45, 0.50) for m in (1, 2) for a in (0.25, 0.30, 0.35, 0.40)
         for g in (0.30, 0.35, 0.40, 0.45)]
+if os.environ.get("COVE_GRID") == "wide":            # one wide absolute grid, identical for every recogniser
+    GRID = [dict(link=l, m=m, attach=a, merge=g, qpct=None, qmin=None)
+            for l in (0.45, 0.50, 0.55, 0.60, 0.65, 0.70) for m in (1, 2)
+            for a in (0.30, 0.35, 0.40, 0.45, 0.50, 0.55) if a <= l
+            for g in (0.40, 0.45, 0.50, 0.55, 0.60)]
 _P = {}
 
 
@@ -85,7 +90,7 @@ def main():
     best = rows[0]
     cfg = {k: best[k] for k in ("link", "m", "attach", "merge", "qpct", "qmin")}
     print("CHOSEN:", cfg, flush=True)
-    save_json(f"exp11_tuned_config{SUFFIX}.json", {"config": cfg, "selected_on": "seed-1 LFW libraries x 7 conditions (ARI) + AgeDB-30 and CFP-FP pair accuracy",
+    save_json(f"exp11_tuned_config{SUFFIX}{TAG}.json", {"config": cfg, "selected_on": "seed-1 LFW libraries x 7 conditions (ARI) + AgeDB-30 and CFP-FP pair accuracy",
                                           "grid": rows})
     print("DONE", flush=True)
 

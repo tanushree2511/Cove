@@ -1,0 +1,63 @@
+{
+ "tuned": {
+  "First-Leader": {
+   "params": {
+    "thr": 0.25
+   },
+   "tuning_ARI_mean": 0.9211
+  },
+  "Two-stage": {
+   "params": {
+    "thr": 0.4,
+    "merge": 0.3
+   },
+   "tuning_ARI_mean": 0.9822
+  },
+  "Single linkage": {
+   "params": {
+    "thr": 0.45
+   },
+   "tuning_ARI_mean": 0.9597
+  },
+  "Agglomerative (avg)": {
+   "params": {
+    "thr": 0.25
+   },
+   "tuning_ARI_mean": 0.9855
+  },
+  "DBSCAN": {
+   "params": {
+    "thr": 0.45,
+    "ms": 2
+   },
+   "tuning_ARI_mean": 0.9597
+  },
+  "HDBSCAN": {
+   "params": {
+    "mcs": 8,
+    "ms": 3
+   },
+   "tuning_ARI_mean": 0.9814
+  },
+  "Ours, no attach": {
+   "params": {
+    "link": 0.45,
+    "m": 1,
+    "attach": null,
+    "merge": 0.4
+   },
+   "tuning_ARI_mean": 0.9693
+  },
+  "Ours": {
+   "params": {
+    "link": 0.5,
+    "m": 1,
+    "attach": 0.35,
+    "merge": 0.45
+   },
+   "tuning_ARI_mean": 0.9826
+  }
+ },
+ "grid": {},
+ "note": "recovered from cache/exp14_mbf.log after the whole-set step ran out of memory; per-configuration grid rows were not saved in that run"
+}

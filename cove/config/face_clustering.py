@@ -9,10 +9,10 @@ results/exp9_hard*.json). Never tuned on the test sets.
 FACE_CLUSTERING = {
     # buffalo_s MobileFaceNet (w600k_mbf) - evaluation/results/exp10_tuned_config.json ("v2")
     "buffalo_s": dict(link_threshold=0.50, min_neighbors=1, attach_threshold=0.35, merge_threshold=0.45),
-    # EdgeFace-S (gamma 0.5) - its cosine scale is ~0.10 higher, so it was tuned on the same grid shifted by +0.10
-    # (COVE_GRID_SHIFT=0.10, evaluation/results/exp11_tuned_config_edgeface_s.json), library-ARI rule ("v5").
-    # Held-out: CPLFW F1 0.854 vs 0.783 for buffalo_s, CALFW 0.949 vs 0.934, degraded photos within +-0.4 points.
-    "edgeface_s": dict(link_threshold=0.60, min_neighbors=1, attach_threshold=0.50, merge_threshold=0.55),
+    # EdgeFace-S (gamma 0.5) - its cosine scale is ~0.10 higher. Tuned in evaluation/exp14_disjoint.py on
+    # identity-DISJOINT tuning libraries (no test person ever seen in tuning), 360-config grid, mean-ARI rule
+    # (results/exp14_disjoint_edgeface_s.json). Test-half results: CALFW F1 0.948, CPLFW 0.841, degraded 0.943-0.998.
+    "edgeface_s": dict(link_threshold=0.65, min_neighbors=1, attach_threshold=0.50, merge_threshold=0.55),
 }
 
 

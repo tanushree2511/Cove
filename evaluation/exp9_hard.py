@@ -32,6 +32,7 @@ METHODS = {"First-Leader": "first_leader", "Two-stage (current)": "two_stage", "
 
 FACE_MODEL = os.environ.get("COVE_FACE_MODEL")          # None = the original buffalo_s embeddings (hard_<set>.npz)
 SUFFIX = f"_{FACE_MODEL}" if FACE_MODEL else ""
+TAG = os.environ.get("COVE_RUN_TAG", "")             # result-file tag for alternative tuning grids (e.g. "_wide")
 if FACE_MODEL:     # face-model comparison (exp13): only our method, tuned for that model. Module level so that
     METHODS = {"Ours (a: pose+age+library rule)": "stable_v4",   # spawned worker processes see the same list.
                "Ours (b: library-ARI rule)": "stable_v5"}
@@ -112,11 +113,11 @@ def main():
     e7 = load_json("exp7_order_stability.json")
     cfg, fl, ag = dict(e8["config"]), e7["thresholds"]["first_leader"], e7["thresholds"]["agglomerative"]
     if FACE_MODEL:                                                     # face-model comparison (exp13): ours, tuned per model
-        g = load_json(f"exp11_tuned_config{SUFFIX}.json")
+        g = load_json(f"exp11_tuned_config{SUFFIX}{TAG}.json")
         cfg["v4"] = g["config"]                                        # rule (a): mean of library ARI, AgeDB, CFP-FP pair acc
         b = max(g["grid"], key=lambda r: r["lfw_ARI"])                 # rule (b): library ARI only (the exp10 / v2 rule)
         cfg["v5"] = {k: b[k] for k in ("link", "m", "attach", "merge", "qpct", "qmin")}
-        ag = load_json(f"exp11_tuned_config{SUFFIX}.json").get("agglomerative", ag)
+        ag = load_json(f"exp11_tuned_config{SUFFIX}{TAG}.json").get("agglomerative", ag)
     cfg["v2"] = load_json("exp10_tuned_config.json")["config"]          # chosen on tuning data only (exp10)
     if not FACE_MODEL and os.path.exists(os.path.join(os.path.dirname(__file__), "results", "exp11_tuned_config.json")):
         cfg["v3"] = load_json("exp11_tuned_config.json")["config"]      # + pose/age tuning data (exp11)
@@ -203,7 +204,7 @@ def main():
             print(f"   {m:<24} F1 {v['F1']:.4f} (worst {v['F1_worst']:.4f})  ARI {v['ARI']:.4f} (worst {v['ARI_worst']:.4f})"
                   f"  order-spread max {v['F1_spread_max']:.4f}", flush=True)
     out["table"] = table
-    save_json(f"exp9_hard{SUFFIX}.json", out)
+    save_json(f"exp9_hard{SUFFIX}{TAG}.json", out)
     print("DONE", flush=True)
 
 
