@@ -1,0 +1,112 @@
+{
+ "protocol": "Re-measure update time with the SHIPPED EdgeFace-S thresholds (review issue 5).\n\nFull LFW clean (EdgeFace-S embeddings), 10 batches, one fixed order. Per batch:\n  incremental: c.add(batch) time + c.labels() time (separately)\n  re-cluster ours: new clusterer on all faces so far (add all + labels)\n  agglomerative avg (batch, sklearn, tuned thr) on all faces so far\nSingle-threaded BLAS for comparability; also reports the consistency ARI between successive partitions.\n",
+ "config": {
+  "link": 0.65,
+  "m": 1,
+  "attach": 0.5,
+  "merge": 0.55
+ },
+ "agglomerative_thr": 0.35,
+ "rows": [
+  {
+   "faces": 829,
+   "inc_add_s": 0.021094199997605756,
+   "inc_labels_s": 0.10662679999950342,
+   "inc_total_s": 0.12772099999710917,
+   "recluster_ours_s": 0.07127079999190755,
+   "agglomerative_s": 0.11585360000026412,
+   "F1": 0.9990944763054633,
+   "prev_partition_ARI": null
+  },
+  {
+   "faces": 1658,
+   "inc_add_s": 0.0334391000069445,
+   "inc_labels_s": 0.160887999998522,
+   "inc_total_s": 0.1943271000054665,
+   "recluster_ours_s": 0.24321479999343865,
+   "agglomerative_s": 0.5180283000081545,
+   "F1": 0.9984898822108125,
+   "prev_partition_ARI": 1.0
+  },
+  {
+   "faces": 2487,
+   "inc_add_s": 0.04749360001005698,
+   "inc_labels_s": 0.33085579999897163,
+   "inc_total_s": 0.3783494000090286,
+   "recluster_ours_s": 0.4712837999977637,
+   "agglomerative_s": 1.4905612000002293,
+   "F1": 0.9987134736866912,
+   "prev_partition_ARI": 0.9985685919379494
+  },
+  {
+   "faces": 3316,
+   "inc_add_s": 0.11278100000345148,
+   "inc_labels_s": 0.6937825000059092,
+   "inc_total_s": 0.8065635000093607,
+   "recluster_ours_s": 0.8453487000078894,
+   "agglomerative_s": 2.3618504000041867,
+   "F1": 0.997795049673761,
+   "prev_partition_ARI": 0.998414428492913
+  },
+  {
+   "faces": 4145,
+   "inc_add_s": 0.08153419999871403,
+   "inc_labels_s": 0.8777620000037132,
+   "inc_total_s": 0.9592962000024272,
+   "recluster_ours_s": 1.2478731000010157,
+   "agglomerative_s": 3.8336448000045493,
+   "F1": 0.9978864782382595,
+   "prev_partition_ARI": 0.9987487214228659
+  },
+  {
+   "faces": 4974,
+   "inc_add_s": 0.08086019998881966,
+   "inc_labels_s": 1.2750310000119498,
+   "inc_total_s": 1.3558912000007695,
+   "recluster_ours_s": 1.7831281999970088,
+   "agglomerative_s": 5.6009341000026325,
+   "F1": 0.9972751056257516,
+   "prev_partition_ARI": 0.9999445159930748
+  },
+  {
+   "faces": 5803,
+   "inc_add_s": 0.10418829999980517,
+   "inc_labels_s": 1.7495136000070488,
+   "inc_total_s": 1.853701900006854,
+   "recluster_ours_s": 2.5192161000013584,
+   "agglomerative_s": 7.612310099997558,
+   "F1": 0.9968142320248486,
+   "prev_partition_ARI": 0.9999453530672376
+  },
+  {
+   "faces": 6632,
+   "inc_add_s": 0.11905839999963064,
+   "inc_labels_s": 2.2050691999902483,
+   "inc_total_s": 2.324127599989879,
+   "recluster_ours_s": 3.109028599996236,
+   "agglomerative_s": 10.02209369999764,
+   "F1": 0.9963923862017845,
+   "prev_partition_ARI": 1.0
+  },
+  {
+   "faces": 7461,
+   "inc_add_s": 0.13141479999467265,
+   "inc_labels_s": 2.850491700010025,
+   "inc_total_s": 2.9819065000046976,
+   "recluster_ours_s": 3.9796698999998625,
+   "agglomerative_s": 13.612278200002038,
+   "F1": 0.9957410732792148,
+   "prev_partition_ARI": 0.9999966892401714
+  },
+  {
+   "faces": 8290,
+   "inc_add_s": 0.14548159998958,
+   "inc_labels_s": 3.3846993999904953,
+   "inc_total_s": 3.5301809999800753,
+   "recluster_ours_s": 4.7152602999995,
+   "agglomerative_s": 16.686232000007294,
+   "F1": 0.9951276803353021,
+   "prev_partition_ARI": 0.9999266927961799
+  }
+ ]
+}
