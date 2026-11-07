@@ -1,0 +1,216 @@
+{
+ "model": "edgeface_s",
+ "protocol": "Experiment 16 - pose-aware similarity (frontal vs profile pairs get a similarity bonus before thresholding).\n\nSignal: yaw proxy from the detector's 5 landmarks (pose_kps.py), free at run time in the app.\nRule:   s' = s + bonus * min(1, | |yaw_i| - |yaw_j| | / scale)    (engines/stable_cluster.py, pose_bonus/pose_scale)\n\nProtocol, fixed BEFORE any test number is computed:\n  * Base method = ours with the exp14 tuned configuration of the recogniser; only bonus and scale are tuned.\n  * Grid: bonus in {0, 0.025, 0.05, 0.075, 0.10, 0.15}, scale in {0.5, 1.0}.\n  * TUNING data only: the 30 exp14 tuning libraries x 7 conditions (mean ARI) and CFP-FP frontal-vs-profile pairs\n    (pair accuracy; a separate dataset never used for testing). Score = mean of the two.\n  * Decision rule: keep the best (bonus, scale) only if its score beats bonus = 0 by >= 0.002; otherwise pose is\n    reported as \"no gain\" and not shipped.\n  * TEST (once): the exp14 test libraries (8 conditions, 3 orders) and the whole CALFW / CPLFW test identities;\n    paired bootstrap of the F1 difference (pose minus no pose) over libraries.\nRun: COVE_FACE_MODEL=mbf|edgeface_s python evaluation/exp16_pose.py   -> results/exp16_pose_<model>.json\n",
+ "tuning": [
+  {
+   "bonus": 0.15,
+   "scale": 1.0,
+   "lfw_ARI": 0.9813370177839073,
+   "cfpfp_pair_acc": 0.9131428571428571,
+   "score": 0.9472399374633822
+  },
+  {
+   "bonus": 0.1,
+   "scale": 0.5,
+   "lfw_ARI": 0.9794206166406755,
+   "cfpfp_pair_acc": 0.9141428571428571,
+   "score": 0.9467817368917664
+  },
+  {
+   "bonus": 0.1,
+   "scale": 1.0,
+   "lfw_ARI": 0.9825021914638644,
+   "cfpfp_pair_acc": 0.9104285714285715,
+   "score": 0.946465381446218
+  },
+  {
+   "bonus": 0.075,
+   "scale": 0.5,
+   "lfw_ARI": 0.9821934580662315,
+   "cfpfp_pair_acc": 0.9095714285714286,
+   "score": 0.94588244331883
+  },
+  {
+   "bonus": 0.15,
+   "scale": 0.5,
+   "lfw_ARI": 0.9755922823244294,
+   "cfpfp_pair_acc": 0.9154285714285715,
+   "score": 0.9455104268765004
+  },
+  {
+   "bonus": 0.075,
+   "scale": 1.0,
+   "lfw_ARI": 0.982428054975591,
+   "cfpfp_pair_acc": 0.906,
+   "score": 0.9442140274877955
+  },
+  {
+   "bonus": 0.05,
+   "scale": 0.5,
+   "lfw_ARI": 0.982522169311797,
+   "cfpfp_pair_acc": 0.9058571428571428,
+   "score": 0.9441896560844699
+  },
+  {
+   "bonus": 0.05,
+   "scale": 1.0,
+   "lfw_ARI": 0.982510952170763,
+   "cfpfp_pair_acc": 0.9017142857142857,
+   "score": 0.9421126189425244
+  },
+  {
+   "bonus": 0.025,
+   "scale": 0.5,
+   "lfw_ARI": 0.982521617765846,
+   "cfpfp_pair_acc": 0.8992857142857142,
+   "score": 0.9409036660257801
+  },
+  {
+   "bonus": 0.025,
+   "scale": 1.0,
+   "lfw_ARI": 0.9824330248889648,
+   "cfpfp_pair_acc": 0.8962857142857142,
+   "score": 0.9393593695873395
+  },
+  {
+   "bonus": 0.0,
+   "scale": 1.0,
+   "lfw_ARI": 0.9822322327332509,
+   "cfpfp_pair_acc": 0.8891428571428571,
+   "score": 0.935687544938054
+  }
+ ],
+ "decision": {
+  "bonus": 0.15,
+  "scale": 1.0
+ },
+ "test": {
+  "dark": {
+   "F1_pose": 0.9971302583765755,
+   "F1_none": 0.9973097126725302,
+   "order_agreement_min_pose": 1.0,
+   "pose_minus_none": {
+    "diff": -0.00017945429595460637,
+    "ci95": [
+     -0.0003307651156802834,
+     -3.759634418153042e-05
+    ]
+   }
+  },
+  "lookalike": {
+   "F1_pose": 0.9976251493774608,
+   "F1_none": 0.9976251493774608,
+   "order_agreement_min_pose": 1.0,
+   "pose_minus_none": {
+    "diff": 0.0,
+    "ci95": [
+     0.0,
+     0.0
+    ]
+   }
+  },
+  "jpeg": {
+   "F1_pose": 0.9939031842014798,
+   "F1_none": 0.9926258797787224,
+   "order_agreement_min_pose": 1.0,
+   "pose_minus_none": {
+    "diff": 0.0012773044227575487,
+    "ci95": [
+     0.0008848764876372249,
+     0.0016601411630720012
+    ]
+   }
+  },
+  "occlude": {
+   "F1_pose": 0.9417825963549721,
+   "F1_none": 0.9431276662970483,
+   "order_agreement_min_pose": 1.0,
+   "pose_minus_none": {
+    "diff": -0.0013450699420761861,
+    "ci95": [
+     -0.0032237736586401434,
+     0.0005008507603425451
+    ]
+   }
+  },
+  "lowres": {
+   "F1_pose": 0.9815434857203587,
+   "F1_none": 0.979798571168827,
+   "order_agreement_min_pose": 1.0,
+   "pose_minus_none": {
+    "diff": 0.0017449145515313624,
+    "ci95": [
+     0.0008858276401872514,
+     0.002548356136359911
+    ]
+   }
+  },
+  "clean": {
+   "F1_pose": 0.997741828374978,
+   "F1_none": 0.997741828374978,
+   "order_agreement_min_pose": 1.0,
+   "pose_minus_none": {
+    "diff": 0.0,
+    "ci95": [
+     0.0,
+     0.0
+    ]
+   }
+  },
+  "blur": {
+   "F1_pose": 0.9967081683854175,
+   "F1_none": 0.9967716499084699,
+   "order_agreement_min_pose": 1.0,
+   "pose_minus_none": {
+    "diff": -6.348152305247767e-05,
+    "ci95": [
+     -0.0004713807982148806,
+     0.0003078233460394924
+    ]
+   }
+  },
+  "mixed": {
+   "F1_pose": 0.9813534652329567,
+   "F1_none": 0.9782303346448316,
+   "order_agreement_min_pose": 1.0,
+   "pose_minus_none": {
+    "diff": 0.0031231305881253,
+    "ci95": [
+     0.0018082560801014678,
+     0.004561341881598659
+    ]
+   }
+  }
+ },
+ "whole_sets_test_identities": {
+  "calfw": {
+   "none": {
+    "B3_P": 0.9914303690302229,
+    "B3_R": 0.9072901445039778,
+    "B3_F1": 0.9474959546402567,
+    "ARI": 0.9246391307037148
+   },
+   "pose": {
+    "B3_P": 0.9879963700044072,
+    "B3_R": 0.9123234291281052,
+    "B3_F1": 0.948653207381214,
+    "ARI": 0.92630662174066
+   }
+  },
+  "cplfw": {
+   "none": {
+    "B3_P": 0.9846160490627969,
+    "B3_R": 0.7332642308024532,
+    "B3_F1": 0.8405518572090651,
+    "ARI": 0.7299460734732872
+   },
+   "pose": {
+    "B3_P": 0.7864882704634698,
+    "B3_R": 0.8134231666234776,
+    "B3_F1": 0.7997289907964457,
+    "ARI": 0.6163738484085803
+   }
+  }
+ },
+ "seconds": 470.11734437942505
+}

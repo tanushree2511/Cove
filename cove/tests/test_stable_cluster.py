@@ -80,3 +80,100 @@ def test_supported_weak_links_order_independent_and_need_support():
     c = StableIncrementalClusterer(dim=3, link_threshold=0.9, min_neighbors=1, merge_threshold=None, weak_threshold=0.3, support=3)
     lab = c.fit_predict(np.vstack([a, b]))
     assert lab[0] != lab[2]
+
+
+def _clusterer(**kw):
+    cfg = dict(link_threshold=0.5, min_neighbors=1, attach_threshold=0.35, merge_threshold=0.45, dim=64)
+    cfg.update(kw)
+    return StableIncrementalClusterer(**cfg)
+
+
+def test_constrained_path_equals_plain_path_without_constraints():
+    X, _ = _blobs(noise=0.9)
+    c = _clusterer()
+    c.add(X)
+    assert adjusted_rand_score(c.labels(), c._labels_constrained()) == 1.0
+
+
+def test_user_corrections_are_obeyed_and_survive_new_photos():
+    X, y = _blobs(noise=0.9, seed=3)
+    c = _clusterer(merge_threshold=0.0)          # merge everything unless the user says otherwise
+    c.add(X[:120])
+    c.add_cannot_link(0, 6)                       # person 0 vs person 1
+    c.add_must_link(12, 13)
+    lab = c.labels()
+    assert lab[0] != lab[6] and lab[12] == lab[13]
+    c.add(X[120:])                                # new photos arrive: corrections still hold
+    lab = c.labels()
+    assert lab[0] != lab[6] and lab[12] == lab[13]
+
+
+def test_cannot_link_splits_a_wrong_merge():
+    X, y = _blobs(n_id=2, per=10, noise=0.9, seed=1)
+    c = _clusterer(merge_threshold=-1.0)          # forces one cluster
+    c.add(X)
+    assert len(set(c.labels())) == 1
+    c.add_cannot_link(0, 10)
+    assert len(set(c.labels())) >= 2
+
+
+def test_constraints_keep_order_independence():
+    X, y = _blobs(noise=0.9, seed=5)
+    rng = np.random.RandomState(0)
+    pairs_c = [(0, 7), (30, 40)]
+    pairs_m = [(1, 2), (50, 55)]
+    ref = None
+    for t in range(4):
+        perm = np.arange(len(X)) if t == 0 else rng.permutation(len(X))
+        inv = np.empty_like(perm); inv[perm] = np.arange(len(X))
+        c = _clusterer()
+        for s in range(0, len(X), 37):
+            c.add(X[perm][s:s + 37])
+        for a, b in (pairs_c if t % 2 else pairs_c[::-1]):
+            c.add_cannot_link(inv[a], inv[b])
+        for a, b in pairs_m:
+            c.add_must_link(inv[a], inv[b])
+        lab = c.labels()[inv]
+        ref = lab if ref is None else ref
+        assert adjusted_rand_score(ref, lab) == 1.0
+
+
+def test_many_cannot_links_always_hold_in_any_order():
+    X, y = _blobs(n_id=6, per=15, noise=1.2, seed=7)
+    rng = np.random.RandomState(1)
+    pairs = []
+    while len(pairs) < 25:
+        a, b = rng.randint(len(X), size=2)
+        if y[a] != y[b]:
+            pairs.append((int(a), int(b)))
+    ref = None
+    for t in range(5):
+        perm = np.arange(len(X)) if t == 0 else rng.permutation(len(X))
+        inv = np.empty_like(perm); inv[perm] = np.arange(len(X))
+        c = _clusterer(merge_threshold=-1.0)      # merge pressure everywhere: only the constraints hold people apart
+        c.add(X[perm])
+        for a, b in [pairs[i] for i in rng.permutation(len(pairs))]:
+            c.add_cannot_link(inv[a], inv[b])
+        lab = c.labels()[inv]
+        assert all(lab[a] != lab[b] for a, b in pairs)
+        ref = lab if ref is None else ref
+        assert adjusted_rand_score(ref, lab) == 1.0
+
+
+def test_pose_bonus_keeps_order_independence_and_zero_bonus_is_plain():
+    X, y = _blobs(noise=0.9, seed=11)
+    yaw = np.random.RandomState(2).uniform(-1, 1, len(X))
+    plain = _clusterer(); plain.add(X)
+    zero = _clusterer(pose_bonus=0.0); zero.add(X, None, yaw)
+    assert adjusted_rand_score(plain.labels(), zero.labels()) == 1.0
+    ref = None
+    rng = np.random.RandomState(4)
+    for t in range(4):
+        perm = np.arange(len(X)) if t == 0 else rng.permutation(len(X))
+        inv = np.empty_like(perm); inv[perm] = np.arange(len(X))
+        c = _clusterer(pose_bonus=0.1, pose_scale=0.5)
+        for s in range(0, len(X), 29):
+            c.add(X[perm][s:s + 29], None, yaw[perm][s:s + 29])
+        lab = c.labels()[inv]
+        ref = lab if ref is None else ref
+        assert adjusted_rand_score(ref, lab) == 1.0
