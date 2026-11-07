@@ -1,0 +1,834 @@
+{
+ "model": "mbf",
+ "protocol": "Experiment 17 - do \"video tracks\" bridge a person's frontal and profile PHOTO clusters?  (simulated, oracle tracks)\n\nIdea (gap G5, research/innovation_scan_round2): faces of one video track are the same person by construction, and a track\noften sweeps from frontal to profile. Fed to the clusterer as must-links, a track could join that person's frontal photo\ncluster and profile photo cluster. Real data with the same people in photos AND videos (YouTube Faces) needs a request\nform, so this is a SIMULATION that measures the mechanism with ideal tracks:\n\n  * People: TEST-half identities of exp14 (identity-disjoint from all tuning) with 3 CPLFW (pose-varied) photos and >= 3\n    LFW photos. CPLFW photos that are near-copies of an LFW photo (cos > 0.90) replace that LFW photo (no duplicates).\n  * 30 libraries (seed 17): 15-40 such people with all their photos (LFW capped at 60) + 50-150 test-half strangers.\n  * Half of the people (fixed seed) \"appear in a video\". Their simulated track = 1 frontal photo (lowest |yaw| LFW) and the\n    most profile CPLFW photo (highest |yaw|), taken OUT of the photo set and added as track faces.\n  * Three runs per library: (a) photos only; (b) photos + track faces, no links; (c) photos + track faces + must-links.\n  * Scored on PHOTOS only (track faces excluded): B-Cubed P/R/F1, and \"frontal-profile recall\" = share of same-person\n    (LFW photo, CPLFW photo) pairs placed together, separately for video people and non-video people.\n  * No parameter is tuned: clusterer config = exp14 tuned config of the recogniser. Paired bootstrap over libraries.\n  * Order check: run (c) in 3 random face orders.\nLimits: tracks are ideal (two real photos, perfectly linked); real video frames are lower quality and may never reach a\nfull profile. A positive result shows the mechanism works; it does not show the size of the gain on real videos.\nRun: COVE_FACE_MODEL=mbf|edgeface_s python evaluation/exp17_track_bridge.py -> results/exp17_track_bridge_<model>.json\n",
+ "eligible_people": 72,
+ "table": {
+  "a_photos": {
+   "F1": 0.991901563876947,
+   "P": 0.9993301872126072,
+   "R": 0.9846035537581411,
+   "fp_recall_video": 0.9675872836616369,
+   "fp_recall_novideo": 0.9230184904636475
+  },
+  "b_tracks_unlinked": {
+   "F1": 0.991901563876947,
+   "P": 0.9993301872126072,
+   "R": 0.9846035537581411,
+   "fp_recall_video": 0.9675872836616369,
+   "fp_recall_novideo": 0.9230184904636475
+  },
+  "c_tracks_linked": {
+   "F1": 0.991901563876947,
+   "P": 0.9993301872126072,
+   "R": 0.9846035537581411,
+   "fp_recall_video": 0.9675872836616369,
+   "fp_recall_novideo": 0.9230184904636475
+  }
+ },
+ "bootstrap": {
+  "b_tracks_unlinked_minus_a": {
+   "diff": 0.0,
+   "ci95": [
+    0.0,
+    0.0
+   ]
+  },
+  "c_tracks_linked_minus_a": {
+   "diff": 0.0,
+   "ci95": [
+    0.0,
+    0.0
+   ]
+  },
+  "c_minus_b": {
+   "diff": 0.0,
+   "ci95": [
+    0.0,
+    0.0
+   ]
+  }
+ },
+ "per_library": {
+  "0": {
+   "a_photos": {
+    "F1": 0.9880448144302976,
+    "P": 1.0,
+    "R": 0.976372104733132,
+    "fp_recall_video": 0.9655172413793104,
+    "fp_recall_novideo": 0.8726415094339622
+   },
+   "b_tracks_unlinked": {
+    "F1": 0.9880448144302976,
+    "P": 1.0,
+    "R": 0.976372104733132,
+    "fp_recall_video": 0.9655172413793104,
+    "fp_recall_novideo": 0.8726415094339622
+   },
+   "c_tracks_linked": {
+    "F1": 0.9880448144302976,
+    "P": 1.0,
+    "R": 0.976372104733132,
+    "fp_recall_video": 0.9655172413793104,
+    "fp_recall_novideo": 0.8726415094339622
+   },
+   "order_agreement_min": 1.0,
+   "faces": 662,
+   "tracks": 15
+  },
+  "1": {
+   "a_photos": {
+    "F1": 0.9966833078291938,
+    "P": 1.0,
+    "R": 0.9933885438233263,
+    "fp_recall_video": 1.0,
+    "fp_recall_novideo": 0.8878048780487805
+   },
+   "b_tracks_unlinked": {
+    "F1": 0.9966833078291938,
+    "P": 1.0,
+    "R": 0.9933885438233263,
+    "fp_recall_video": 1.0,
+    "fp_recall_novideo": 0.8878048780487805
+   },
+   "c_tracks_linked": {
+    "F1": 0.9966833078291938,
+    "P": 1.0,
+    "R": 0.9933885438233263,
+    "fp_recall_video": 1.0,
+    "fp_recall_novideo": 0.8878048780487805
+   },
+   "order_agreement_min": 1.0,
+   "faces": 575,
+   "tracks": 9
+  },
+  "2": {
+   "a_photos": {
+    "F1": 0.9881839205237136,
+    "P": 1.0,
+    "R": 0.9766438195320986,
+    "fp_recall_video": 0.9383561643835616,
+    "fp_recall_novideo": 0.955952380952381
+   },
+   "b_tracks_unlinked": {
+    "F1": 0.9881839205237136,
+    "P": 1.0,
+    "R": 0.9766438195320986,
+    "fp_recall_video": 0.9383561643835616,
+    "fp_recall_novideo": 0.955952380952381
+   },
+   "c_tracks_linked": {
+    "F1": 0.9881839205237136,
+    "P": 1.0,
+    "R": 0.9766438195320986,
+    "fp_recall_video": 0.9383561643835616,
+    "fp_recall_novideo": 0.955952380952381
+   },
+   "order_agreement_min": 1.0,
+   "faces": 815,
+   "tracks": 17
+  },
+  "3": {
+   "a_photos": {
+    "F1": 0.987624006817708,
+    "P": 1.0,
+    "R": 0.9755505992523795,
+    "fp_recall_video": 0.9317180616740088,
+    "fp_recall_novideo": 0.8868388683886839
+   },
+   "b_tracks_unlinked": {
+    "F1": 0.987624006817708,
+    "P": 1.0,
+    "R": 0.9755505992523795,
+    "fp_recall_video": 0.9317180616740088,
+    "fp_recall_novideo": 0.8868388683886839
+   },
+   "c_tracks_linked": {
+    "F1": 0.987624006817708,
+    "P": 1.0,
+    "R": 0.9755505992523795,
+    "fp_recall_video": 0.9317180616740088,
+    "fp_recall_novideo": 0.8868388683886839
+   },
+   "order_agreement_min": 1.0,
+   "faces": 674,
+   "tracks": 16
+  },
+  "4": {
+   "a_photos": {
+    "F1": 0.9940119760479043,
+    "P": 1.0,
+    "R": 0.9880952380952381,
+    "fp_recall_video": 1.0,
+    "fp_recall_novideo": 0.9544513457556936
+   },
+   "b_tracks_unlinked": {
+    "F1": 0.9940119760479043,
+    "P": 1.0,
+    "R": 0.9880952380952381,
+    "fp_recall_video": 1.0,
+    "fp_recall_novideo": 0.9544513457556936
+   },
+   "c_tracks_linked": {
+    "F1": 0.9940119760479043,
+    "P": 1.0,
+    "R": 0.9880952380952381,
+    "fp_recall_video": 1.0,
+    "fp_recall_novideo": 0.9544513457556936
+   },
+   "order_agreement_min": 1.0,
+   "faces": 448,
+   "tracks": 10
+  },
+  "5": {
+   "a_photos": {
+    "F1": 0.9835021139953981,
+    "P": 0.9954322256480529,
+    "R": 0.9718545770604486,
+    "fp_recall_video": 0.9501510574018127,
+    "fp_recall_novideo": 0.9122257053291536
+   },
+   "b_tracks_unlinked": {
+    "F1": 0.9835021139953981,
+    "P": 0.9954322256480529,
+    "R": 0.9718545770604486,
+    "fp_recall_video": 0.9501510574018127,
+    "fp_recall_novideo": 0.9122257053291536
+   },
+   "c_tracks_linked": {
+    "F1": 0.9835021139953981,
+    "P": 0.9954322256480529,
+    "R": 0.9718545770604486,
+    "fp_recall_video": 0.9501510574018127,
+    "fp_recall_novideo": 0.9122257053291536
+   },
+   "order_agreement_min": 1.0,
+   "faces": 834,
+   "tracks": 18
+  },
+  "6": {
+   "a_photos": {
+    "F1": 0.9928846931363562,
+    "P": 1.0,
+    "R": 0.9858699260846262,
+    "fp_recall_video": 0.966,
+    "fp_recall_novideo": 0.9250440917107584
+   },
+   "b_tracks_unlinked": {
+    "F1": 0.9928846931363562,
+    "P": 1.0,
+    "R": 0.9858699260846262,
+    "fp_recall_video": 0.966,
+    "fp_recall_novideo": 0.9250440917107584
+   },
+   "c_tracks_linked": {
+    "F1": 0.9928846931363562,
+    "P": 1.0,
+    "R": 0.9858699260846262,
+    "fp_recall_video": 0.966,
+    "fp_recall_novideo": 0.9250440917107584
+   },
+   "order_agreement_min": 1.0,
+   "faces": 792,
+   "tracks": 16
+  },
+  "7": {
+   "a_photos": {
+    "F1": 0.9889817395510456,
+    "P": 1.0,
+    "R": 0.9782036371053048,
+    "fp_recall_video": 0.9689542483660131,
+    "fp_recall_novideo": 0.8467741935483871
+   },
+   "b_tracks_unlinked": {
+    "F1": 0.9889817395510456,
+    "P": 1.0,
+    "R": 0.9782036371053048,
+    "fp_recall_video": 0.9689542483660131,
+    "fp_recall_novideo": 0.8467741935483871
+   },
+   "c_tracks_linked": {
+    "F1": 0.9889817395510456,
+    "P": 1.0,
+    "R": 0.9782036371053048,
+    "fp_recall_video": 0.9689542483660131,
+    "fp_recall_novideo": 0.8467741935483871
+   },
+   "order_agreement_min": 1.0,
+   "faces": 838,
+   "tracks": 19
+  },
+  "8": {
+   "a_photos": {
+    "F1": 0.9935258488872205,
+    "P": 1.0,
+    "R": 0.9871349878074435,
+    "fp_recall_video": 0.9663341645885287,
+    "fp_recall_novideo": 0.9175627240143369
+   },
+   "b_tracks_unlinked": {
+    "F1": 0.9935258488872205,
+    "P": 1.0,
+    "R": 0.9871349878074435,
+    "fp_recall_video": 0.9663341645885287,
+    "fp_recall_novideo": 0.9175627240143369
+   },
+   "c_tracks_linked": {
+    "F1": 0.9935258488872205,
+    "P": 1.0,
+    "R": 0.9871349878074435,
+    "fp_recall_video": 0.9663341645885287,
+    "fp_recall_novideo": 0.9175627240143369
+   },
+   "order_agreement_min": 1.0,
+   "faces": 994,
+   "tracks": 20
+  },
+  "9": {
+   "a_photos": {
+    "F1": 0.9905126835684473,
+    "P": 1.0,
+    "R": 0.9812036936430476,
+    "fp_recall_video": 0.9761904761904762,
+    "fp_recall_novideo": 0.9111111111111111
+   },
+   "b_tracks_unlinked": {
+    "F1": 0.9905126835684473,
+    "P": 1.0,
+    "R": 0.9812036936430476,
+    "fp_recall_video": 0.9761904761904762,
+    "fp_recall_novideo": 0.9111111111111111
+   },
+   "c_tracks_linked": {
+    "F1": 0.9905126835684473,
+    "P": 1.0,
+    "R": 0.9812036936430476,
+    "fp_recall_video": 0.9761904761904762,
+    "fp_recall_novideo": 0.9111111111111111
+   },
+   "order_agreement_min": 1.0,
+   "faces": 857,
+   "tracks": 17
+  },
+  "10": {
+   "a_photos": {
+    "F1": 0.9885506727336,
+    "P": 1.0,
+    "R": 0.977360551917428,
+    "fp_recall_video": 0.9927536231884058,
+    "fp_recall_novideo": 0.8251633986928104
+   },
+   "b_tracks_unlinked": {
+    "F1": 0.9885506727336,
+    "P": 1.0,
+    "R": 0.977360551917428,
+    "fp_recall_video": 0.9927536231884058,
+    "fp_recall_novideo": 0.8251633986928104
+   },
+   "c_tracks_linked": {
+    "F1": 0.9885506727336,
+    "P": 1.0,
+    "R": 0.977360551917428,
+    "fp_recall_video": 0.9927536231884058,
+    "fp_recall_novideo": 0.8251633986928104
+   },
+   "order_agreement_min": 1.0,
+   "faces": 475,
+   "tracks": 8
+  },
+  "11": {
+   "a_photos": {
+    "F1": 0.9960428305400373,
+    "P": 1.0,
+    "R": 0.9921168560166937,
+    "fp_recall_video": 0.930327868852459,
+    "fp_recall_novideo": 1.0
+   },
+   "b_tracks_unlinked": {
+    "F1": 0.9960428305400373,
+    "P": 1.0,
+    "R": 0.9921168560166937,
+    "fp_recall_video": 0.930327868852459,
+    "fp_recall_novideo": 1.0
+   },
+   "c_tracks_linked": {
+    "F1": 0.9960428305400373,
+    "P": 1.0,
+    "R": 0.9921168560166937,
+    "fp_recall_video": 0.930327868852459,
+    "fp_recall_novideo": 1.0
+   },
+   "order_agreement_min": 1.0,
+   "faces": 454,
+   "tracks": 8
+  },
+  "12": {
+   "a_photos": {
+    "F1": 0.9926243956238736,
+    "P": 1.0,
+    "R": 0.9853567937438904,
+    "fp_recall_video": 0.9253731343283582,
+    "fp_recall_novideo": 0.9866666666666667
+   },
+   "b_tracks_unlinked": {
+    "F1": 0.9926243956238736,
+    "P": 1.0,
+    "R": 0.9853567937438904,
+    "fp_recall_video": 0.9253731343283582,
+    "fp_recall_novideo": 0.9866666666666667
+   },
+   "c_tracks_linked": {
+    "F1": 0.9926243956238736,
+    "P": 1.0,
+    "R": 0.9853567937438904,
+    "fp_recall_video": 0.9253731343283582,
+    "fp_recall_novideo": 0.9866666666666667
+   },
+   "order_agreement_min": 1.0,
+   "faces": 465,
+   "tracks": 10
+  },
+  "13": {
+   "a_photos": {
+    "F1": 0.9919547961792009,
+    "P": 1.0,
+    "R": 0.9840380098227632,
+    "fp_recall_video": 1.0,
+    "fp_recall_novideo": 0.9155251141552512
+   },
+   "b_tracks_unlinked": {
+    "F1": 0.9919547961792009,
+    "P": 1.0,
+    "R": 0.9840380098227632,
+    "fp_recall_video": 1.0,
+    "fp_recall_novideo": 0.9155251141552512
+   },
+   "c_tracks_linked": {
+    "F1": 0.9919547961792009,
+    "P": 1.0,
+    "R": 0.9840380098227632,
+    "fp_recall_video": 1.0,
+    "fp_recall_novideo": 0.9155251141552512
+   },
+   "order_agreement_min": 1.0,
+   "faces": 446,
+   "tracks": 9
+  },
+  "14": {
+   "a_photos": {
+    "F1": 0.9922008458030986,
+    "P": 1.0,
+    "R": 0.9845224037658249,
+    "fp_recall_video": 1.0,
+    "fp_recall_novideo": 0.8805460750853242
+   },
+   "b_tracks_unlinked": {
+    "F1": 0.9922008458030986,
+    "P": 1.0,
+    "R": 0.9845224037658249,
+    "fp_recall_video": 1.0,
+    "fp_recall_novideo": 0.8805460750853242
+   },
+   "c_tracks_linked": {
+    "F1": 0.9922008458030986,
+    "P": 1.0,
+    "R": 0.9845224037658249,
+    "fp_recall_video": 1.0,
+    "fp_recall_novideo": 0.8805460750853242
+   },
+   "order_agreement_min": 1.0,
+   "faces": 608,
+   "tracks": 11
+  },
+  "15": {
+   "a_photos": {
+    "F1": 0.9948952592627829,
+    "P": 0.9970672029495559,
+    "R": 0.9927327574386399,
+    "fp_recall_video": 0.9821428571428571,
+    "fp_recall_novideo": 0.9914529914529915
+   },
+   "b_tracks_unlinked": {
+    "F1": 0.9948952592627829,
+    "P": 0.9970672029495559,
+    "R": 0.9927327574386399,
+    "fp_recall_video": 0.9821428571428571,
+    "fp_recall_novideo": 0.9914529914529915
+   },
+   "c_tracks_linked": {
+    "F1": 0.9948952592627829,
+    "P": 0.9970672029495559,
+    "R": 0.9927327574386399,
+    "fp_recall_video": 0.9821428571428571,
+    "fp_recall_novideo": 0.9914529914529915
+   },
+   "order_agreement_min": 1.0,
+   "faces": 663,
+   "tracks": 10
+  },
+  "18": {
+   "a_photos": {
+    "F1": 0.9958090229271099,
+    "P": 1.0,
+    "R": 0.9916530278232406,
+    "fp_recall_video": 1.0,
+    "fp_recall_novideo": 0.9738562091503268
+   },
+   "b_tracks_unlinked": {
+    "F1": 0.9958090229271099,
+    "P": 1.0,
+    "R": 0.9916530278232406,
+    "fp_recall_video": 1.0,
+    "fp_recall_novideo": 0.9738562091503268
+   },
+   "c_tracks_linked": {
+    "F1": 0.9958090229271099,
+    "P": 1.0,
+    "R": 0.9916530278232406,
+    "fp_recall_video": 1.0,
+    "fp_recall_novideo": 0.9738562091503268
+   },
+   "order_agreement_min": 1.0,
+   "faces": 611,
+   "tracks": 13
+  },
+  "17": {
+   "a_photos": {
+    "F1": 0.9967892531086439,
+    "P": 1.0,
+    "R": 0.9935990580218459,
+    "fp_recall_video": 1.0,
+    "fp_recall_novideo": 0.9454545454545454
+   },
+   "b_tracks_unlinked": {
+    "F1": 0.9967892531086439,
+    "P": 1.0,
+    "R": 0.9935990580218459,
+    "fp_recall_video": 1.0,
+    "fp_recall_novideo": 0.9454545454545454
+   },
+   "c_tracks_linked": {
+    "F1": 0.9967892531086439,
+    "P": 1.0,
+    "R": 0.9935990580218459,
+    "fp_recall_video": 1.0,
+    "fp_recall_novideo": 0.9454545454545454
+   },
+   "order_agreement_min": 1.0,
+   "faces": 587,
+   "tracks": 11
+  },
+  "16": {
+   "a_photos": {
+    "F1": 0.9936585212939907,
+    "P": 0.9978835978835979,
+    "R": 0.9894690721221333,
+    "fp_recall_video": 1.0,
+    "fp_recall_novideo": 0.9468599033816425
+   },
+   "b_tracks_unlinked": {
+    "F1": 0.9936585212939907,
+    "P": 0.9978835978835979,
+    "R": 0.9894690721221333,
+    "fp_recall_video": 1.0,
+    "fp_recall_novideo": 0.9468599033816425
+   },
+   "c_tracks_linked": {
+    "F1": 0.9936585212939907,
+    "P": 0.9978835978835979,
+    "R": 0.9894690721221333,
+    "fp_recall_video": 1.0,
+    "fp_recall_novideo": 0.9468599033816425
+   },
+   "order_agreement_min": 1.0,
+   "faces": 882,
+   "tracks": 17
+  },
+  "19": {
+   "a_photos": {
+    "F1": 0.9968063565900626,
+    "P": 1.0,
+    "R": 0.9936330469577499,
+    "fp_recall_video": 0.9773755656108597,
+    "fp_recall_novideo": 1.0
+   },
+   "b_tracks_unlinked": {
+    "F1": 0.9968063565900626,
+    "P": 1.0,
+    "R": 0.9936330469577499,
+    "fp_recall_video": 0.9773755656108597,
+    "fp_recall_novideo": 1.0
+   },
+   "c_tracks_linked": {
+    "F1": 0.9968063565900626,
+    "P": 1.0,
+    "R": 0.9936330469577499,
+    "fp_recall_video": 0.9773755656108597,
+    "fp_recall_novideo": 1.0
+   },
+   "order_agreement_min": 1.0,
+   "faces": 586,
+   "tracks": 10
+  },
+  "20": {
+   "a_photos": {
+    "F1": 0.9987682750495367,
+    "P": 1.0,
+    "R": 0.9975395806589645,
+    "fp_recall_video": 0.9660493827160493,
+    "fp_recall_novideo": 1.0
+   },
+   "b_tracks_unlinked": {
+    "F1": 0.9987682750495367,
+    "P": 1.0,
+    "R": 0.9975395806589645,
+    "fp_recall_video": 0.9660493827160493,
+    "fp_recall_novideo": 1.0
+   },
+   "c_tracks_linked": {
+    "F1": 0.9987682750495367,
+    "P": 1.0,
+    "R": 0.9975395806589645,
+    "fp_recall_video": 0.9660493827160493,
+    "fp_recall_novideo": 1.0
+   },
+   "order_agreement_min": 1.0,
+   "faces": 779,
+   "tracks": 11
+  },
+  "21": {
+   "a_photos": {
+    "F1": 0.9866980890249817,
+    "P": 0.9964447317388493,
+    "R": 0.9771402713132036,
+    "fp_recall_video": 0.9339622641509434,
+    "fp_recall_novideo": 0.8645418326693227
+   },
+   "b_tracks_unlinked": {
+    "F1": 0.9866980890249817,
+    "P": 0.9964447317388493,
+    "R": 0.9771402713132036,
+    "fp_recall_video": 0.9339622641509434,
+    "fp_recall_novideo": 0.8645418326693227
+   },
+   "c_tracks_linked": {
+    "F1": 0.9866980890249817,
+    "P": 0.9964447317388493,
+    "R": 0.9771402713132036,
+    "fp_recall_video": 0.9339622641509434,
+    "fp_recall_novideo": 0.8645418326693227
+   },
+   "order_agreement_min": 1.0,
+   "faces": 546,
+   "tracks": 9
+  },
+  "22": {
+   "a_photos": {
+    "F1": 0.9924869917438551,
+    "P": 0.9976280120481927,
+    "R": 0.9873986856516976,
+    "fp_recall_video": 0.9665071770334929,
+    "fp_recall_novideo": 0.9575033200531209
+   },
+   "b_tracks_unlinked": {
+    "F1": 0.9924869917438551,
+    "P": 0.9976280120481927,
+    "R": 0.9873986856516976,
+    "fp_recall_video": 0.9665071770334929,
+    "fp_recall_novideo": 0.9575033200531209
+   },
+   "c_tracks_linked": {
+    "F1": 0.9924869917438551,
+    "P": 0.9976280120481927,
+    "R": 0.9873986856516976,
+    "fp_recall_video": 0.9665071770334929,
+    "fp_recall_novideo": 0.9575033200531209
+   },
+   "order_agreement_min": 1.0,
+   "faces": 830,
+   "tracks": 15
+  },
+  "25": {
+   "a_photos": {
+    "F1": 0.9923593220414424,
+    "P": 1.0,
+    "R": 0.9848345186420274,
+    "fp_recall_video": 0.9126984126984127,
+    "fp_recall_novideo": 0.8666666666666667
+   },
+   "b_tracks_unlinked": {
+    "F1": 0.9923593220414424,
+    "P": 1.0,
+    "R": 0.9848345186420274,
+    "fp_recall_video": 0.9126984126984127,
+    "fp_recall_novideo": 0.8666666666666667
+   },
+   "c_tracks_linked": {
+    "F1": 0.9923593220414424,
+    "P": 1.0,
+    "R": 0.9848345186420274,
+    "fp_recall_video": 0.9126984126984127,
+    "fp_recall_novideo": 0.8666666666666667
+   },
+   "order_agreement_min": 1.0,
+   "faces": 383,
+   "tracks": 8
+  },
+  "24": {
+   "a_photos": {
+    "F1": 0.9907178973826694,
+    "P": 1.0,
+    "R": 0.9816065248888102,
+    "fp_recall_video": 0.9847972972972973,
+    "fp_recall_novideo": 0.9162929745889388
+   },
+   "b_tracks_unlinked": {
+    "F1": 0.9907178973826694,
+    "P": 1.0,
+    "R": 0.9816065248888102,
+    "fp_recall_video": 0.9847972972972973,
+    "fp_recall_novideo": 0.9162929745889388
+   },
+   "c_tracks_linked": {
+    "F1": 0.9907178973826694,
+    "P": 1.0,
+    "R": 0.9816065248888102,
+    "fp_recall_video": 0.9847972972972973,
+    "fp_recall_novideo": 0.9162929745889388
+   },
+   "order_agreement_min": 1.0,
+   "faces": 891,
+   "tracks": 17
+  },
+  "23": {
+   "a_photos": {
+    "F1": 0.9934235424867623,
+    "P": 1.0,
+    "R": 0.9869330194161604,
+    "fp_recall_video": 0.9978494623655914,
+    "fp_recall_novideo": 0.9448961156278229
+   },
+   "b_tracks_unlinked": {
+    "F1": 0.9934235424867623,
+    "P": 1.0,
+    "R": 0.9869330194161604,
+    "fp_recall_video": 0.9978494623655914,
+    "fp_recall_novideo": 0.9448961156278229
+   },
+   "c_tracks_linked": {
+    "F1": 0.9934235424867623,
+    "P": 1.0,
+    "R": 0.9869330194161604,
+    "fp_recall_video": 0.9978494623655914,
+    "fp_recall_novideo": 0.9448961156278229
+   },
+   "order_agreement_min": 1.0,
+   "faces": 992,
+   "tracks": 17
+  },
+  "28": {
+   "a_photos": {
+    "F1": 0.9891006102585853,
+    "P": 1.0,
+    "R": 0.9784362522086343,
+    "fp_recall_video": 0.8772455089820359,
+    "fp_recall_novideo": 0.9614921780986763
+   },
+   "b_tracks_unlinked": {
+    "F1": 0.9891006102585853,
+    "P": 1.0,
+    "R": 0.9784362522086343,
+    "fp_recall_video": 0.8772455089820359,
+    "fp_recall_novideo": 0.9614921780986763
+   },
+   "c_tracks_linked": {
+    "F1": 0.9891006102585853,
+    "P": 1.0,
+    "R": 0.9784362522086343,
+    "fp_recall_video": 0.8772455089820359,
+    "fp_recall_novideo": 0.9614921780986763
+   },
+   "order_agreement_min": 1.0,
+   "faces": 582,
+   "tracks": 14
+  },
+  "26": {
+   "a_photos": {
+    "F1": 0.9898188078291159,
+    "P": 0.9977152182782537,
+    "R": 0.9820464080739676,
+    "fp_recall_video": 0.9944289693593314,
+    "fp_recall_novideo": 0.87248322147651
+   },
+   "b_tracks_unlinked": {
+    "F1": 0.9898188078291159,
+    "P": 0.9977152182782537,
+    "R": 0.9820464080739676,
+    "fp_recall_video": 0.9944289693593314,
+    "fp_recall_novideo": 0.87248322147651
+   },
+   "c_tracks_linked": {
+    "F1": 0.9898188078291159,
+    "P": 0.9977152182782537,
+    "R": 0.9820464080739676,
+    "fp_recall_video": 0.9944289693593314,
+    "fp_recall_novideo": 0.87248322147651
+   },
+   "order_agreement_min": 1.0,
+   "faces": 817,
+   "tracks": 15
+  },
+  "27": {
+   "a_photos": {
+    "F1": 0.9921043770729198,
+    "P": 0.9977346278317152,
+    "R": 0.9865373131453229,
+    "fp_recall_video": 1.0,
+    "fp_recall_novideo": 0.896640826873385
+   },
+   "b_tracks_unlinked": {
+    "F1": 0.9921043770729198,
+    "P": 0.9977346278317152,
+    "R": 0.9865373131453229,
+    "fp_recall_video": 1.0,
+    "fp_recall_novideo": 0.896640826873385
+   },
+   "c_tracks_linked": {
+    "F1": 0.9921043770729198,
+    "P": 0.9977346278317152,
+    "R": 0.9865373131453229,
+    "fp_recall_video": 1.0,
+    "fp_recall_novideo": 0.896640826873385
+   },
+   "order_agreement_min": 1.0,
+   "faces": 824,
+   "tracks": 15
+  },
+  "29": {
+   "a_photos": {
+    "F1": 0.9882819445688517,
+    "P": 1.0,
+    "R": 0.976835333978191,
+    "fp_recall_video": 0.9228855721393034,
+    "fp_recall_novideo": 0.8741058655221745
+   },
+   "b_tracks_unlinked": {
+    "F1": 0.9882819445688517,
+    "P": 1.0,
+    "R": 0.976835333978191,
+    "fp_recall_video": 0.9228855721393034,
+    "fp_recall_novideo": 0.8741058655221745
+   },
+   "c_tracks_linked": {
+    "F1": 0.9882819445688517,
+    "P": 1.0,
+    "R": 0.976835333978191,
+    "fp_recall_video": 0.9228855721393034,
+    "fp_recall_novideo": 0.8741058655221745
+   },
+   "order_agreement_min": 1.0,
+   "faces": 546,
+   "tracks": 10
+  }
+ },
+ "seconds": 37.1484169960022
+}

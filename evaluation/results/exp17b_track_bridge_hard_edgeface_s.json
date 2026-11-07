@@ -1,0 +1,31 @@
+{
+ "model": "edgeface_s",
+ "protocol": "Experiment 17b - the track bridge in the HARD setting: the whole CPLFW test half (where ours scores F1 ~0.84).\n\nSimulated ideal tracks, as exp17: for a fixed random half of the test-half CPLFW people that also have an LFW photo that is\nNOT a copy of their CPLFW photos, a track = (their most frontal such LFW photo, their most profile CPLFW photo); that CPLFW\nphoto leaves the photo set. Same photos are scored in all runs:\n  (a) photos only, (b) photos + track faces unlinked, (c) photos + track faces + must-link.\nScored on the remaining CPLFW photos: B-Cubed P/R/F1 overall, and same-person pair recall for video vs non-video people.\nNo tuning; exp14 tuned config. Order check on (c) with 2 random orders.\n",
+ "result": {
+  "a_photos": {
+   "F1": 0.8539008082934534,
+   "P": 0.9937477477477478,
+   "R": 0.7485585585585585,
+   "pair_recall_video": 0.5847953216374269,
+   "pair_recall_novideo": 0.6113149847094801
+  },
+  "b_tracks_unlinked": {
+   "F1": 0.8577965566444588,
+   "P": 0.9933873873873875,
+   "R": 0.7547747747747747,
+   "pair_recall_video": 0.7192982456140351,
+   "pair_recall_novideo": 0.6113149847094801
+  },
+  "c_tracks_linked": {
+   "F1": 0.8596120395657305,
+   "P": 0.9931171171171173,
+   "R": 0.7577477477477478,
+   "pair_recall_video": 0.783625730994152,
+   "pair_recall_novideo": 0.6113149847094801
+  },
+  "order_agreement_min": 1.0
+ },
+ "people": 1323,
+ "video_people": 171,
+ "seconds": 48.46279501914978
+}
