@@ -1,0 +1,51 @@
+[CORR-BASELINES] 240 jobs | free RAM 4.92 GB, floor 1.78 GB, CPU budget 8 workers
+[CORR-BASELINES]   test  1 workers: job time x1.00 vs 1 worker -> speedup x1.00 (wall 265.6s), lowest free RAM 4.69 GB (~0.09 GB/worker)
+[CORR-BASELINES]   test  2 workers: job time x1.39 vs 1 worker -> speedup x1.44 (wall 229.7s), lowest free RAM 4.56 GB (~0.11 GB/worker)
+[CORR-BASELINES]   test  3 workers: job time x1.80 vs 1 worker -> speedup x1.67 (wall 209.5s), lowest free RAM 4.38 GB (~0.14 GB/worker)
+[CORR-BASELINES]   test  4 workers: job time x2.08 vs 1 worker -> speedup x1.92 (wall 174.8s), lowest free RAM 4.16 GB (~0.16 GB/worker)
+[CORR-BASELINES] CHOSEN 4 workers (live RAM guard on); 236 jobs left
+[CORR-BASELINES] re-check: x4.13 at 4 workers -> trying 5
+[CORR-BASELINES]   [11/236] 219s, ~4485s left, 5 workers, free RAM 4.22 GB
+[CORR-BASELINES] re-check: 5 workers x2.32 not faster than x4.13 -> back to 4
+[CORR-BASELINES]   [22/236] 555s, ~5398s left, 4 workers, free RAM 4.20 GB
+[CORR-BASELINES]   [33/236] 878s, ~5398s left, 4 workers, free RAM 4.19 GB
+[CORR-BASELINES]   [44/236] 1143s, ~4988s left, 4 workers, free RAM 4.19 GB
+[CORR-BASELINES] re-check: x2.16 at 4 workers -> trying 5
+[CORR-BASELINES]   [55/236] 1291s, ~4249s left, 5 workers, free RAM 4.20 GB
+[CORR-BASELINES] re-check: 5 workers x5.56 > x2.16 -> keeping 5
+[CORR-BASELINES]   [66/236] 1536s, ~3957s left, 5 workers, free RAM 4.12 GB
+[CORR-BASELINES] re-check: x2.61 at 5 workers -> trying 6
+[CORR-BASELINES]   [77/236] 1799s, ~3714s left, 6 workers, free RAM 3.97 GB
+[CORR-BASELINES] re-check: 6 workers x3.87 > x2.61 -> keeping 6
+[CORR-BASELINES]   [88/236] 2005s, ~3372s left, 6 workers, free RAM 3.97 GB
+[CORR-BASELINES] re-check: x2.93 at 6 workers -> trying 7
+[CORR-BASELINES]   [99/236] 2196s, ~3038s left, 7 workers, free RAM 3.83 GB
+[CORR-BASELINES] re-check: 7 workers x4.36 > x2.93 -> keeping 7
+[CORR-BASELINES]   [110/236] 2457s, ~2815s left, 7 workers, free RAM 3.79 GB
+[CORR-BASELINES]   [121/236] 2684s, ~2551s left, 7 workers, free RAM 3.80 GB
+[CORR-BASELINES] re-check: x2.61 at 7 workers -> trying 8
+[CORR-BASELINES]   [132/236] 2991s, ~2357s left, 8 workers, free RAM 3.66 GB
+[CORR-BASELINES] re-check: 8 workers x2.79 > x2.61 -> keeping 8
+[CORR-BASELINES]   [143/236] 3253s, ~2116s left, 8 workers, free RAM 3.63 GB
+[CORR-BASELINES]   [154/236] 3481s, ~1854s left, 8 workers, free RAM 3.63 GB
+[CORR-BASELINES]   [165/236] 3691s, ~1588s left, 8 workers, free RAM 3.60 GB
+[CORR-BASELINES]   [176/236] 3892s, ~1327s left, 8 workers, free RAM 3.64 GB
+[CORR-BASELINES]   [187/236] 4083s, ~1070s left, 8 workers, free RAM 3.62 GB
+[CORR-BASELINES]   [198/236] 4323s, ~830s left, 8 workers, free RAM 3.61 GB
+[CORR-BASELINES]   [209/236] 4592s, ~593s left, 8 workers, free RAM 3.61 GB
+[CORR-BASELINES]   [220/236] 4926s, ~358s left, 8 workers, free RAM 3.59 GB
+[CORR-BASELINES]   [231/236] 5205s, ~113s left, 8 workers, free RAM 3.61 GB
+[CORR-BASELINES]   [236/236] 5317s, ~0s left, 8 workers, free RAM 3.70 GB
+oracle ours          corr 5.8 wrong   0 | now 0.9837->0.9944 | later 0.9925 (lost 0.9833) new 0.9897 | held 1.000 (lost 0.169) | order 1.0000
+oracle ours+reapply  corr 5.9 wrong   0 | now 0.9837->0.9934 | later 0.9904 (lost 0.9833) new 0.9884 | held 0.954 (lost 0.192) | order 1.0000
+oracle avg+reapply   corr 6.7 wrong   0 | now 0.9854->0.9936 | later 0.9908 (lost 0.9851) new 0.9913 | held 0.924 (lost 0.202) | order 1.0000
+oracle c-avg         corr 6.8 wrong   0 | now 0.9854->0.9940 | later 0.9912 (lost 0.9851) new 0.9913 | held 1.000 (lost 0.176) | order 1.0000
+casual ours          corr 5.9 wrong   0 | now 0.9837->0.9941 | later 0.9922 (lost 0.9833) new 0.9895 | held 1.000 (lost 0.183)
+casual ours+reapply  corr 6.1 wrong   0 | now 0.9837->0.9899 | later 0.9878 (lost 0.9833) new 0.9871 | held 0.653 (lost 0.427)
+casual avg+reapply   corr 6.9 wrong   0 | now 0.9854->0.9908 | later 0.9890 (lost 0.9851) new 0.9910 | held 0.648 (lost 0.218)
+casual c-avg         corr 6.9 wrong   0 | now 0.9854->0.9938 | later 0.9909 (lost 0.9851) new 0.9913 | held 1.000 (lost 0.200)
+noisy  ours          corr 6.5 wrong 142 | now 0.9837->0.9868 | later 0.9859 (lost 0.9833) new 0.9857 | held 0.995 (lost 0.343)
+noisy  ours+reapply  corr 6.4 wrong 139 | now 0.9837->0.9881 | later 0.9864 (lost 0.9833) new 0.9863 | held 0.590 (lost 0.459)
+noisy  avg+reapply   corr 7.2 wrong 176 | now 0.9854->0.9901 | later 0.9882 (lost 0.9851) new 0.9903 | held 0.639 (lost 0.231)
+noisy  c-avg         corr 7.5 wrong 176 | now 0.9854->0.9879 | later 0.9861 (lost 0.9851) new 0.9908 | held 0.989 (lost 0.365)
+DONE in 6204s

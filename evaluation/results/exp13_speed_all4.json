@@ -1,0 +1,58 @@
+{
+ "mbf": [
+  {
+   "1thread_batch1": 19.04338132912408,
+   "allcores_batch32": 14.303169642841697,
+   "params_M": 3.400448,
+   "file_MB": 13.616099
+  },
+  {
+   "1thread_batch1": 19.72314360657455,
+   "allcores_batch32": 16.33403593749942,
+   "params_M": 3.400448,
+   "file_MB": 13.616099
+  }
+ ],
+ "edgeface_s": [
+  {
+   "1thread_batch1": 9.652243569125332,
+   "allcores_batch32": 7.103740393513699,
+   "params_M": 3.65252,
+   "file_MB": 14.805497
+  },
+  {
+   "1thread_batch1": 10.004292333323974,
+   "allcores_batch32": 8.54114171195998,
+   "params_M": 3.65252,
+   "file_MB": 14.805497
+  }
+ ],
+ "edgeface_xs": [
+  {
+   "1thread_batch1": 6.305650105038213,
+   "allcores_batch32": 4.858606810907636,
+   "params_M": 1.770492,
+   "file_MB": 7.277247
+  },
+  {
+   "1thread_batch1": 6.671930555554961,
+   "allcores_batch32": 5.684480492411901,
+   "params_M": 1.770492,
+   "file_MB": 7.277247
+  }
+ ],
+ "ghostface": [
+  {
+   "1thread_batch1": 27.056784234216817,
+   "allcores_batch32": 32.0107244792022,
+   "params_M": 4.04752,
+   "file_MB": 17.446081
+  },
+  {
+   "1thread_batch1": 29.566482758580182,
+   "allcores_batch32": 35.12240364587645,
+   "params_M": 4.04752,
+   "file_MB": 17.446081
+  }
+ ]
+}

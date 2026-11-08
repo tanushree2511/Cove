@@ -1,0 +1,17 @@
+{
+ "protocol": "Experiment 18b - read time of the clusterer WITH user corrections (review round 2, R2 W5 / R3).\n\nWith any must-/cannot-link present, labels() runs the constrained batch path (_labels_constrained). Same data and\nsetting as exp18 (8,290 clean LFW faces, EdgeFace-S, shipped exp14 thresholds, one thread). We time labels() with\n0, 1, 10 and 50 corrections (exp15's simulated user, picked on the uncorrected result), 3 repeats each, median.\n",
+ "faces": 8290,
+ "config": {
+  "link": 0.65,
+  "m": 1,
+  "attach": 0.5,
+  "merge": 0.55
+ },
+ "labels_seconds_by_corrections": {
+  "0": 3.8041297999880044,
+  "1": 4.25562149999314,
+  "10": 5.143482799991034,
+  "50": 5.046826699996018
+ },
+ "corrections_available": 50
+}

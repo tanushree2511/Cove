@@ -177,3 +177,28 @@ def test_pose_bonus_keeps_order_independence_and_zero_bonus_is_plain():
         lab = c.labels()[inv]
         ref = lab if ref is None else ref
         assert adjusted_rand_score(ref, lab) == 1.0
+
+
+def test_contradictory_corrections_resolved_independent_of_order():
+    # user says 0~3 same, 3~6 same, but 0 != 6: the cannot-link wins and one must-link must be dropped;
+    # which one is dropped must not depend on the order in which faces were added (round-2 review, DA m1)
+    rng = np.random.RandomState(0)
+    d = 16
+    c0, c1, c2 = rng.randn(3, d)
+    X = np.vstack([c + 0.05 * rng.randn(3, d) for c in (c0, c1, c2)]).astype("float32")
+    X /= np.linalg.norm(X, axis=1, keepdims=True)
+    outcomes = set()
+    for t in range(12):
+        o = np.random.RandomState(t).permutation(len(X))
+        inv = np.empty_like(o)
+        inv[o] = np.arange(len(X))
+        c = StableIncrementalClusterer(link_threshold=0.9, min_neighbors=1, attach_threshold=0.8,
+                                       merge_threshold=0.95, dim=d)
+        c.add(X[o])
+        c.add_must_link(inv[0], inv[3])
+        c.add_must_link(inv[3], inv[6])
+        c.add_cannot_link(inv[0], inv[6])
+        lab = c.labels()[inv]
+        assert lab[0] != lab[6]
+        outcomes.add((lab[0] == lab[3], lab[3] == lab[6]))
+    assert len(outcomes) == 1

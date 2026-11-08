@@ -1,0 +1,37 @@
+[FROZEN] 240 jobs | free RAM 4.93 GB, floor 1.78 GB, CPU budget 8 workers
+[FROZEN]   test  1 workers: job time x1.00 vs 1 worker -> speedup x1.00 (wall 7.5s), lowest free RAM 4.77 GB (~0.02 GB/worker)
+[FROZEN]   test  2 workers: job time x1.12 vs 1 worker -> speedup x1.78 (wall 6.5s), lowest free RAM 4.62 GB (~0.09 GB/worker)
+[FROZEN]   test  3 workers: job time x1.29 vs 1 worker -> speedup x2.33 (wall 6.0s), lowest free RAM 4.46 GB (~0.11 GB/worker)
+[FROZEN]   test  4 workers: job time x1.53 vs 1 worker -> speedup x2.61 (wall 5.3s), lowest free RAM 4.32 GB (~0.12 GB/worker)
+[FROZEN] CHOSEN 4 workers (live RAM guard on); 236 jobs left
+[FROZEN]   [11/236] 6s, ~115s left, 4 workers, free RAM 4.28 GB
+[FROZEN]   [22/236] 14s, ~140s left, 4 workers, free RAM 4.26 GB
+[FROZEN]   [33/236] 24s, ~149s left, 4 workers, free RAM 4.20 GB
+[FROZEN]   [44/236] 34s, ~147s left, 4 workers, free RAM 4.19 GB
+[FROZEN]   [55/236] 38s, ~126s left, 4 workers, free RAM 4.16 GB
+[FROZEN]   [66/236] 45s, ~116s left, 4 workers, free RAM 4.13 GB
+[FROZEN]   [77/236] 52s, ~108s left, 4 workers, free RAM 4.11 GB
+[FROZEN]   [88/236] 59s, ~99s left, 4 workers, free RAM 4.10 GB
+[FROZEN]   [99/236] 65s, ~89s left, 4 workers, free RAM 4.08 GB
+[FROZEN]   [110/236] 71s, ~82s left, 4 workers, free RAM 4.06 GB
+[FROZEN]   [121/236] 78s, ~74s left, 4 workers, free RAM 4.05 GB
+[FROZEN]   [132/236] 85s, ~67s left, 4 workers, free RAM 4.03 GB
+[FROZEN]   [143/236] 91s, ~60s left, 4 workers, free RAM 4.02 GB
+[FROZEN]   [154/236] 97s, ~52s left, 4 workers, free RAM 4.02 GB
+[FROZEN]   [165/236] 103s, ~44s left, 4 workers, free RAM 3.99 GB
+[FROZEN]   [176/236] 110s, ~37s left, 4 workers, free RAM 3.97 GB
+[FROZEN]   [187/236] 117s, ~31s left, 4 workers, free RAM 3.96 GB
+[FROZEN]   [198/236] 123s, ~24s left, 4 workers, free RAM 3.94 GB
+[FROZEN]   [209/236] 131s, ~17s left, 4 workers, free RAM 3.91 GB
+[FROZEN]   [220/236] 140s, ~10s left, 4 workers, free RAM 3.90 GB
+[FROZEN]   [231/236] 146s, ~3s left, 4 workers, free RAM 3.89 GB
+[FROZEN]   [236/236] 149s, ~0s left, 4 workers, free RAM 3.90 GB
+ALL {'later_F1': 0.9834, 'later_new_F1': 0.9536, 'held_share': 1.0, 'order_agreement_min': 0.9882}
+blur {'later_F1': 0.994, 'later_new_F1': 0.9767, 'held_share': 1.0, 'order_agreement_min': 0.9964}
+dark {'later_F1': 0.9964, 'later_new_F1': 0.9856, 'held_share': 1.0, 'order_agreement_min': 0.9982}
+lowres {'later_F1': 0.9785, 'later_new_F1': 0.9334, 'held_share': 1.0, 'order_agreement_min': 0.9952}
+lookalike {'later_F1': 0.9975, 'later_new_F1': 0.9903, 'held_share': 1.0, 'order_agreement_min': 0.9977}
+clean {'later_F1': 0.9985, 'later_new_F1': 0.9943, 'held_share': 1.0, 'order_agreement_min': 0.9992}
+jpeg {'later_F1': 0.9636, 'later_new_F1': 0.8747, 'held_share': 1.0, 'order_agreement_min': 0.9882}
+occlude {'later_F1': 0.9684, 'later_new_F1': 0.9592, 'held_share': 1.0, 'order_agreement_min': 0.996}
+mixed {'later_F1': 0.9701, 'later_new_F1': 0.9147, 'held_share': 1.0, 'order_agreement_min': 0.9909}

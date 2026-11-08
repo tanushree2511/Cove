@@ -230,7 +230,12 @@ class StableIncrementalClusterer:
                 enemies.setdefault(rb, set()).update(moved)
             return True
 
-        for a, b in sorted(self.must):                 # 1. the user's "same person" first
+        X = self._X                                    # 1. the user's "same person" first, most similar pair
+        def must_key(p):                               #    first, so contradictory corrections are resolved by
+            a, b = p                                   #    content, never by face ids (insertion order)
+            ka, kb = sorted((X[a].tobytes(), X[b].tobytes()))
+            return (-float(np.dot(X[a], X[b])), ka, kb)
+        for a, b in sorted(self.must, key=must_key):
             try_union(a, b)
         lt = self.link_threshold                       # 2. core links, strongest first
         edges = [(s, i, j) for i in range(n) if self.core[i] for j, s in self.adj[i]
