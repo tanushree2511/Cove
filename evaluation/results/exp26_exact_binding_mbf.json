@@ -1,0 +1,5442 @@
+{
+ "model": "mbf",
+ "protocol": "Experiment 26 - a stronger exactness check of the fast read step, with corrections that really bind (round-5 audit, SQ1).\n\nexp20 compared the fast and the reference read step with random corrections. Counting them showed that, per library, they were\non average 2.2 correct 'same person', 4.0 'different people' between random faces (which rarely change anything) and 2.0 wrong\n'same person' - not 'twelve corrections'. Here the corrections are the ones the exp19 users make on the clusterer's own result:\n  oracle  exp15's user (central face of the main person, intruder most like them)\n  casual  random faces of the two people involved\n  noisy   casual, and each correction is a WRONG look-alike 'same person' with probability 0.1\nEach user makes up to 10 corrections, one at a time, aimed at the biggest remaining mistake, on the whole library (fast path\nused to choose the next one). After 5 and after the last correction the labels of the fast path and of the reference path\n(fast_merge=False, the original centroid merge) must be the same partition. Also recorded: whether the corrections changed the\npartition at all (so the check is not vacuous). Pre-declared pass: zero differences. Nothing is tuned (exp14 thresholds).\nRun: COVE_FACE_MODEL=mbf|edgeface_s python evaluation/exp26_exact_binding.py\n",
+ "table": {
+  "oracle": {
+   "libraries": 240,
+   "libraries_with_corrections": 210,
+   "mean_corrections": 6.058333333333334,
+   "libraries_where_corrections_changed_partition": 210,
+   "identical_last": 210,
+   "identical_5": 210,
+   "differences": []
+  },
+  "casual": {
+   "libraries": 240,
+   "libraries_with_corrections": 210,
+   "mean_corrections": 6.108333333333333,
+   "libraries_where_corrections_changed_partition": 210,
+   "identical_last": 210,
+   "identical_5": 210,
+   "differences": []
+  },
+  "noisy": {
+   "libraries": 240,
+   "libraries_with_corrections": 214,
+   "mean_corrections": 6.8125,
+   "libraries_where_corrections_changed_partition": 214,
+   "identical_last": 214,
+   "identical_5": 214,
+   "differences": []
+  }
+ },
+ "per_library": {
+  "test|blur|5": {
+   "faces": 1042,
+   "oracle": {
+    "n": 9,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 9,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 3,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|blur|28": {
+   "faces": 1298,
+   "oracle": {
+    "n": 8,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 8,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 8,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|dark|8": {
+   "faces": 1023,
+   "oracle": {
+    "n": 2,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   },
+   "casual": {
+    "n": 2,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   },
+   "noisy": {
+    "n": 2,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   }
+  },
+  "test|lowres|13": {
+   "faces": 1293,
+   "oracle": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|lookalike|3": {
+   "faces": 313,
+   "oracle": {
+    "n": 0,
+    "n_wrong": 0,
+    "changed_partition": false
+   },
+   "casual": {
+    "n": 0,
+    "n_wrong": 0,
+    "changed_partition": false
+   },
+   "noisy": {
+    "n": 0,
+    "n_wrong": 0,
+    "changed_partition": false
+   }
+  },
+  "test|jpeg|16": {
+   "faces": 947,
+   "oracle": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 1,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|clean|1": {
+   "faces": 642,
+   "oracle": {
+    "n": 0,
+    "n_wrong": 0,
+    "changed_partition": false
+   },
+   "casual": {
+    "n": 0,
+    "n_wrong": 0,
+    "changed_partition": false
+   },
+   "noisy": {
+    "n": 0,
+    "n_wrong": 0,
+    "changed_partition": false
+   }
+  },
+  "test|lookalike|4": {
+   "faces": 145,
+   "oracle": {
+    "n": 0,
+    "n_wrong": 0,
+    "changed_partition": false
+   },
+   "casual": {
+    "n": 0,
+    "n_wrong": 0,
+    "changed_partition": false
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 1,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|blur|9": {
+   "faces": 1116,
+   "oracle": {
+    "n": 8,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 8,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 2,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|jpeg|26": {
+   "faces": 817,
+   "oracle": {
+    "n": 6,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 6,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 1,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|lowres|16": {
+   "faces": 947,
+   "oracle": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 1,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|jpeg|22": {
+   "faces": 936,
+   "oracle": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 1,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|jpeg|2": {
+   "faces": 728,
+   "oracle": {
+    "n": 6,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 6,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 6,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|dark|11": {
+   "faces": 872,
+   "oracle": {
+    "n": 3,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   },
+   "casual": {
+    "n": 3,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   },
+   "noisy": {
+    "n": 3,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   }
+  },
+  "test|jpeg|19": {
+   "faces": 853,
+   "oracle": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|lowres|19": {
+   "faces": 854,
+   "oracle": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|lowres|28": {
+   "faces": 1297,
+   "oracle": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|jpeg|25": {
+   "faces": 1032,
+   "oracle": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 1,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|lowres|14": {
+   "faces": 1065,
+   "oracle": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 1,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|occlude|27": {
+   "faces": 967,
+   "oracle": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 1,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|jpeg|29": {
+   "faces": 1259,
+   "oracle": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 1,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|occlude|12": {
+   "faces": 538,
+   "oracle": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 1,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|blur|7": {
+   "faces": 1009,
+   "oracle": {
+    "n": 5,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 5,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 5,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|occlude|29": {
+   "faces": 1253,
+   "oracle": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|blur|27": {
+   "faces": 974,
+   "oracle": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 2,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|dark|7": {
+   "faces": 1007,
+   "oracle": {
+    "n": 1,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   },
+   "casual": {
+    "n": 1,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   },
+   "noisy": {
+    "n": 1,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   }
+  },
+  "test|mixed|3": {
+   "faces": 1053,
+   "oracle": {
+    "n": 7,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 7,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 1,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|lookalike|25": {
+   "faces": 221,
+   "oracle": {
+    "n": 0,
+    "n_wrong": 0,
+    "changed_partition": false
+   },
+   "casual": {
+    "n": 0,
+    "n_wrong": 0,
+    "changed_partition": false
+   },
+   "noisy": {
+    "n": 0,
+    "n_wrong": 0,
+    "changed_partition": false
+   }
+  },
+  "test|occlude|2": {
+   "faces": 728,
+   "oracle": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|occlude|17": {
+   "faces": 1029,
+   "oracle": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 1,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|lowres|10": {
+   "faces": 1111,
+   "oracle": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|dark|14": {
+   "faces": 1062,
+   "oracle": {
+    "n": 4,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   },
+   "casual": {
+    "n": 4,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   },
+   "noisy": {
+    "n": 4,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   }
+  },
+  "test|jpeg|4": {
+   "faces": 1347,
+   "oracle": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 1,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|lookalike|29": {
+   "faces": 181,
+   "oracle": {
+    "n": 0,
+    "n_wrong": 0,
+    "changed_partition": false
+   },
+   "casual": {
+    "n": 0,
+    "n_wrong": 0,
+    "changed_partition": false
+   },
+   "noisy": {
+    "n": 0,
+    "n_wrong": 0,
+    "changed_partition": false
+   }
+  },
+  "test|clean|13": {
+   "faces": 1293,
+   "oracle": {
+    "n": 2,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   },
+   "casual": {
+    "n": 2,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   },
+   "noisy": {
+    "n": 2,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   }
+  },
+  "test|mixed|29": {
+   "faces": 1260,
+   "oracle": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 1,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|mixed|18": {
+   "faces": 871,
+   "oracle": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 1,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|occlude|18": {
+   "faces": 867,
+   "oracle": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|lowres|0": {
+   "faces": 881,
+   "oracle": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|lowres|21": {
+   "faces": 1057,
+   "oracle": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 1,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|jpeg|28": {
+   "faces": 1296,
+   "oracle": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 1,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|lookalike|19": {
+   "faces": 328,
+   "oracle": {
+    "n": 0,
+    "n_wrong": 0,
+    "changed_partition": false
+   },
+   "casual": {
+    "n": 0,
+    "n_wrong": 0,
+    "changed_partition": false
+   },
+   "noisy": {
+    "n": 0,
+    "n_wrong": 0,
+    "changed_partition": false
+   }
+  },
+  "test|jpeg|7": {
+   "faces": 1009,
+   "oracle": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|mixed|10": {
+   "faces": 1110,
+   "oracle": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 2,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|lowres|29": {
+   "faces": 1261,
+   "oracle": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 1,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|clean|29": {
+   "faces": 1261,
+   "oracle": {
+    "n": 2,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   },
+   "casual": {
+    "n": 2,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   },
+   "noisy": {
+    "n": 2,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   }
+  },
+  "test|jpeg|27": {
+   "faces": 973,
+   "oracle": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 1,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|lookalike|0": {
+   "faces": 177,
+   "oracle": {
+    "n": 1,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   },
+   "casual": {
+    "n": 1,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   },
+   "noisy": {
+    "n": 1,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   }
+  },
+  "test|lowres|2": {
+   "faces": 730,
+   "oracle": {
+    "n": 9,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 9,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 9,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|mixed|22": {
+   "faces": 935,
+   "oracle": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 1,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|dark|15": {
+   "faces": 837,
+   "oracle": {
+    "n": 2,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   },
+   "casual": {
+    "n": 2,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   },
+   "noisy": {
+    "n": 2,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   }
+  },
+  "test|clean|19": {
+   "faces": 854,
+   "oracle": {
+    "n": 2,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   },
+   "casual": {
+    "n": 2,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   },
+   "noisy": {
+    "n": 2,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   }
+  },
+  "test|occlude|3": {
+   "faces": 1049,
+   "oracle": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|jpeg|20": {
+   "faces": 789,
+   "oracle": {
+    "n": 4,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   },
+   "casual": {
+    "n": 4,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   },
+   "noisy": {
+    "n": 4,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   }
+  },
+  "test|lookalike|10": {
+   "faces": 243,
+   "oracle": {
+    "n": 0,
+    "n_wrong": 0,
+    "changed_partition": false
+   },
+   "casual": {
+    "n": 0,
+    "n_wrong": 0,
+    "changed_partition": false
+   },
+   "noisy": {
+    "n": 0,
+    "n_wrong": 0,
+    "changed_partition": false
+   }
+  },
+  "test|blur|11": {
+   "faces": 872,
+   "oracle": {
+    "n": 5,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 7,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 5,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|occlude|20": {
+   "faces": 789,
+   "oracle": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 2,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|mixed|12": {
+   "faces": 541,
+   "oracle": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|clean|6": {
+   "faces": 585,
+   "oracle": {
+    "n": 0,
+    "n_wrong": 0,
+    "changed_partition": false
+   },
+   "casual": {
+    "n": 0,
+    "n_wrong": 0,
+    "changed_partition": false
+   },
+   "noisy": {
+    "n": 0,
+    "n_wrong": 0,
+    "changed_partition": false
+   }
+  },
+  "test|occlude|23": {
+   "faces": 867,
+   "oracle": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 1,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|lookalike|18": {
+   "faces": 414,
+   "oracle": {
+    "n": 2,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   },
+   "casual": {
+    "n": 2,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   },
+   "noisy": {
+    "n": 2,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   }
+  },
+  "test|lowres|9": {
+   "faces": 1116,
+   "oracle": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 2,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|lookalike|12": {
+   "faces": 154,
+   "oracle": {
+    "n": 1,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   },
+   "casual": {
+    "n": 1,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   },
+   "noisy": {
+    "n": 1,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   }
+  },
+  "test|lookalike|15": {
+   "faces": 284,
+   "oracle": {
+    "n": 0,
+    "n_wrong": 0,
+    "changed_partition": false
+   },
+   "casual": {
+    "n": 0,
+    "n_wrong": 0,
+    "changed_partition": false
+   },
+   "noisy": {
+    "n": 0,
+    "n_wrong": 0,
+    "changed_partition": false
+   }
+  },
+  "test|clean|26": {
+   "faces": 819,
+   "oracle": {
+    "n": 0,
+    "n_wrong": 0,
+    "changed_partition": false
+   },
+   "casual": {
+    "n": 0,
+    "n_wrong": 0,
+    "changed_partition": false
+   },
+   "noisy": {
+    "n": 0,
+    "n_wrong": 0,
+    "changed_partition": false
+   }
+  },
+  "test|jpeg|9": {
+   "faces": 1115,
+   "oracle": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 3,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|blur|16": {
+   "faces": 948,
+   "oracle": {
+    "n": 5,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 5,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 5,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|dark|24": {
+   "faces": 1209,
+   "oracle": {
+    "n": 8,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 1,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|dark|27": {
+   "faces": 973,
+   "oracle": {
+    "n": 7,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 8,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 2,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|dark|28": {
+   "faces": 1298,
+   "oracle": {
+    "n": 3,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   },
+   "casual": {
+    "n": 3,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 1,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|mixed|28": {
+   "faces": 1297,
+   "oracle": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 1,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|dark|26": {
+   "faces": 819,
+   "oracle": {
+    "n": 0,
+    "n_wrong": 0,
+    "changed_partition": false
+   },
+   "casual": {
+    "n": 0,
+    "n_wrong": 0,
+    "changed_partition": false
+   },
+   "noisy": {
+    "n": 0,
+    "n_wrong": 0,
+    "changed_partition": false
+   }
+  },
+  "test|jpeg|5": {
+   "faces": 1042,
+   "oracle": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 3,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|clean|4": {
+   "faces": 1348,
+   "oracle": {
+    "n": 5,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 5,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 2,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|clean|11": {
+   "faces": 872,
+   "oracle": {
+    "n": 2,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   },
+   "casual": {
+    "n": 2,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 4,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|dark|3": {
+   "faces": 1052,
+   "oracle": {
+    "n": 0,
+    "n_wrong": 0,
+    "changed_partition": false
+   },
+   "casual": {
+    "n": 0,
+    "n_wrong": 0,
+    "changed_partition": false
+   },
+   "noisy": {
+    "n": 0,
+    "n_wrong": 0,
+    "changed_partition": false
+   }
+  },
+  "test|lowres|20": {
+   "faces": 790,
+   "oracle": {
+    "n": 8,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 8,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 1,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|occlude|11": {
+   "faces": 867,
+   "oracle": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|lookalike|20": {
+   "faces": 367,
+   "oracle": {
+    "n": 0,
+    "n_wrong": 0,
+    "changed_partition": false
+   },
+   "casual": {
+    "n": 0,
+    "n_wrong": 0,
+    "changed_partition": false
+   },
+   "noisy": {
+    "n": 0,
+    "n_wrong": 0,
+    "changed_partition": false
+   }
+  },
+  "test|occlude|24": {
+   "faces": 1204,
+   "oracle": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 1,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|mixed|8": {
+   "faces": 1025,
+   "oracle": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|dark|12": {
+   "faces": 543,
+   "oracle": {
+    "n": 1,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   },
+   "casual": {
+    "n": 1,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   },
+   "noisy": {
+    "n": 1,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   }
+  },
+  "test|mixed|26": {
+   "faces": 818,
+   "oracle": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 1,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|occlude|9": {
+   "faces": 1111,
+   "oracle": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 2,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|blur|8": {
+   "faces": 1025,
+   "oracle": {
+    "n": 9,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 9,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 3,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|lookalike|14": {
+   "faces": 242,
+   "oracle": {
+    "n": 0,
+    "n_wrong": 0,
+    "changed_partition": false
+   },
+   "casual": {
+    "n": 0,
+    "n_wrong": 0,
+    "changed_partition": false
+   },
+   "noisy": {
+    "n": 0,
+    "n_wrong": 0,
+    "changed_partition": false
+   }
+  },
+  "test|mixed|2": {
+   "faces": 730,
+   "oracle": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|clean|5": {
+   "faces": 1042,
+   "oracle": {
+    "n": 0,
+    "n_wrong": 0,
+    "changed_partition": false
+   },
+   "casual": {
+    "n": 0,
+    "n_wrong": 0,
+    "changed_partition": false
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 4,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|jpeg|6": {
+   "faces": 585,
+   "oracle": {
+    "n": 4,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   },
+   "casual": {
+    "n": 4,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 1,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|clean|12": {
+   "faces": 543,
+   "oracle": {
+    "n": 2,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   },
+   "casual": {
+    "n": 2,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   },
+   "noisy": {
+    "n": 2,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   }
+  },
+  "test|clean|7": {
+   "faces": 1009,
+   "oracle": {
+    "n": 0,
+    "n_wrong": 0,
+    "changed_partition": false
+   },
+   "casual": {
+    "n": 0,
+    "n_wrong": 0,
+    "changed_partition": false
+   },
+   "noisy": {
+    "n": 0,
+    "n_wrong": 0,
+    "changed_partition": false
+   }
+  },
+  "test|mixed|25": {
+   "faces": 1033,
+   "oracle": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 1,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|lowres|24": {
+   "faces": 1210,
+   "oracle": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 1,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|jpeg|14": {
+   "faces": 1064,
+   "oracle": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|clean|21": {
+   "faces": 1057,
+   "oracle": {
+    "n": 2,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   },
+   "casual": {
+    "n": 2,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 1,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|occlude|1": {
+   "faces": 640,
+   "oracle": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|mixed|19": {
+   "faces": 853,
+   "oracle": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|clean|28": {
+   "faces": 1298,
+   "oracle": {
+    "n": 2,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   },
+   "casual": {
+    "n": 2,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 2,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|jpeg|3": {
+   "faces": 1052,
+   "oracle": {
+    "n": 5,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 5,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 2,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|jpeg|18": {
+   "faces": 871,
+   "oracle": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|clean|2": {
+   "faces": 730,
+   "oracle": {
+    "n": 1,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   },
+   "casual": {
+    "n": 1,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   },
+   "noisy": {
+    "n": 1,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   }
+  },
+  "test|lookalike|7": {
+   "faces": 234,
+   "oracle": {
+    "n": 0,
+    "n_wrong": 0,
+    "changed_partition": false
+   },
+   "casual": {
+    "n": 0,
+    "n_wrong": 0,
+    "changed_partition": false
+   },
+   "noisy": {
+    "n": 0,
+    "n_wrong": 0,
+    "changed_partition": false
+   }
+  },
+  "test|lowres|12": {
+   "faces": 543,
+   "oracle": {
+    "n": 6,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 6,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 1,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|lowres|4": {
+   "faces": 1348,
+   "oracle": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 2,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|lookalike|21": {
+   "faces": 249,
+   "oracle": {
+    "n": 0,
+    "n_wrong": 0,
+    "changed_partition": false
+   },
+   "casual": {
+    "n": 0,
+    "n_wrong": 0,
+    "changed_partition": false
+   },
+   "noisy": {
+    "n": 0,
+    "n_wrong": 0,
+    "changed_partition": false
+   }
+  },
+  "test|lookalike|5": {
+   "faces": 313,
+   "oracle": {
+    "n": 1,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   },
+   "casual": {
+    "n": 1,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 5,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|clean|14": {
+   "faces": 1065,
+   "oracle": {
+    "n": 3,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   },
+   "casual": {
+    "n": 3,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   },
+   "noisy": {
+    "n": 3,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   }
+  },
+  "test|occlude|28": {
+   "faces": 1292,
+   "oracle": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 2,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|mixed|17": {
+   "faces": 1029,
+   "oracle": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 1,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|lookalike|24": {
+   "faces": 371,
+   "oracle": {
+    "n": 1,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   },
+   "casual": {
+    "n": 1,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   },
+   "noisy": {
+    "n": 1,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   }
+  },
+  "test|blur|18": {
+   "faces": 872,
+   "oracle": {
+    "n": 6,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 6,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 6,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|lowres|11": {
+   "faces": 872,
+   "oracle": {
+    "n": 8,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 8,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|lowres|15": {
+   "faces": 839,
+   "oracle": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|jpeg|11": {
+   "faces": 871,
+   "oracle": {
+    "n": 9,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 9,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 1,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|blur|22": {
+   "faces": 938,
+   "oracle": {
+    "n": 6,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 6,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 6,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|blur|29": {
+   "faces": 1261,
+   "oracle": {
+    "n": 5,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 5,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 1,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|mixed|23": {
+   "faces": 868,
+   "oracle": {
+    "n": 9,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 9,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 1,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|lookalike|9": {
+   "faces": 160,
+   "oracle": {
+    "n": 0,
+    "n_wrong": 0,
+    "changed_partition": false
+   },
+   "casual": {
+    "n": 0,
+    "n_wrong": 0,
+    "changed_partition": false
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 1,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|blur|3": {
+   "faces": 1053,
+   "oracle": {
+    "n": 3,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   },
+   "casual": {
+    "n": 3,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   },
+   "noisy": {
+    "n": 3,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   }
+  },
+  "test|lowres|27": {
+   "faces": 974,
+   "oracle": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 3,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|lowres|23": {
+   "faces": 870,
+   "oracle": {
+    "n": 9,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 9,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 3,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|mixed|21": {
+   "faces": 1056,
+   "oracle": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 1,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|dark|17": {
+   "faces": 1030,
+   "oracle": {
+    "n": 4,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   },
+   "casual": {
+    "n": 7,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 3,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   }
+  },
+  "test|jpeg|15": {
+   "faces": 839,
+   "oracle": {
+    "n": 8,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 8,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 8,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|blur|26": {
+   "faces": 819,
+   "oracle": {
+    "n": 2,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   },
+   "casual": {
+    "n": 2,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   },
+   "noisy": {
+    "n": 2,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   }
+  },
+  "test|lookalike|13": {
+   "faces": 298,
+   "oracle": {
+    "n": 2,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   },
+   "casual": {
+    "n": 2,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   },
+   "noisy": {
+    "n": 2,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   }
+  },
+  "test|blur|15": {
+   "faces": 839,
+   "oracle": {
+    "n": 6,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 6,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 1,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|blur|10": {
+   "faces": 1111,
+   "oracle": {
+    "n": 1,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   },
+   "casual": {
+    "n": 1,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   },
+   "noisy": {
+    "n": 1,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   }
+  },
+  "test|blur|0": {
+   "faces": 881,
+   "oracle": {
+    "n": 8,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 8,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 9,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|occlude|16": {
+   "faces": 944,
+   "oracle": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 1,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|jpeg|10": {
+   "faces": 1109,
+   "oracle": {
+    "n": 9,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 9,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 1,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|clean|9": {
+   "faces": 1116,
+   "oracle": {
+    "n": 4,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   },
+   "casual": {
+    "n": 4,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 2,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|occlude|14": {
+   "faces": 1061,
+   "oracle": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 1,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|clean|22": {
+   "faces": 938,
+   "oracle": {
+    "n": 2,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   },
+   "casual": {
+    "n": 2,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   },
+   "noisy": {
+    "n": 2,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   }
+  },
+  "test|lowres|8": {
+   "faces": 1025,
+   "oracle": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|dark|1": {
+   "faces": 642,
+   "oracle": {
+    "n": 0,
+    "n_wrong": 0,
+    "changed_partition": false
+   },
+   "casual": {
+    "n": 0,
+    "n_wrong": 0,
+    "changed_partition": false
+   },
+   "noisy": {
+    "n": 0,
+    "n_wrong": 0,
+    "changed_partition": false
+   }
+  },
+  "test|lowres|3": {
+   "faces": 1053,
+   "oracle": {
+    "n": 5,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 5,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 5,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|clean|17": {
+   "faces": 1031,
+   "oracle": {
+    "n": 3,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   },
+   "casual": {
+    "n": 2,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   },
+   "noisy": {
+    "n": 5,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|clean|8": {
+   "faces": 1025,
+   "oracle": {
+    "n": 2,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   },
+   "casual": {
+    "n": 2,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   },
+   "noisy": {
+    "n": 2,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   }
+  },
+  "test|dark|22": {
+   "faces": 935,
+   "oracle": {
+    "n": 3,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   },
+   "casual": {
+    "n": 3,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   },
+   "noisy": {
+    "n": 3,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   }
+  },
+  "test|mixed|9": {
+   "faces": 1114,
+   "oracle": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 2,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|occlude|22": {
+   "faces": 933,
+   "oracle": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 1,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|lowres|17": {
+   "faces": 1031,
+   "oracle": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 1,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|occlude|7": {
+   "faces": 1007,
+   "oracle": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|lookalike|28": {
+   "faces": 254,
+   "oracle": {
+    "n": 0,
+    "n_wrong": 0,
+    "changed_partition": false
+   },
+   "casual": {
+    "n": 0,
+    "n_wrong": 0,
+    "changed_partition": false
+   },
+   "noisy": {
+    "n": 0,
+    "n_wrong": 0,
+    "changed_partition": false
+   }
+  },
+  "test|occlude|19": {
+   "faces": 849,
+   "oracle": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 1,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|mixed|15": {
+   "faces": 837,
+   "oracle": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 1,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|occlude|15": {
+   "faces": 836,
+   "oracle": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|mixed|11": {
+   "faces": 871,
+   "oracle": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 2,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|blur|13": {
+   "faces": 1293,
+   "oracle": {
+    "n": 6,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 6,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 6,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|lookalike|27": {
+   "faces": 263,
+   "oracle": {
+    "n": 0,
+    "n_wrong": 0,
+    "changed_partition": false
+   },
+   "casual": {
+    "n": 0,
+    "n_wrong": 0,
+    "changed_partition": false
+   },
+   "noisy": {
+    "n": 0,
+    "n_wrong": 0,
+    "changed_partition": false
+   }
+  },
+  "test|occlude|0": {
+   "faces": 877,
+   "oracle": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|occlude|5": {
+   "faces": 1039,
+   "oracle": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 2,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|dark|18": {
+   "faces": 871,
+   "oracle": {
+    "n": 5,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 5,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 5,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|lowres|1": {
+   "faces": 642,
+   "oracle": {
+    "n": 3,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   },
+   "casual": {
+    "n": 3,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   },
+   "noisy": {
+    "n": 3,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   }
+  },
+  "test|occlude|26": {
+   "faces": 817,
+   "oracle": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 2,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|lookalike|8": {
+   "faces": 192,
+   "oracle": {
+    "n": 2,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   },
+   "casual": {
+    "n": 2,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   },
+   "noisy": {
+    "n": 2,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   }
+  },
+  "test|lookalike|26": {
+   "faces": 261,
+   "oracle": {
+    "n": 0,
+    "n_wrong": 0,
+    "changed_partition": false
+   },
+   "casual": {
+    "n": 0,
+    "n_wrong": 0,
+    "changed_partition": false
+   },
+   "noisy": {
+    "n": 0,
+    "n_wrong": 0,
+    "changed_partition": false
+   }
+  },
+  "test|mixed|7": {
+   "faces": 1008,
+   "oracle": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 1,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|blur|14": {
+   "faces": 1065,
+   "oracle": {
+    "n": 9,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 9,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 9,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|dark|5": {
+   "faces": 1041,
+   "oracle": {
+    "n": 0,
+    "n_wrong": 0,
+    "changed_partition": false
+   },
+   "casual": {
+    "n": 0,
+    "n_wrong": 0,
+    "changed_partition": false
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 3,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|lookalike|22": {
+   "faces": 324,
+   "oracle": {
+    "n": 2,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   },
+   "casual": {
+    "n": 2,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   },
+   "noisy": {
+    "n": 2,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   }
+  },
+  "test|clean|27": {
+   "faces": 974,
+   "oracle": {
+    "n": 5,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 4,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 3,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|clean|20": {
+   "faces": 790,
+   "oracle": {
+    "n": 1,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   },
+   "casual": {
+    "n": 1,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   },
+   "noisy": {
+    "n": 1,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   }
+  },
+  "test|mixed|5": {
+   "faces": 1042,
+   "oracle": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 4,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|blur|21": {
+   "faces": 1057,
+   "oracle": {
+    "n": 7,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 7,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 1,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|dark|19": {
+   "faces": 853,
+   "oracle": {
+    "n": 2,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   },
+   "casual": {
+    "n": 2,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   },
+   "noisy": {
+    "n": 2,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   }
+  },
+  "test|blur|1": {
+   "faces": 642,
+   "oracle": {
+    "n": 1,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   },
+   "casual": {
+    "n": 1,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   },
+   "noisy": {
+    "n": 1,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   }
+  },
+  "test|jpeg|24": {
+   "faces": 1209,
+   "oracle": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 2,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|lowres|6": {
+   "faces": 585,
+   "oracle": {
+    "n": 8,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 8,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 3,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|lowres|26": {
+   "faces": 819,
+   "oracle": {
+    "n": 3,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   },
+   "casual": {
+    "n": 3,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   },
+   "noisy": {
+    "n": 3,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   }
+  },
+  "test|dark|25": {
+   "faces": 1032,
+   "oracle": {
+    "n": 3,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   },
+   "casual": {
+    "n": 3,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   },
+   "noisy": {
+    "n": 3,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   }
+  },
+  "test|clean|16": {
+   "faces": 948,
+   "oracle": {
+    "n": 3,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   },
+   "casual": {
+    "n": 3,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   },
+   "noisy": {
+    "n": 3,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   }
+  },
+  "test|lowres|18": {
+   "faces": 872,
+   "oracle": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 1,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|blur|2": {
+   "faces": 730,
+   "oracle": {
+    "n": 5,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 5,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 5,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|dark|6": {
+   "faces": 585,
+   "oracle": {
+    "n": 1,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   },
+   "casual": {
+    "n": 1,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   },
+   "noisy": {
+    "n": 1,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   }
+  },
+  "test|blur|25": {
+   "faces": 1033,
+   "oracle": {
+    "n": 4,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   },
+   "casual": {
+    "n": 4,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   },
+   "noisy": {
+    "n": 4,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   }
+  },
+  "test|blur|23": {
+   "faces": 870,
+   "oracle": {
+    "n": 7,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 7,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 1,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|clean|0": {
+   "faces": 881,
+   "oracle": {
+    "n": 4,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   },
+   "casual": {
+    "n": 4,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   },
+   "noisy": {
+    "n": 4,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   }
+  },
+  "test|mixed|16": {
+   "faces": 948,
+   "oracle": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 1,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|mixed|1": {
+   "faces": 641,
+   "oracle": {
+    "n": 5,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 5,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 5,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|occlude|10": {
+   "faces": 1107,
+   "oracle": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|jpeg|12": {
+   "faces": 542,
+   "oracle": {
+    "n": 8,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 8,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 8,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|occlude|21": {
+   "faces": 1057,
+   "oracle": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|clean|23": {
+   "faces": 870,
+   "oracle": {
+    "n": 1,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   },
+   "casual": {
+    "n": 1,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   },
+   "noisy": {
+    "n": 1,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   }
+  },
+  "test|clean|3": {
+   "faces": 1053,
+   "oracle": {
+    "n": 0,
+    "n_wrong": 0,
+    "changed_partition": false
+   },
+   "casual": {
+    "n": 0,
+    "n_wrong": 0,
+    "changed_partition": false
+   },
+   "noisy": {
+    "n": 0,
+    "n_wrong": 0,
+    "changed_partition": false
+   }
+  },
+  "test|dark|20": {
+   "faces": 789,
+   "oracle": {
+    "n": 1,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   },
+   "casual": {
+    "n": 1,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   },
+   "noisy": {
+    "n": 1,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   }
+  },
+  "test|clean|15": {
+   "faces": 839,
+   "oracle": {
+    "n": 1,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   },
+   "casual": {
+    "n": 1,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   },
+   "noisy": {
+    "n": 1,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   }
+  },
+  "test|lookalike|23": {
+   "faces": 337,
+   "oracle": {
+    "n": 2,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   },
+   "casual": {
+    "n": 2,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   },
+   "noisy": {
+    "n": 2,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   }
+  },
+  "test|mixed|4": {
+   "faces": 1347,
+   "oracle": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 1,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|dark|13": {
+   "faces": 1292,
+   "oracle": {
+    "n": 2,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   },
+   "casual": {
+    "n": 2,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   },
+   "noisy": {
+    "n": 2,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   }
+  },
+  "test|lookalike|16": {
+   "faces": 244,
+   "oracle": {
+    "n": 2,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   },
+   "casual": {
+    "n": 2,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   },
+   "noisy": {
+    "n": 2,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   }
+  },
+  "test|jpeg|23": {
+   "faces": 868,
+   "oracle": {
+    "n": 8,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 8,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 1,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|dark|21": {
+   "faces": 1056,
+   "oracle": {
+    "n": 2,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   },
+   "casual": {
+    "n": 2,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 1,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|lowres|22": {
+   "faces": 938,
+   "oracle": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 1,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|occlude|6": {
+   "faces": 583,
+   "oracle": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 1,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|blur|20": {
+   "faces": 790,
+   "oracle": {
+    "n": 6,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 6,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 7,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|occlude|13": {
+   "faces": 1289,
+   "oracle": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 1,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|lookalike|1": {
+   "faces": 317,
+   "oracle": {
+    "n": 0,
+    "n_wrong": 0,
+    "changed_partition": false
+   },
+   "casual": {
+    "n": 0,
+    "n_wrong": 0,
+    "changed_partition": false
+   },
+   "noisy": {
+    "n": 0,
+    "n_wrong": 0,
+    "changed_partition": false
+   }
+  },
+  "test|dark|23": {
+   "faces": 869,
+   "oracle": {
+    "n": 1,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   },
+   "casual": {
+    "n": 1,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   },
+   "noisy": {
+    "n": 1,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   }
+  },
+  "test|jpeg|21": {
+   "faces": 1056,
+   "oracle": {
+    "n": 8,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 8,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 2,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|jpeg|0": {
+   "faces": 881,
+   "oracle": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 2,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|dark|0": {
+   "faces": 881,
+   "oracle": {
+    "n": 5,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 5,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 5,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|clean|18": {
+   "faces": 872,
+   "oracle": {
+    "n": 4,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   },
+   "casual": {
+    "n": 4,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   },
+   "noisy": {
+    "n": 4,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   }
+  },
+  "test|occlude|25": {
+   "faces": 1030,
+   "oracle": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 1,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|mixed|6": {
+   "faces": 585,
+   "oracle": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 2,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|blur|24": {
+   "faces": 1210,
+   "oracle": {
+    "n": 8,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 1,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|blur|19": {
+   "faces": 854,
+   "oracle": {
+    "n": 5,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 5,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 5,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|clean|25": {
+   "faces": 1033,
+   "oracle": {
+    "n": 2,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   },
+   "casual": {
+    "n": 2,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   },
+   "noisy": {
+    "n": 2,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   }
+  },
+  "test|lowres|7": {
+   "faces": 1008,
+   "oracle": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 2,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|mixed|27": {
+   "faces": 971,
+   "oracle": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 1,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|dark|16": {
+   "faces": 947,
+   "oracle": {
+    "n": 4,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   },
+   "casual": {
+    "n": 4,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   },
+   "noisy": {
+    "n": 4,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   }
+  },
+  "test|mixed|0": {
+   "faces": 880,
+   "oracle": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 1,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|occlude|4": {
+   "faces": 1341,
+   "oracle": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 1,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|occlude|8": {
+   "faces": 1022,
+   "oracle": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 3,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|mixed|24": {
+   "faces": 1210,
+   "oracle": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 1,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|blur|4": {
+   "faces": 1348,
+   "oracle": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 2,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|lookalike|11": {
+   "faces": 365,
+   "oracle": {
+    "n": 0,
+    "n_wrong": 0,
+    "changed_partition": false
+   },
+   "casual": {
+    "n": 0,
+    "n_wrong": 0,
+    "changed_partition": false
+   },
+   "noisy": {
+    "n": 0,
+    "n_wrong": 0,
+    "changed_partition": false
+   }
+  },
+  "test|blur|12": {
+   "faces": 543,
+   "oracle": {
+    "n": 2,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   },
+   "casual": {
+    "n": 2,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   },
+   "noisy": {
+    "n": 2,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   }
+  },
+  "test|mixed|13": {
+   "faces": 1293,
+   "oracle": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|clean|24": {
+   "faces": 1210,
+   "oracle": {
+    "n": 7,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 8,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|lowres|5": {
+   "faces": 1042,
+   "oracle": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 3,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|dark|9": {
+   "faces": 1114,
+   "oracle": {
+    "n": 4,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   },
+   "casual": {
+    "n": 4,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 3,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|dark|29": {
+   "faces": 1260,
+   "oracle": {
+    "n": 3,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   },
+   "casual": {
+    "n": 3,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   },
+   "noisy": {
+    "n": 3,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   }
+  },
+  "test|jpeg|1": {
+   "faces": 640,
+   "oracle": {
+    "n": 2,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   },
+   "casual": {
+    "n": 2,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   },
+   "noisy": {
+    "n": 2,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   }
+  },
+  "test|lowres|25": {
+   "faces": 1033,
+   "oracle": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 1,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|lookalike|2": {
+   "faces": 302,
+   "oracle": {
+    "n": 0,
+    "n_wrong": 0,
+    "changed_partition": false
+   },
+   "casual": {
+    "n": 0,
+    "n_wrong": 0,
+    "changed_partition": false
+   },
+   "noisy": {
+    "n": 0,
+    "n_wrong": 0,
+    "changed_partition": false
+   }
+  },
+  "test|dark|2": {
+   "faces": 730,
+   "oracle": {
+    "n": 2,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   },
+   "casual": {
+    "n": 2,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   },
+   "noisy": {
+    "n": 2,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   }
+  },
+  "test|mixed|20": {
+   "faces": 788,
+   "oracle": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 1,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|blur|17": {
+   "faces": 1031,
+   "oracle": {
+    "n": 9,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 1,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|dark|10": {
+   "faces": 1110,
+   "oracle": {
+    "n": 1,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   },
+   "casual": {
+    "n": 1,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   },
+   "noisy": {
+    "n": 1,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   }
+  },
+  "test|jpeg|13": {
+   "faces": 1293,
+   "oracle": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|blur|6": {
+   "faces": 585,
+   "oracle": {
+    "n": 3,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   },
+   "casual": {
+    "n": 3,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   },
+   "noisy": {
+    "n": 3,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   }
+  },
+  "test|clean|10": {
+   "faces": 1111,
+   "oracle": {
+    "n": 1,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   },
+   "casual": {
+    "n": 1,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   },
+   "noisy": {
+    "n": 1,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true
+   }
+  },
+  "test|lookalike|17": {
+   "faces": 293,
+   "oracle": {
+    "n": 0,
+    "n_wrong": 0,
+    "changed_partition": false
+   },
+   "casual": {
+    "n": 0,
+    "n_wrong": 0,
+    "changed_partition": false
+   },
+   "noisy": {
+    "n": 0,
+    "n_wrong": 0,
+    "changed_partition": false
+   }
+  },
+  "test|dark|4": {
+   "faces": 1346,
+   "oracle": {
+    "n": 6,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 6,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 2,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|jpeg|17": {
+   "faces": 1029,
+   "oracle": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 1,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|lookalike|6": {
+   "faces": 298,
+   "oracle": {
+    "n": 0,
+    "n_wrong": 0,
+    "changed_partition": false
+   },
+   "casual": {
+    "n": 0,
+    "n_wrong": 0,
+    "changed_partition": false
+   },
+   "noisy": {
+    "n": 0,
+    "n_wrong": 0,
+    "changed_partition": false
+   }
+  },
+  "test|mixed|14": {
+   "faces": 1063,
+   "oracle": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 2,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  },
+  "test|jpeg|8": {
+   "faces": 1024,
+   "oracle": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "casual": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   },
+   "noisy": {
+    "n": 10,
+    "n_wrong": 0,
+    "changed_partition": true,
+    "identical_last": true,
+    "identical_5": true
+   }
+  }
+ },
+ "seconds": 431.4761908054352
+}
