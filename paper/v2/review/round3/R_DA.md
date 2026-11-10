@@ -16,7 +16,7 @@
 |---|---|---|---|---|
 | 1,658 | 0.72 s | 1.09 s | 4.69 s | 4.00 s (3 corrections) |
 | 3,316 | 3.43 s | 5.18 s | 30.6 s | 32.0 s (8 corrections) |
-| 8,290 | see addendum | see addendum | see addendum | see addendum |
+| 8,290 | not finished | not finished | not finished | not finished (see addendum) |
 
   Frozen rule: assigning the last 829 faces to the 7,461 already placed took 1.8 s with a naive per-face loop, and would be far less with one batched matrix product.
 
@@ -87,4 +87,4 @@ The paper assumes that the right outcome measure for corrections is whether a st
 - My timing checks are single runs on a different machine; they establish that the repo's `c_avg` is much slower than scikit-learn's average linkage, not a precise ratio.
 
 ### Addendum: n = 8,290 timing of the repo's `c_avg`
-(Filled in below if the run finished before delivery.)
+I started the 8,290-face run and stopped it after more than 10 minutes without output (the script prints only at the end, and the earlier steps, ours and scikit-learn, take seconds, so the time went to the two `c_avg` calls). I therefore have no 8,290-face figure; the 1,658 and 3,316 points (a 7-fold rise for a 2-fold rise in size, roughly n^2.8) are what I can state. This is the repo's pure-NumPy implementation with no compiled inner loop. Only the claim "the repo's `c_avg` is much slower than the 16.7 s used in the paper" is established, not a clean ratio for constrained average linkage in general.
