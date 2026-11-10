@@ -99,16 +99,21 @@ points); our clusterer builds on this core-point idea. Constraints have also bee
 (C-DBSCAN~\cite{ruiz2007cdbscan}, its stream version C-DenStream~\cite{ruiz2009cdenstream}, and later
 work~\cite{lasek2019density}), and incremental hierarchical clustering can repair earlier merges as points
 arrive~\cite{monath2019grinch}. For faces, pairwise constraints have been used in clustering by
-Shi \emph{et al.}~\cite{shi2018conpac} and, from video tracks, by Wu \emph{et al.}~\cite{wu2013constrained}. Our
-constrained step is closest to C-DBSCAN; what we add is the guarantee that the result, with corrections, does not
-depend on insertion order, and a measurement of what happens to corrections when new photos arrive. OGMC~\cite{montero2022ogmc} clusters face streams with an online mixture model. Must-link and
+Shi \emph{et al.}~\cite{shi2018conpac} and, from video tracks, by Wu \emph{et al.}~\cite{wu2013constrained}. Order-independent
+incremental clustering is known without corrections~\cite{bandyopadhyay2016axioms}; Grinch's guarantee needs a
+separability condition~\cite{monath2019grinch}, and OGMC~\cite{montero2022ogmc} clusters face streams online and reports
+reduced order dependence. Our constrained step is closest to C-DBSCAN. We keep order independence while enforcing hard
+must-link and cannot-link corrections, and we measure what happens to those corrections as photos arrive. Must-link and
 cannot-link constraints were introduced for $k$-means~\cite{wagstaff2001copkmeans} and studied for agglomerative
 clustering~\cite{davidson2005agglomerative}; Davidson \emph{et al.}~\cite{davidson2007incremental} update a clustering
 as a user adds constraints over time. Constraints can also be used to tune a clusterer's thresholds~\cite{daniels2006threshold,vancraenendonck2017selection}.
+That a constraint set can lower accuracy~\cite{davidson2006utility}, and that constraints from imperfect users need
+special handling~\cite{zhu2016imperfect,mazumdar2017noisy}, is known.
 
 \textbf{Interactive face grouping.} Photo album systems have long let users label or correct face groups and propagate
 the labels~\cite{tian2007face,cui2007easyalbum,song2006context}, and FaceCluster~\cite{filonenko2025facecluster} is a
-recent local, interactive photo organizer. In the sources we searched (SciSpace, Consensus and web search, abstracts
+recent local, interactive photo organizer. Active face clustering with human answers~\cite{biswas2014active} is the
+usual frame for simulated users. In the sources we searched (SciSpace, Consensus and web search, abstracts
 only) we did not find an evaluation of whether such corrections survive later re-clustering, or of order dependence
 in personal libraries.
 
@@ -133,7 +138,7 @@ threshold $\tau_g$. Let $N_\ell(i)=\{j\ne i: s(i,j)\ge\tau_\ell\}$.
 \item Face $i$ is \emph{core} if $|N_\ell(i)|\ge m$. Two core faces are \emph{linked} if $s(i,j)\ge\tau_\ell$, and
 clusters are the connected components of the link graph over core faces.
 \item A non-core face joins the cluster of its most similar core face with $s\ge\tau_a$; otherwise it stays alone.
-Non-core faces never link two clusters, while the looser $\tau_a$ still recovers degraded faces of a known person.
+Without corrections, non-core faces never link two clusters, while the looser $\tau_a$ still recovers degraded faces of a known person.
 \item Cluster centroids are merged by average-linkage agglomerative clustering at similarity $\tau_g$, which re-joins a
 person split by a large appearance change.
 \end{itemize}
@@ -158,7 +163,8 @@ cannot-linked pair into one cluster, which builds a constrained maximum-spanning
 \item non-core faces attach to their most similar allowed core face;
 \item the centroid merge is average linkage in which two clusters containing a cannot-linked pair may never merge.
 \end{enumerate}
-A cannot-link wins over a conflicting must-link. A user's ``these are different people'' therefore splits a wrong
+A cannot-link wins over a conflicting must-link. One side effect: a must-link between two non-core faces can also join
+the two clusters they attach to in step~3; we kept this behaviour in all experiments. A user's ``these are different people'' therefore splits a wrong
 merge at its weakest links, and ``same person'' joins two clusters, including all photos added to them later.
 
 \begin{proposition}
@@ -212,7 +218,7 @@ the faces they click. The \emph{precise} user picks the central face of the main
 the other; the \emph{casual} user picks random faces of the two people; the \emph{error-prone} user is casual, but each
 correction is, with probability 0.1, a wrong ``same person'' between random faces of the two most similar clusters
 that hold different people (a look-alike). The ``later'' photos then arrive and each method produces the new clustering:
-\emph{ours} (corrections as constraints); \emph{constrained average linkage}~\cite{davidson2005agglomerative} (must-link
+\emph{ours} (corrections as constraints); \emph{constrained average linkage} (our implementation, after~\cite{davidson2005agglomerative}; must-link
 groups first, then average-linkage merges that never join a cannot-linked pair); \emph{re-apply} (our clusterer or
 average linkage without the corrections, after which each cannot-linked pair found in one cluster splits it by
 similarity to the two faces, and each must-linked pair in two clusters merges them unless this joins a cannot-linked
@@ -319,12 +325,12 @@ still true after the new photos (precise\,/\,casual user, pooled over correction
  & Now & \multicolumn{3}{c}{Later: F1} & Held \\
 Method & F1 & precise & casual & error-pr. & (\%) \\
 \midrule
-No corrections kept  & 0.9939 & 0.9854 & 0.9854 & 0.9854 & 20\,/\,23 \
-Re-apply (ours)      & 0.9925 & 0.9914 & 0.9899 & 0.9893 & 96\,/\,73 \
-Re-apply (avg.\ link.) & 0.9936 & 0.9914 & 0.9900 & \textbf{0.9896} & 93\,/\,68 \
-Frozen (Immich-style) & 0.9939 & \textbf{0.9928} & -- & -- & 100\,/\,-- \
-Constr.\ avg.\ link. & \textbf{0.9945} & 0.9914 & 0.9917 & 0.9878 & 100\,/\,100 \
-\textbf{Ours}        & 0.9939 & 0.9925 & \textbf{0.9920} & 0.9851 & 100\,/\,100 \
+No corrections kept  & 0.9939 & 0.9854 & 0.9854 & 0.9854 & 20\,/\,23 \\
+Re-apply (ours)      & 0.9925 & 0.9914 & 0.9899 & 0.9893 & 96\,/\,73 \\
+Re-apply (avg.\ link.) & 0.9936 & 0.9914 & 0.9900 & \textbf{0.9896} & 93\,/\,68 \\
+Frozen (Immich-style) & 0.9939 & \textbf{0.9928} & -- & -- & 100\,/\,-- \\
+Constr.\ avg.\ link. & \textbf{0.9945} & 0.9914 & 0.9917 & 0.9878 & 100\,/\,100 \\
+\textbf{Ours}        & 0.9939 & 0.9925 & \textbf{0.9920} & 0.9851 & 100\,/\,100 \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -400,8 +406,10 @@ per photo is clustered. (iv) The confidence intervals treat the 30 libraries as 
 test ``family'' people (about 11 libraries each), so they are likely too narrow. (v) The tuned Two-stage threshold
 (0.70) lies on the edge of the grid. (vi) Profile faces remain the weakest condition. (vii) The corrections are
 implemented and tested in the clusterer only: the current app has no interface for corrections yet, re-clusters from
-scratch on every import, and overwrites user-assigned names. Wiring the clusterer and its corrections into the app,
-with a way to review and remove corrections, is the next engineering step.
+scratch on every import, and overwrites user-assigned names. Corrections are addressed by face index, which deleting a photo renumbers, so an
+app must key them by photo and face box. Wiring the clusterer and its corrections into the app, with a way to review and
+remove corrections, is the next engineering step. (viii) The centroid merge is skipped above 20{,}000 clusters in the
+current code, so larger libraries are untested.
 
 \textbf{Future work.} Faces in one video track are the same person by construction, and a track often turns from
 frontal to profile. In a simulation with ideal tracks on the CPLFW test half, adding a track's faces as must-links
@@ -411,10 +419,12 @@ this on real videos (e.g., YouTube Faces) is future work.
 
 \textbf{Privacy.} All processing, including recognition, runs locally. We make no formal privacy claim beyond this
 architecture. Stored face embeddings are as sensitive as the photos and should be protected by device encryption. The
-current local API has no access key and accepts requests from any origin; in the Docker install it is reachable from
-the local network, so ``nothing leaves the device'' holds only when that port is not exposed. Restricting the API to
-the app is required before this claim can be made without qualification. Grouping faces also groups people who did not
-consent to it; the system keeps this information on the owner's device, and users should be able to delete a person's face data.
+local API accepts requests from any origin; its optional access key is off by default and the web front end does not
+send it. The Docker setup publishes the service ports (8000, 8001, 8080) on all network interfaces, including endpoints
+that upload and delete photos, so ``nothing leaves the device'' holds only when those ports are not reachable from
+other machines. Restricting the API to the app is required before this claim can be made without qualification.
+Grouping faces also groups people who did not consent to it; the system keeps this information on the owner's device,
+but we found no endpoint that deletes one person's face data.
 
 \section{Conclusion}
 Cove's face clusterer gives the same people for every import order and keeps the user's corrections across later
