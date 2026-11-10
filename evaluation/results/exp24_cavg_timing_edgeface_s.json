@@ -1,0 +1,41 @@
+{
+ "protocol": "Experiment 24 - the missing cost comparison: constrained average linkage timed directly (review round 3, DA M1).\n\nRound 3 found that the paper's 5.1 s vs 16.7 s compared our read step with PLAIN average linkage, never with the\nconstrained average linkage that exp19 uses as the strongest baseline. Here, on the clean LFW faces (EdgeFace-S, shipped\nexp14 thresholds, ONE thread), with 0 and 10 corrections (exp15's oracle user on the uncorrected result):\n  c-avg (as written)   exp19's c_avg, a dense NumPy implementation, on random subsets of 1,658 and 3,316 faces\n                       (it did not finish at 8,290 faces within 10 minutes in the reviewer's run)\n  c-avg (decomposed)  the same algorithm run per connected group of the threshold graph (exact for average linkage;\n                       checked equal to the plain version on the 1,658-face subset), so it can be timed at 8,290 faces\n  ours                labels() of the clusterer after the faces were added (fast read step, exp20)\nRun: COVE_FACE_MODEL=edgeface_s python evaluation/exp24_cavg_timing.py\n",
+ "config": {
+  "link": 0.65,
+  "m": 1,
+  "attach": 0.5,
+  "merge": 0.55
+ },
+ "avg_thr": 0.35,
+ "rows": {
+  "1658": {
+   "faces": 1658,
+   "ours_0_s": 0.0345085000153631,
+   "cavg_decomposed_0_s": 1.289604599995073,
+   "cavg_pure_0_s": 2.5515145999961533,
+   "cavg_equal_0": true,
+   "ours_10_s": 0.11497729999246076,
+   "cavg_decomposed_10_s": 1.0698737000348046,
+   "cavg_pure_10_s": 2.1296012999955565,
+   "cavg_equal_10": true
+  },
+  "3316": {
+   "faces": 3316,
+   "ours_0_s": 0.06730950000928715,
+   "cavg_decomposed_0_s": 11.678256699990015,
+   "cavg_pure_0_s": 15.694900700007565,
+   "cavg_equal_0": true,
+   "ours_10_s": 0.27360019995830953,
+   "cavg_decomposed_10_s": 11.204717199958395,
+   "cavg_pure_10_s": 15.601426500012167,
+   "cavg_equal_10": true
+  },
+  "8290": {
+   "faces": 8290,
+   "ours_0_s": 0.3153288000030443,
+   "cavg_decomposed_0_s": 260.8881622000481,
+   "ours_10_s": 1.277201899967622,
+   "cavg_decomposed_10_s": 292.98930489999475
+  }
+ }
+}
