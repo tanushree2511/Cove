@@ -317,7 +317,7 @@ faces, split per component of the threshold graph (identical labels to the unspl
 Our first NumPy implementation, which scans the whole similarity matrix at each merge, took 293\,s at 8{,}290 faces; this
 overstates the method's cost. An implementation that caches each row's best partner (identical labels, checked at
 1{,}658 and 3{,}316 faces) took 32\,s without and 31\,s with ten corrections, against 0.6 and 2.0\,s for our read step in
-the same run: a gap of 16 to 53 times. A fully compiled implementation could narrow it further; we did not test one.
+the same run: a gap of 16 to 54 times. A fully compiled implementation could narrow it further; we did not test one.
 
 % ---------------------------------------------------------------------------------------------------------------------
 \section{Discussion and Limitations}
