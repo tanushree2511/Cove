@@ -43,7 +43,10 @@ import numpy as np
 class StableIncrementalClusterer:
     def __init__(self, link_threshold: float = 0.45, min_neighbors: int = 2,
                  merge_threshold=0.40, quality_min=None, dim: int = 512, attach_threshold=None,
-                 weak_threshold=None, support: int = 3, pose_bonus: float = 0.0, pose_scale: float = 1.0):
+                 weak_threshold=None, support: int = 3, pose_bonus: float = 0.0, pose_scale: float = 1.0,
+                 fast_merge: bool = True, max_component: int = 20000):
+        self.fast_merge = bool(fast_merge)      # exact threshold-graph decomposition of the centroid merge (same labels)
+        self.max_component = int(max_component)  # merge is skipped only if ONE group of mutually close centroids exceeds this
         self.link_threshold = float(link_threshold)
         # Non-core faces (e.g. blurred / old / compressed photos) attach to their most similar core face if the
         # similarity is >= attach_threshold (default: link_threshold). A looser attach threshold recovers degraded
@@ -188,17 +191,52 @@ class StableIncrementalClusterer:
         lab = np.unique(lab, return_inverse=True)[1]
         return self._merge(lab)
 
+    def _components(self, cent, thr, block=2048):
+        """Connected components of the graph whose edges are centroid pairs with cosine >= thr (minus a tiny margin).
+        Average linkage can never join two centroids that are in different components (every cross pair is below thr,
+        so any average of them is too), so each component can be agglomerated alone with an identical result.
+        Similarities are computed block by block, so memory stays O(block * k)."""
+        from scipy.sparse import coo_matrix
+        from scipy.sparse.csgraph import connected_components
+        k = len(cent)
+        rows, cols = [], []
+        c32 = np.asarray(cent, dtype="float32")
+        for s0 in range(0, k, block):
+            S = c32[s0:s0 + block] @ c32.T
+            r, c = np.nonzero(S >= thr - 1e-4)
+            rows.append(r + s0)
+            cols.append(c)
+        r, c = np.concatenate(rows), np.concatenate(cols)
+        g = coo_matrix((np.ones(len(r), dtype=np.int8), (r, c)), shape=(k, k))
+        return connected_components(g, directed=False)[1]
+
     def _merge(self, lab):
         ids = np.unique(lab)
-        if self.merge_threshold is None or len(ids) < 2 or len(ids) > 20000:
+        if self.merge_threshold is None or len(ids) < 2:
             return lab
-        from sklearn.cluster import AgglomerativeClustering
         X = np.stack(self._X)
         cent = np.zeros((len(ids), X.shape[1]), dtype="float32")
         np.add.at(cent, lab, X)
         cent /= (np.linalg.norm(cent, axis=1, keepdims=True) + 1e-9)
-        merged = AgglomerativeClustering(n_clusters=None, metric="cosine", linkage="average",
-                                         distance_threshold=1.0 - self.merge_threshold).fit_predict(cent)
+        from sklearn.cluster import AgglomerativeClustering
+        if not self.fast_merge:                        # reference path (kept to prove the fast path is exact)
+            if len(ids) > 20000:
+                return lab
+            merged = AgglomerativeClustering(n_clusters=None, metric="cosine", linkage="average",
+                                             distance_threshold=1.0 - self.merge_threshold).fit_predict(cent)
+            return merged[lab]
+        comp = self._components(cent, self.merge_threshold)
+        sizes = np.bincount(comp)
+        if sizes.max() > self.max_component:
+            return lab
+        merged = np.arange(len(ids))
+        nxt = len(ids)
+        for cid in np.nonzero(sizes > 1)[0]:
+            idx = np.nonzero(comp == cid)[0]
+            sub = AgglomerativeClustering(n_clusters=None, metric="cosine", linkage="average",
+                                          distance_threshold=1.0 - self.merge_threshold).fit_predict(cent[idx])
+            merged[idx] = nxt + sub
+            nxt += int(sub.max()) + 1
         return merged[lab]
 
     def _labels_constrained(self):
@@ -262,19 +300,40 @@ class StableIncrementalClusterer:
                     break
         roots = np.array([find(i) for i in range(n)])
         ids, lab = np.unique(roots, return_inverse=True)
-        if self.merge_threshold is None or len(ids) < 2 or len(ids) > 20000:
+        if self.merge_threshold is None or len(ids) < 2:
+            return lab
+        if not self.fast_merge and len(ids) > 20000:
             return lab
         X = np.stack(self._X)                          # 4. constrained average-linkage merge of centroids
         k = len(ids)
         cent = np.zeros((k, X.shape[1]), dtype="float64")
         np.add.at(cent, lab, X)
         cent /= (np.linalg.norm(cent, axis=1, keepdims=True) + 1e-12)
+        grp = np.arange(k)
+        if self.fast_merge:                            # independent groups of mutually close centroids (exact)
+            comp = self._components(cent, self.merge_threshold)
+            sizes = np.bincount(comp)
+            if sizes.max() > self.max_component:
+                return lab
+            parts = [np.nonzero(comp == c)[0] for c in np.nonzero(sizes > 1)[0]]
+        else:
+            parts = [np.arange(k)]
+        cannot_cl = [(int(lab[a]), int(lab[b])) for a, b in self.cannot]
+        for idx in parts:
+            pos = {int(g): t for t, g in enumerate(idx)}
+            bad = np.zeros((len(idx), len(idx)), dtype=bool)
+            for ca, cb in cannot_cl:
+                if ca in pos and cb in pos:
+                    bad[pos[ca], pos[cb]] = bad[pos[cb], pos[ca]] = True
+            grp[idx] = idx[self._cavg_merge(cent[idx], bad)]
+        return np.unique(grp[lab], return_inverse=True)[1]
+
+    def _cavg_merge(self, cent, bad):
+        """Average linkage on the centroids of one group, never joining a cannot-linked pair. Returns, for every
+        centroid, the local index of the centroid that represents its merged group."""
+        k = len(cent)
         S = cent @ cent.T
-        bad = np.zeros((k, k), dtype=bool)
-        for a, b in self.cannot:
-            bad[lab[a], lab[b]] = bad[lab[b], lab[a]] = True
         size = np.ones(k)
-        alive = np.ones(k, dtype=bool)
         grp = np.arange(k)
         np.fill_diagonal(S, -np.inf)
         while True:
@@ -293,9 +352,8 @@ class StableIncrementalClusterer:
             bad[a] |= bad[b]
             bad[:, a] = bad[a]
             size[a] += size[b]
-            alive[b] = False
             grp[grp == b] = a
-        return np.unique(grp[lab], return_inverse=True)[1]
+        return grp
 
     def fit_predict(self, embeddings, norms=None):
         """Batch convenience: add everything in one call and return labels."""

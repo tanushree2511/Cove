@@ -202,3 +202,23 @@ def test_contradictory_corrections_resolved_independent_of_order():
         assert lab[0] != lab[6]
         outcomes.add((lab[0] == lab[3], lab[3] == lab[6]))
     assert len(outcomes) == 1
+
+
+def test_fast_merge_gives_identical_partition_with_and_without_corrections():
+    import numpy as np
+    from engines.stable_cluster import StableIncrementalClusterer
+    rng = np.random.RandomState(3)
+    cent = rng.randn(12, 16)
+    X = np.vstack([c + 0.35 * rng.randn(15, 16) for c in cent]).astype("float32")
+    runs = []
+    for fast in (False, True):
+        c = StableIncrementalClusterer(link_threshold=0.6, min_neighbors=1, attach_threshold=0.4,
+                                       merge_threshold=0.3, dim=16, fast_merge=fast)
+        c.add(X)
+        plain = c.labels()
+        c.add_must_link(0, 100)
+        c.add_cannot_link(1, 2)
+        runs.append((plain, c.labels()))
+    for a, b in zip(*runs):
+        assert (np.unique(a, return_inverse=True)[1] == np.unique(b, return_inverse=True)[1]).all() or \
+            len({(x, y) for x, y in zip(a, b)}) == len(set(a)) == len(set(b))

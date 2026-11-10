@@ -1,0 +1,10061 @@
+{
+ "model": "edgeface_s",
+ "protocol": "Experiment 22 (E3) - undoing a wrong correction, and how a frozen rule differs.\n\nPre-declared protocol (round-4 research plan, nothing tuned; exp14 thresholds, exp14 test libraries):\n  The error-prone user of exp19 (casual clicks, 10% wrong \"same person\" between look-alike clusters) works on the\n  \"now\" 80% of a library with ours. For every library where this user made at least one WRONG correction we take the\n  first wrong one, let the \"later\" 20% arrive, and then the user RETRACTS that correction.\n  never-made   the same session without the wrong correction (faces in a different arrival order)\n  ours-undo    the stored corrections minus the wrong one, recomputed; compared with never-made (exact equality?)\n  frozen-undo  Immich-style frozen labels (exp19b rule, cosine >= 0.5) built from the corrected \"now\" labels with the\n               wrong correction in place; retraction is the inverse edit of the stored labels: the merged person is split\n               again by which of the two clicked faces each member (including faces that arrived later) is closer to.\nOutcome: share of libraries whose result after retraction is IDENTICAL to never-made; ARI to never-made; F1 with the\nmistake in place, after retraction and never-made. Also (b): can a wrong \"same person\" click be flagged?  AUC of\n(1 - cosine of the two clicked faces) for wrong vs correct \"same person\" clicks, pooled over all libraries and users\n(reported even if poor; look-alike merges involve very similar faces, so it may be below 0.5).\nRun: COVE_FACE_MODEL=mbf|edgeface_s python evaluation/exp22_undo.py\n",
+ "table": {
+  "libraries": 240,
+  "libraries_with_wrong_correction": 104,
+  "ours": {
+   "identical_share": 1.0,
+   "min_ari": 1.0,
+   "mean_ari": 1.0,
+   "F1_with_mistake": 0.9697215938731034,
+   "F1_after_retraction": 0.9797158572534438,
+   "F1_never_made": 0.9797158572534438
+  },
+  "frozen": {
+   "identical_share": 0.04807692307692308,
+   "min_ari": 0.8220100851033374,
+   "mean_ari": 0.9902731723931429,
+   "F1_with_mistake": 0.970146059498873,
+   "F1_after_retraction": 0.9741436761408082,
+   "F1_never_made": 0.9798970500242679
+  },
+  "detector": {
+   "must_links": 1071,
+   "wrong": 160,
+   "auc_low_similarity_flags_wrong": 0.5954034028540067,
+   "mean_cos_wrong": 0.277470444352366,
+   "mean_cos_right": 0.3160634530978083
+  }
+ },
+ "per_library": {
+  "test|blur|5": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.3236048221588135
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.2095831036567688
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.6139527559280396
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.6529096961021423
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.35405468940734863
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.2121661901473999
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.5807695388793945
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.3648776412010193
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.28193163871765137
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.5999685525894165
+    }
+   ],
+   "ours": {
+    "identical": true,
+    "ari": 1.0,
+    "F1_with": 0.9903899939241528,
+    "F1_after": 0.9903899939241528,
+    "F1_never": 0.9903899939241528
+   },
+   "frozen": {
+    "identical": true,
+    "ari": 1.0,
+    "F1_with": 0.9903899939241528,
+    "F1_after": 0.9903899939241528,
+    "F1_never": 0.9903899939241528
+   }
+  },
+  "test|blur|28": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": -0.1048155426979065
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.2721524238586426
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.1860218197107315
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": -0.16486410796642303
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.3040507435798645
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.3336590826511383
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.5873508453369141
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.664677619934082
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.34594082832336426
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.31945204734802246
+    }
+   ],
+   "ours": {
+    "identical": true,
+    "ari": 1.0,
+    "F1_with": 0.9927430971449887,
+    "F1_after": 1.0,
+    "F1_never": 1.0
+   },
+   "frozen": {
+    "identical": false,
+    "ari": 0.9995414549532123,
+    "F1_with": 0.9927430971449887,
+    "F1_after": 0.9977939554378998,
+    "F1_never": 1.0
+   }
+  },
+  "test|dark|8": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": -0.02611028589308262
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.13403531908988953
+    }
+   ]
+  },
+  "test|lowres|13": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.2838646173477173
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.32588863372802734
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.33605778217315674
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.47516024112701416
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.40294966101646423
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.27958929538726807
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.4423523545265198
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.5086524486541748
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.1614847034215927
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.2132948935031891
+    }
+   ],
+   "ours": {
+    "identical": true,
+    "ari": 1.0,
+    "F1_with": 0.9780053467980714,
+    "F1_after": 0.9881628759241309,
+    "F1_never": 0.9881628759241309
+   },
+   "frozen": {
+    "identical": false,
+    "ari": 0.9993917668063654,
+    "F1_with": 0.9775826007242114,
+    "F1_after": 0.9863052763988256,
+    "F1_never": 0.9877337621679716
+   }
+  },
+  "test|lookalike|3": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.1278725266456604
+    }
+   ]
+  },
+  "test|jpeg|16": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.06398947536945343
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.23837484419345856
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.19566866755485535
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.2734585404396057
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": -0.013391692191362381
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.42771461606025696
+    }
+   ]
+  },
+  "test|clean|1": {
+   "clicks": []
+  },
+  "test|lookalike|4": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.32343775033950806
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.29960209131240845
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.7826858758926392
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.8002992868423462
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.7287202477455139
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.7345904111862183
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.7968367338180542
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.7581830620765686
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.8276228904724121
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.2167155146598816
+    }
+   ],
+   "ours": {
+    "identical": true,
+    "ari": 1.0,
+    "F1_with": 0.9683099439575987,
+    "F1_after": 0.9966479109302048,
+    "F1_never": 0.9966479109302048
+   },
+   "frozen": {
+    "identical": false,
+    "ari": 0.9961271804796247,
+    "F1_with": 0.9683099439575987,
+    "F1_after": 0.9870567940843615,
+    "F1_never": 0.9966479109302048
+   }
+  },
+  "test|blur|9": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.31107303500175476
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.18785834312438965
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.14556899666786194
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.27936214208602905
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.264689564704895
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.2115384042263031
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.3148984909057617
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.5449451208114624
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.5896483659744263
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.7015097141265869
+    }
+   ],
+   "ours": {
+    "identical": true,
+    "ari": 1.0,
+    "F1_with": 0.9858611847180282,
+    "F1_after": 0.9875581334688561,
+    "F1_never": 0.9875581334688561
+   },
+   "frozen": {
+    "identical": false,
+    "ari": 0.9966684356404373,
+    "F1_with": 0.985008479918528,
+    "F1_after": 0.985824197485493,
+    "F1_never": 0.9867055418526076
+   }
+  },
+  "test|jpeg|26": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.41672423481941223
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.17299242317676544
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.09566444903612137
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.18666920065879822
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.1668519675731659
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.21998170018196106
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.4964917302131653
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.2736894488334656
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.6378637552261353
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.518448531627655
+    }
+   ],
+   "ours": {
+    "identical": true,
+    "ari": 1.0,
+    "F1_with": 0.9377186152526467,
+    "F1_after": 0.9413750878473112,
+    "F1_never": 0.9413750878473112
+   },
+   "frozen": {
+    "identical": false,
+    "ari": 0.9914829606549651,
+    "F1_with": 0.9463137259219762,
+    "F1_after": 0.9474741559638455,
+    "F1_never": 0.9503638486754176
+   }
+  },
+  "test|lowres|16": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.4964284896850586
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.08054190874099731
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.28065747022628784
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.21797284483909607
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.4519118666648865
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.25226324796676636
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.279826283454895
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.3627879023551941
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.286487340927124
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.27284079790115356
+    }
+   ],
+   "ours": {
+    "identical": true,
+    "ari": 1.0,
+    "F1_with": 0.9673222115377424,
+    "F1_after": 0.9886577754949085,
+    "F1_never": 0.9886577754949085
+   },
+   "frozen": {
+    "identical": false,
+    "ari": 0.9845116790264768,
+    "F1_with": 0.9719433154453002,
+    "F1_after": 0.9739164715278261,
+    "F1_never": 0.9819040739147464
+   }
+  },
+  "test|jpeg|22": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.3870818018913269
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.43103307485580444
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.16310864686965942
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.36663010716438293
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.3546026349067688
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.37593185901641846
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.3956468105316162
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.4297810196876526
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.22019106149673462
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.34640276432037354
+    }
+   ],
+   "ours": {
+    "identical": true,
+    "ari": 1.0,
+    "F1_with": 0.9842388659274098,
+    "F1_after": 0.9941177455762135,
+    "F1_never": 0.9941177455762135
+   },
+   "frozen": {
+    "identical": false,
+    "ari": 0.9973128840881841,
+    "F1_with": 0.9834385593849555,
+    "F1_after": 0.9871271481430415,
+    "F1_never": 0.9933149481279736
+   }
+  },
+  "test|jpeg|2": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.09440804272890091
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.35667306184768677
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.42614540457725525
+    }
+   ]
+  },
+  "test|dark|11": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.291301429271698
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.050132736563682556
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.10879066586494446
+    }
+   ]
+  },
+  "test|jpeg|19": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.4456951916217804
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.3239120841026306
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.09377448260784149
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.15397235751152039
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.3844100534915924
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.3748984634876251
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.3035358488559723
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.4115775227546692
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.24121123552322388
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.38655632734298706
+    }
+   ]
+  },
+  "test|lowres|19": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.4409635663032532
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.3805481791496277
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.30189305543899536
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.3602127432823181
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.4510589838027954
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.35473230481147766
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.5879826545715332
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.4889541566371918
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.35072025656700134
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.4094967842102051
+    }
+   ]
+  },
+  "test|lowres|28": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.3279809355735779
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.3934372663497925
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.4242978096008301
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.2849026918411255
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.4782004952430725
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.34159475564956665
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.664859414100647
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.4679061472415924
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.28479576110839844
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.35178858041763306
+    }
+   ],
+   "ours": {
+    "identical": true,
+    "ari": 1.0,
+    "F1_with": 0.9827413458817578,
+    "F1_after": 0.9841919929202909,
+    "F1_never": 0.9841919929202909
+   },
+   "frozen": {
+    "identical": false,
+    "ari": 0.999791739227465,
+    "F1_with": 0.9796658532534943,
+    "F1_after": 0.9803579789189476,
+    "F1_never": 0.9811168203701274
+   }
+  },
+  "test|jpeg|25": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.030450930818915367
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.42468321323394775
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.3054123520851135
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.4520358443260193
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.46856606006622314
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.3247602880001068
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.6311880946159363
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.32971447706222534
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.3523167371749878
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.3923429846763611
+    }
+   ],
+   "ours": {
+    "identical": true,
+    "ari": 1.0,
+    "F1_with": 0.9946360138441889,
+    "F1_after": 0.9964985935516597,
+    "F1_never": 0.9964985935516597
+   },
+   "frozen": {
+    "identical": false,
+    "ari": 0.9997805498369796,
+    "F1_with": 0.9924631056387027,
+    "F1_after": 0.9934056840671348,
+    "F1_never": 0.994325538816433
+   }
+  },
+  "test|lowres|14": {
+   "clicks": [
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.3441307544708252
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.06168525665998459
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": -0.032720983028411865
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.43062061071395874
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": -0.010040970519185066
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": -0.020065588876605034
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.3072165846824646
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.3709964156150818
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.41229501366615295
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.5274003744125366
+    }
+   ],
+   "ours": {
+    "identical": true,
+    "ari": 1.0,
+    "F1_with": 0.9773234665597745,
+    "F1_after": 0.9790905345571956,
+    "F1_never": 0.9790905345571956
+   },
+   "frozen": {
+    "identical": false,
+    "ari": 0.9994656866272331,
+    "F1_with": 0.9751445142162865,
+    "F1_after": 0.9759800382724905,
+    "F1_never": 0.9769119842035029
+   }
+  },
+  "test|occlude|27": {
+   "clicks": [
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.4108960032463074
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.47024771571159363
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.38759562373161316
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.043819960206747055
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.40399259328842163
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.43335413932800293
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.5279181599617004
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.31643128395080566
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.4853852391242981
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.15386509895324707
+    }
+   ],
+   "ours": {
+    "identical": true,
+    "ari": 1.0,
+    "F1_with": 0.9609005283962339,
+    "F1_after": 0.9627451462760881,
+    "F1_never": 0.9627451462760881
+   },
+   "frozen": {
+    "identical": false,
+    "ari": 0.9996740622819809,
+    "F1_with": 0.9700479190471201,
+    "F1_after": 0.9709684668594701,
+    "F1_never": 0.9718933174414739
+   }
+  },
+  "test|jpeg|29": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.014006991870701313
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.500296950340271
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.35383814573287964
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.3448229432106018
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.4398324489593506
+    }
+   ]
+  },
+  "test|occlude|12": {
+   "clicks": [
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.49760955572128296
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.30420732498168945
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.2525861859321594
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.1425459384918213
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.43639928102493286
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.43364790081977844
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.2028839886188507
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.428573876619339
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.322562575340271
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.3842620253562927
+    }
+   ],
+   "ours": {
+    "identical": true,
+    "ari": 1.0,
+    "F1_with": 0.9685018393235081,
+    "F1_after": 0.9828662451052441,
+    "F1_never": 0.9828662451052441
+   },
+   "frozen": {
+    "identical": false,
+    "ari": 0.9929817325175072,
+    "F1_with": 0.9743107171089963,
+    "F1_after": 0.9810930794084811,
+    "F1_never": 0.9888260121651765
+   }
+  },
+  "test|blur|7": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.3961811661720276
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.3822261393070221
+    }
+   ]
+  },
+  "test|blur|27": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.1832466870546341
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.18717831373214722
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.19699043035507202
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.04907680302858353
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.3939632177352905
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.2046758532524109
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.31465673446655273
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.5500733852386475
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.2167140543460846
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.7349846363067627
+    }
+   ],
+   "ours": {
+    "identical": true,
+    "ari": 1.0,
+    "F1_with": 0.9832099711711875,
+    "F1_after": 0.9856852864059681,
+    "F1_never": 0.9856852864059681
+   },
+   "frozen": {
+    "identical": false,
+    "ari": 0.9964800817706126,
+    "F1_with": 0.9829966062532756,
+    "F1_after": 0.9887247184639463,
+    "F1_never": 0.9915775011173665
+   }
+  },
+  "test|occlude|29": {
+   "clicks": [
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.529088020324707
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.484729140996933
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.31800544261932373
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.1563946008682251
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.3645769953727722
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.2639889717102051
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.3757079541683197
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.22511251270771027
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.04588919132947922
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.17127948999404907
+    }
+   ],
+   "ours": {
+    "identical": true,
+    "ari": 1.0,
+    "F1_with": 0.9552713356620239,
+    "F1_after": 0.9581039682402859,
+    "F1_never": 0.9581039682402859
+   },
+   "frozen": {
+    "identical": false,
+    "ari": 0.998035889634988,
+    "F1_with": 0.9577175227597169,
+    "F1_after": 0.9583069589840943,
+    "F1_never": 0.9618643605457922
+   }
+  },
+  "test|dark|7": {
+   "clicks": []
+  },
+  "test|occlude|2": {
+   "clicks": [
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.3405323028564453
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.22412747144699097
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.17681801319122314
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.3295765519142151
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.4176984131336212
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.12245500832796097
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.3890083134174347
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.2531741261482239
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.3075304329395294
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.5564126372337341
+    }
+   ]
+  },
+  "test|lookalike|25": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.09511110186576843
+    }
+   ]
+  },
+  "test|mixed|3": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.3667346239089966
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.3143487572669983
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.3587029278278351
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.45245426893234253
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.4257879853248596
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.3813250660896301
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.19744381308555603
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.11890426278114319
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.23681175708770752
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.15751445293426514
+    }
+   ],
+   "ours": {
+    "identical": true,
+    "ari": 1.0,
+    "F1_with": 0.9825829392830311,
+    "F1_after": 0.9902499191729086,
+    "F1_never": 0.9902499191729086
+   },
+   "frozen": {
+    "identical": false,
+    "ari": 0.9629471438079644,
+    "F1_with": 0.9649750366044442,
+    "F1_after": 0.9771168598841135,
+    "F1_never": 0.9853087587437811
+   }
+  },
+  "test|occlude|17": {
+   "clicks": [
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.38067254424095154
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.055261436849832535
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.1806030571460724
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.13700449466705322
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.39449232816696167
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.34503763914108276
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.49425387382507324
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": -0.0164625346660614
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.41604822874069214
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.3398052453994751
+    }
+   ],
+   "ours": {
+    "identical": true,
+    "ari": 1.0,
+    "F1_with": 0.9802295126364171,
+    "F1_after": 0.9801868902782678,
+    "F1_never": 0.9801868902782678
+   },
+   "frozen": {
+    "identical": false,
+    "ari": 0.9996025668102027,
+    "F1_with": 0.9833277554331037,
+    "F1_after": 0.9841538439618682,
+    "F1_never": 0.9832850973694816
+   }
+  },
+  "test|lowres|10": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.2799985408782959
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.3061402142047882
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.27655380964279175
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.48211240768432617
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.3173585534095764
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.43749701976776123
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.30146950483322144
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.2433142513036728
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.2311248928308487
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.4112614393234253
+    }
+   ],
+   "ours": {
+    "identical": true,
+    "ari": 1.0,
+    "F1_with": 0.984505954713618,
+    "F1_after": 0.9861966278045381,
+    "F1_never": 0.9861966278045381
+   },
+   "frozen": {
+    "identical": false,
+    "ari": 0.9997888381171619,
+    "F1_with": 0.9783118387801638,
+    "F1_after": 0.9791323255789683,
+    "F1_never": 0.9800026271410935
+   }
+  },
+  "test|dark|14": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.27798834443092346
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": -0.041942644864320755
+    }
+   ]
+  },
+  "test|jpeg|4": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.3811236023902893
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.23663011193275452
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.5026751160621643
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.6330535411834717
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.5810209512710571
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.4491756558418274
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.625471830368042
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.6796428561210632
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.5738846063613892
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.6099852323532104
+    }
+   ],
+   "ours": {
+    "identical": true,
+    "ari": 1.0,
+    "F1_with": 0.9773468205663987,
+    "F1_after": 0.9939233194617585,
+    "F1_never": 0.9939233194617585
+   },
+   "frozen": {
+    "identical": false,
+    "ari": 0.9929672291528985,
+    "F1_with": 0.9769039132483279,
+    "F1_after": 0.9837011552511677,
+    "F1_never": 0.9932109244240201
+   }
+  },
+  "test|lookalike|29": {
+   "clicks": []
+  },
+  "test|clean|13": {
+   "clicks": []
+  },
+  "test|mixed|29": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.06346622109413147
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.253642737865448
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": -0.11810032278299332
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.3221852779388428
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.3585160970687866
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.334757000207901
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.41914868354797363
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.2509419023990631
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.313131183385849
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.4256959557533264
+    }
+   ],
+   "ours": {
+    "identical": true,
+    "ari": 1.0,
+    "F1_with": 0.9759316468237964,
+    "F1_after": 0.9825759909153923,
+    "F1_never": 0.9825759909153923
+   },
+   "frozen": {
+    "identical": false,
+    "ari": 0.9986121267943281,
+    "F1_with": 0.9755694488538786,
+    "F1_after": 0.9757667264195703,
+    "F1_never": 0.9805282155268426
+   }
+  },
+  "test|occlude|18": {
+   "clicks": [
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.5257898569107056
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.3251292109489441
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.21038731932640076
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.3398270905017853
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.4280455410480499
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.4615238606929779
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.32696735858917236
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.2463398277759552
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.3543362319469452
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.45142412185668945
+    }
+   ]
+  },
+  "test|mixed|18": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.18641385436058044
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.23028597235679626
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.3555198311805725
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.16832633316516876
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.200381338596344
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.31990599632263184
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.4567776322364807
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.1779053807258606
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.21623864769935608
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.17020520567893982
+    }
+   ],
+   "ours": {
+    "identical": true,
+    "ari": 1.0,
+    "F1_with": 0.9706999567291258,
+    "F1_after": 0.9861837806514749,
+    "F1_never": 0.9861837806514749
+   },
+   "frozen": {
+    "identical": false,
+    "ari": 0.9929212193807305,
+    "F1_with": 0.9660401578116181,
+    "F1_after": 0.9740243556249042,
+    "F1_never": 0.9814366263002027
+   }
+  },
+  "test|lowres|0": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.228532612323761
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.03382325917482376
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.48615914583206177
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.022839859127998352
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.18964934349060059
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.2358250617980957
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.5402355194091797
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.36046624183654785
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.33054018020629883
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.44117212295532227
+    }
+   ]
+  },
+  "test|lowres|21": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.34161150455474854
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.23749442398548126
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.27922624349594116
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.19998425245285034
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.4392859935760498
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.5168073177337646
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.3768365681171417
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.5821101665496826
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.4358455538749695
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.372845858335495
+    }
+   ],
+   "ours": {
+    "identical": true,
+    "ari": 1.0,
+    "F1_with": 0.9175045540873059,
+    "F1_after": 0.9763436294334767,
+    "F1_never": 0.9763436294334767
+   },
+   "frozen": {
+    "identical": false,
+    "ari": 0.9101049817092346,
+    "F1_with": 0.9270518684017323,
+    "F1_after": 0.932605044275004,
+    "F1_never": 0.9685302967841539
+   }
+  },
+  "test|jpeg|7": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.46041885018348694
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.35983866453170776
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.3296971321105957
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.3409733176231384
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.34701007604599
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.3694891929626465
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.36669111251831055
+    }
+   ]
+  },
+  "test|lookalike|19": {
+   "clicks": []
+  },
+  "test|jpeg|28": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.295119971036911
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.11422186344861984
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.5273717641830444
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.21746334433555603
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.12698477506637573
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.34113991260528564
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.2469802349805832
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.20655487477779388
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.49439144134521484
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.6035572290420532
+    }
+   ],
+   "ours": {
+    "identical": true,
+    "ari": 1.0,
+    "F1_with": 0.9901422440014591,
+    "F1_after": 0.9977944283150441,
+    "F1_never": 0.9977944283150441
+   },
+   "frozen": {
+    "identical": false,
+    "ari": 0.9954236172443292,
+    "F1_with": 0.9906254586420418,
+    "F1_after": 0.992855336746906,
+    "F1_never": 0.9970834963714622
+   }
+  },
+  "test|lowres|29": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.2367846965789795
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.03382325917482376
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.022550271824002266
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.5164535641670227
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.2898034155368805
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.33872702717781067
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.4112875461578369
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.3387606739997864
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.2945924997329712
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.3197900056838989
+    }
+   ]
+  },
+  "test|mixed|10": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.28668442368507385
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.3629305958747864
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.5220693349838257
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.3294677734375
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.39445245265960693
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.4145704209804535
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.01948065310716629
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.43872660398483276
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.3335779309272766
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.2699921727180481
+    }
+   ]
+  },
+  "test|clean|29": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": -0.011213622987270355
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.3223486542701721
+    }
+   ]
+  },
+  "test|lowres|2": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.29085007309913635
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.044321104884147644
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.27234500646591187
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.3747735023498535
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.40101689100265503
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.24175980687141418
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.09269094467163086
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.3914133906364441
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.1859709620475769
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.44884634017944336
+    }
+   ]
+  },
+  "test|lookalike|0": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.09538190811872482
+    }
+   ]
+  },
+  "test|jpeg|27": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.09440804272890091
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.5997447371482849
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.2098880112171173
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.2849426865577698
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.14445346593856812
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.28494793176651
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.2998332977294922
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.15026196837425232
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.5664986371994019
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.6225265264511108
+    }
+   ],
+   "ours": {
+    "identical": true,
+    "ari": 1.0,
+    "F1_with": 0.9842097501200943,
+    "F1_after": 0.9870311490832742,
+    "F1_never": 0.9870311490832742
+   },
+   "frozen": {
+    "identical": false,
+    "ari": 0.9983625304859804,
+    "F1_with": 0.9842097501200943,
+    "F1_after": 0.9871678193748705,
+    "F1_never": 0.9870311490832742
+   }
+  },
+  "test|mixed|22": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.010627377778291702
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.18435896933078766
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.23804402351379395
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.5133453011512756
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.23276738822460175
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.4497286379337311
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.4571225047111511
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.3269661068916321
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.36947646737098694
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.44033873081207275
+    }
+   ]
+  },
+  "test|occlude|3": {
+   "clicks": [
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.41798824071884155
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.3522001802921295
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.14029864966869354
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.3579922318458557
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.38369184732437134
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.03919830545783043
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.2105669379234314
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.4818703532218933
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.4686846137046814
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.4905034303665161
+    }
+   ]
+  },
+  "test|clean|19": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.31998342275619507
+    }
+   ]
+  },
+  "test|jpeg|20": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.39005517959594727
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.3562087416648865
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.3603551387786865
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.38655632734298706
+    }
+   ]
+  },
+  "test|dark|15": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": -0.09176689386367798
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.291301429271698
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.26885151863098145
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.3152122497558594
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.2876097559928894
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.37951838970184326
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.3587622344493866
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.31890472769737244
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.2726208567619324
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.26234808564186096
+    }
+   ],
+   "ours": {
+    "identical": true,
+    "ari": 1.0,
+    "F1_with": 0.9344220410963296,
+    "F1_after": 0.9501755640741494,
+    "F1_never": 0.9501755640741494
+   },
+   "frozen": {
+    "identical": true,
+    "ari": 1.0,
+    "F1_with": 0.9351038571113299,
+    "F1_after": 0.9509617728775468,
+    "F1_never": 0.9509617728775468
+   }
+  },
+  "test|lookalike|10": {
+   "clicks": []
+  },
+  "test|blur|11": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": -0.11054478585720062
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.1512487232685089
+    }
+   ]
+  },
+  "test|occlude|20": {
+   "clicks": [
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.302914023399353
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.4270484149456024
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.34099897742271423
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": -0.01055997796356678
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.39400750398635864
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.3568793535232544
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.24442815780639648
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.5388202667236328
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.3525855541229248
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.34107327461242676
+    }
+   ],
+   "ours": {
+    "identical": true,
+    "ari": 1.0,
+    "F1_with": 0.9728230087554293,
+    "F1_after": 0.9796524659023791,
+    "F1_never": 0.9796524659023791
+   },
+   "frozen": {
+    "identical": false,
+    "ari": 0.9963495157881596,
+    "F1_with": 0.9720896007139285,
+    "F1_after": 0.9768727627263234,
+    "F1_never": 0.9759873994781691
+   }
+  },
+  "test|mixed|12": {
+   "clicks": [
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.28599631786346436
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.2217777520418167
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.44634151458740234
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.08415019512176514
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.24274329841136932
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.28540557622909546
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.2579219937324524
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.18848228454589844
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.06517910212278366
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.475222647190094
+    }
+   ],
+   "ours": {
+    "identical": true,
+    "ari": 1.0,
+    "F1_with": 0.968092462020831,
+    "F1_after": 0.979251801053483,
+    "F1_never": 0.979251801053483
+   },
+   "frozen": {
+    "identical": false,
+    "ari": 0.9902320367728006,
+    "F1_with": 0.9676041220626198,
+    "F1_after": 0.9727635841741096,
+    "F1_never": 0.9779359519758478
+   }
+  },
+  "test|clean|6": {
+   "clicks": []
+  },
+  "test|occlude|23": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.41128554940223694
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.19801172614097595
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.4167284369468689
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.1963629573583603
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.44831815361976624
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.09515074640512466
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.0850018560886383
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.2125711888074875
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.1607654094696045
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.13603049516677856
+    }
+   ],
+   "ours": {
+    "identical": true,
+    "ari": 1.0,
+    "F1_with": 0.9636639938397761,
+    "F1_after": 0.9719460737629108,
+    "F1_never": 0.9719460737629108
+   },
+   "frozen": {
+    "identical": false,
+    "ari": 0.9991474662216279,
+    "F1_with": 0.9596817110419664,
+    "F1_after": 0.9638715179608174,
+    "F1_never": 0.9676302210372676
+   }
+  },
+  "test|lookalike|18": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.07943429052829742
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.02081122249364853
+    }
+   ]
+  },
+  "test|lowres|9": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.3324626386165619
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": -0.1196487694978714
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.3866141438484192
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.2630158066749573
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.4224965274333954
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.11773926019668579
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.11276435852050781
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.2615511417388916
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.37311553955078125
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.24492889642715454
+    }
+   ],
+   "ours": {
+    "identical": true,
+    "ari": 1.0,
+    "F1_with": 0.969337002090555,
+    "F1_after": 0.9710142528460015,
+    "F1_never": 0.9710142528460015
+   },
+   "frozen": {
+    "identical": false,
+    "ari": 0.9994525875183397,
+    "F1_with": 0.9653190146560331,
+    "F1_after": 0.9648406391697218,
+    "F1_never": 0.9669965610772073
+   }
+  },
+  "test|lookalike|12": {
+   "clicks": []
+  },
+  "test|lookalike|15": {
+   "clicks": []
+  },
+  "test|clean|26": {
+   "clicks": []
+  },
+  "test|jpeg|9": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.15543709695339203
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.3016757071018219
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.15823107957839966
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.29375728964805603
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.5204923152923584
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.1523606777191162
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.09016682207584381
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.32704758644104004
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.42222851514816284
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.588293194770813
+    }
+   ],
+   "ours": {
+    "identical": true,
+    "ari": 1.0,
+    "F1_with": 0.9838278636650104,
+    "F1_after": 0.9851898260388026,
+    "F1_never": 0.9851898260388026
+   },
+   "frozen": {
+    "identical": false,
+    "ari": 0.9958516850631449,
+    "F1_with": 0.9817603481866566,
+    "F1_after": 0.9846677398954322,
+    "F1_never": 0.9830499225552987
+   }
+  },
+  "test|blur|16": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.10862430930137634
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.3409101068973541
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.1621594876050949
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.39155298471450806
+    }
+   ]
+  },
+  "test|dark|27": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.33067286014556885
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.16186073422431946
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.390495628118515
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.21966016292572021
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.2902846336364746
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.32622432708740234
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.17710290849208832
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.2765366733074188
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.18968872725963593
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.3440342843532562
+    }
+   ],
+   "ours": {
+    "identical": true,
+    "ari": 1.0,
+    "F1_with": 0.9897608017277737,
+    "F1_after": 0.9916856490154699,
+    "F1_never": 0.9916856490154699
+   },
+   "frozen": {
+    "identical": false,
+    "ari": 0.9995353120113882,
+    "F1_with": 0.9897608017277737,
+    "F1_after": 0.9907169177139302,
+    "F1_never": 0.9916856490154699
+   }
+  },
+  "test|dark|24": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.4224952757358551
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.09113960713148117
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.02656463161110878
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.15205739438533783
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.45562848448753357
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.3493558168411255
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.3438834547996521
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.6084282398223877
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.6653351783752441
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.5882775783538818
+    }
+   ],
+   "ours": {
+    "identical": true,
+    "ari": 1.0,
+    "F1_with": 0.9918595180069095,
+    "F1_after": 0.9962878464308568,
+    "F1_never": 0.9962878464308568
+   },
+   "frozen": {
+    "identical": false,
+    "ari": 0.9980935822142618,
+    "F1_with": 0.9903455285460477,
+    "F1_after": 0.9910221706181663,
+    "F1_never": 0.9947746561181319
+   }
+  },
+  "test|dark|28": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.3025016784667969
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.21975740790367126
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.043111905455589294
+    }
+   ]
+  },
+  "test|mixed|28": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.41433653235435486
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.12256616353988647
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.3617230951786041
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.3582589328289032
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.4230338931083679
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.22621622681617737
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.16087180376052856
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.2933182120323181
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.3220198154449463
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.06760557740926743
+    }
+   ],
+   "ours": {
+    "identical": true,
+    "ari": 1.0,
+    "F1_with": 0.982103964457833,
+    "F1_after": 0.9869908522970054,
+    "F1_never": 0.9869908522970054
+   },
+   "frozen": {
+    "identical": false,
+    "ari": 0.9985993968808283,
+    "F1_with": 0.9859164639528718,
+    "F1_after": 0.9849896253723532,
+    "F1_never": 0.9890570875645783
+   }
+  },
+  "test|dark|26": {
+   "clicks": []
+  },
+  "test|clean|4": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.3784942030906677
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.3856455981731415
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.38367417454719543
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.2727315425872803
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.38541460037231445
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.6401984095573425
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.6742838621139526
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.6433793306350708
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.7117066979408264
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.6314704418182373
+    }
+   ],
+   "ours": {
+    "identical": true,
+    "ari": 1.0,
+    "F1_with": 0.9861784046724397,
+    "F1_after": 0.9958727883368291,
+    "F1_never": 0.9958727883368291
+   },
+   "frozen": {
+    "identical": false,
+    "ari": 0.9960350932491234,
+    "F1_with": 0.9861784046724397,
+    "F1_after": 0.990072274647804,
+    "F1_never": 0.9958727883368291
+   }
+  },
+  "test|clean|11": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": -0.07338671386241913
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.11375855654478073
+    }
+   ]
+  },
+  "test|jpeg|5": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.19450347125530243
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.42273086309432983
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.4168197512626648
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.2225329577922821
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.4551776349544525
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.2529781460762024
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.5071192383766174
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.33083829283714294
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.5666499137878418
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.43784022331237793
+    }
+   ],
+   "ours": {
+    "identical": true,
+    "ari": 1.0,
+    "F1_with": 0.9853307103215,
+    "F1_after": 0.9892907596327607,
+    "F1_never": 0.9892907596327607
+   },
+   "frozen": {
+    "identical": false,
+    "ari": 0.9997649799362069,
+    "F1_with": 0.9877727904168723,
+    "F1_after": 0.9886101393912802,
+    "F1_never": 0.9890905175438208
+   }
+  },
+  "test|dark|3": {
+   "clicks": []
+  },
+  "test|lowres|20": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.2962179183959961
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.1869906634092331
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.48055729269981384
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.3639690577983856
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.34960150718688965
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.37663260102272034
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.26496243476867676
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.5048058032989502
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": -0.1489977240562439
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.4222991466522217
+    }
+   ]
+  },
+  "test|occlude|11": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.38426148891448975
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.36004698276519775
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.26290950179100037
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.34464338421821594
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.30195802450180054
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.506801187992096
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.07449118793010712
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.6204580068588257
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.22007374465465546
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.11618953198194504
+    }
+   ]
+  },
+  "test|lookalike|20": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.1278725266456604
+    }
+   ]
+  },
+  "test|mixed|8": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.2975754737854004
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.5196752548217773
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.3410460948944092
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.4018650949001312
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": -0.05280069634318352
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": -0.10145802795886993
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.31335875391960144
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.37595123052597046
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.14791779220104218
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.4788370430469513
+    }
+   ]
+  },
+  "test|occlude|24": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.3940044045448303
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.3113076090812683
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.2167588174343109
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.5766983032226562
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.29134976863861084
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.250095933675766
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.41030606627464294
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.08770444989204407
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.43258798122406006
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.01147286593914032
+    }
+   ],
+   "ours": {
+    "identical": true,
+    "ari": 1.0,
+    "F1_with": 0.9347299515476025,
+    "F1_after": 0.9347299515476025,
+    "F1_never": 0.9347299515476025
+   },
+   "frozen": {
+    "identical": false,
+    "ari": 0.9976994442449673,
+    "F1_with": 0.9525590170830188,
+    "F1_after": 0.9520873642488806,
+    "F1_never": 0.9537570716359565
+   }
+  },
+  "test|dark|12": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.08972205221652985
+    }
+   ]
+  },
+  "test|mixed|26": {
+   "clicks": [
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.3025397062301636
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.49334579706192017
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.5110169053077698
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.4710923731327057
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.22844168543815613
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.291284441947937
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.5086899995803833
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.18940569460391998
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.23169854283332825
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.135148823261261
+    }
+   ],
+   "ours": {
+    "identical": true,
+    "ari": 1.0,
+    "F1_with": 0.9779319108705049,
+    "F1_after": 0.99768333014665,
+    "F1_never": 0.99768333014665
+   },
+   "frozen": {
+    "identical": false,
+    "ari": 0.999737274054424,
+    "F1_with": 0.9953162622259814,
+    "F1_after": 0.9965276840605258,
+    "F1_never": 0.99768333014665
+   }
+  },
+  "test|blur|8": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.036726854741573334
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.10862430930137634
+    }
+   ]
+  },
+  "test|mixed|2": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.48575037717819214
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.5899268388748169
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.15098053216934204
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.38185203075408936
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.459804892539978
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.25069159269332886
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.36352813243865967
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.46995633840560913
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.4193609356880188
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.23445945978164673
+    }
+   ]
+  },
+  "test|lookalike|14": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.07943429052829742
+    }
+   ]
+  },
+  "test|occlude|9": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.3036479949951172
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.36195677518844604
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.28490516543388367
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.4360307455062866
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.33012229204177856
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.3023892641067505
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.33995598554611206
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.3307332396507263
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.3673357367515564
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.13276521861553192
+    }
+   ],
+   "ours": {
+    "identical": true,
+    "ari": 1.0,
+    "F1_with": 0.956630954744161,
+    "F1_after": 0.956630954744161,
+    "F1_never": 0.956630954744161
+   },
+   "frozen": {
+    "identical": false,
+    "ari": 0.9980505047090458,
+    "F1_with": 0.9541714303596509,
+    "F1_after": 0.9585281804201328,
+    "F1_never": 0.9541714303596509
+   }
+  },
+  "test|jpeg|6": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.3401072025299072
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.2644820213317871
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.35361117124557495
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.3406897187232971
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.33048078417778015
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.1320028305053711
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.2955808937549591
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.14681169390678406
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.27923762798309326
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.30943286418914795
+    }
+   ],
+   "ours": {
+    "identical": true,
+    "ari": 1.0,
+    "F1_with": 0.9889644409758945,
+    "F1_after": 0.9939050607018431,
+    "F1_never": 0.9939050607018431
+   },
+   "frozen": {
+    "identical": false,
+    "ari": 0.9954763853463561,
+    "F1_with": 0.9843404004751173,
+    "F1_after": 0.985962277211409,
+    "F1_never": 0.989296119745243
+   }
+  },
+  "test|clean|5": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.2699054479598999
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.3554608225822449
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.2797861695289612
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.22871516644954681
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.7296997308731079
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.37443768978118896
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.1947283148765564
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.2919017970561981
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.24753566086292267
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.23483383655548096
+    }
+   ],
+   "ours": {
+    "identical": true,
+    "ari": 1.0,
+    "F1_with": 0.9877555690895621,
+    "F1_after": 0.9973416974826406,
+    "F1_never": 0.9973416974826406
+   },
+   "frozen": {
+    "identical": false,
+    "ari": 0.9961590983837884,
+    "F1_with": 0.9877555690895621,
+    "F1_after": 0.990234433025643,
+    "F1_never": 0.9973416974826406
+   }
+  },
+  "test|clean|12": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.05963429808616638
+    }
+   ]
+  },
+  "test|clean|7": {
+   "clicks": []
+  },
+  "test|mixed|25": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.32018283009529114
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.39766135811805725
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.384784996509552
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.22014078497886658
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.1367250680923462
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.30705899000167847
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.4356690049171448
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.26713186502456665
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.4122451841831207
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.3449596166610718
+    }
+   ],
+   "ours": {
+    "identical": true,
+    "ari": 1.0,
+    "F1_with": 0.9760614349458323,
+    "F1_after": 0.9863896808500207,
+    "F1_never": 0.9863896808500207
+   },
+   "frozen": {
+    "identical": false,
+    "ari": 0.998813729439129,
+    "F1_with": 0.9700735824821317,
+    "F1_after": 0.9760713448079096,
+    "F1_never": 0.9808423615362382
+   }
+  },
+  "test|lowres|24": {
+   "clicks": [
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.39074966311454773
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.2663193345069885
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.39032167196273804
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.3866141438484192
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.3922056257724762
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.13666990399360657
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.3056013882160187
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.2442864179611206
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.5867049098014832
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.7105194926261902
+    }
+   ],
+   "ours": {
+    "identical": true,
+    "ari": 1.0,
+    "F1_with": 0.982638665670868,
+    "F1_after": 0.9869437836461701,
+    "F1_never": 0.9869437836461701
+   },
+   "frozen": {
+    "identical": false,
+    "ari": 0.9987957046403054,
+    "F1_with": 0.9735713682080367,
+    "F1_after": 0.9762797684419323,
+    "F1_never": 0.979749543007336
+   }
+  },
+  "test|clean|21": {
+   "clicks": []
+  },
+  "test|occlude|1": {
+   "clicks": [
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.4644615650177002
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.41265401244163513
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": -0.06006404012441635
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.340053915977478
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.3634166419506073
+    }
+   ]
+  },
+  "test|clean|28": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.24908921122550964
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.11095553636550903
+    }
+   ]
+  },
+  "test|jpeg|14": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.27922219038009644
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.478446364402771
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.43566811084747314
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.4015313386917114
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": -0.06384057551622391
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.3888990879058838
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.40332934260368347
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.4925233721733093
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.3424833416938782
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.37540581822395325
+    }
+   ],
+   "ours": {
+    "identical": true,
+    "ari": 1.0,
+    "F1_with": 0.9931664103601286,
+    "F1_after": 0.9949566457365493,
+    "F1_never": 0.9949566457365493
+   },
+   "frozen": {
+    "identical": false,
+    "ari": 0.9994186489665542,
+    "F1_with": 0.995537295833093,
+    "F1_after": 0.9964268044830489,
+    "F1_never": 0.9973274984022086
+   }
+  },
+  "test|mixed|19": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.34521403908729553
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.4266278147697449
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.2737170159816742
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.4803011119365692
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.4566083550453186
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.26460695266723633
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.2763175070285797
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.23796918988227844
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.1224420964717865
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.4764300584793091
+    }
+   ]
+  },
+  "test|jpeg|18": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.4759860038757324
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.4056730568408966
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.35667306184768677
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.10101272910833359
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.3728501796722412
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.3573814630508423
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.38775894045829773
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.036668501794338226
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.2642313838005066
+    }
+   ]
+  },
+  "test|lowres|4": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.2558009624481201
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.22872094810009003
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.38066399097442627
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.24479615688323975
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.09603678435087204
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.20689475536346436
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.35489362478256226
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.2697778344154358
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.40808701515197754
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.465250164270401
+    }
+   ],
+   "ours": {
+    "identical": true,
+    "ari": 1.0,
+    "F1_with": 0.969940260336513,
+    "F1_after": 0.9868546324093236,
+    "F1_never": 0.9868546324093236
+   },
+   "frozen": {
+    "identical": false,
+    "ari": 0.9921001597425961,
+    "F1_with": 0.9691560739768965,
+    "F1_after": 0.9737835510617522,
+    "F1_never": 0.9862089743322542
+   }
+  },
+  "test|jpeg|3": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.32524925470352173
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.4493432343006134
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.46248292922973633
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.36669111251831055
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.4890444874763489
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.28769728541374207
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.2802630066871643
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.22045272588729858
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.2688806653022766
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.3290732800960541
+    }
+   ],
+   "ours": {
+    "identical": true,
+    "ari": 1.0,
+    "F1_with": 0.9866480473937361,
+    "F1_after": 0.9972944107232544,
+    "F1_never": 0.9972944107232544
+   },
+   "frozen": {
+    "identical": false,
+    "ari": 0.9919461803815162,
+    "F1_with": 0.9855132554179267,
+    "F1_after": 0.991725453120529,
+    "F1_never": 0.994684550883377
+   }
+  },
+  "test|clean|2": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.14456963539123535
+    }
+   ]
+  },
+  "test|lookalike|7": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.027333149686455727
+    }
+   ]
+  },
+  "test|lowres|12": {
+   "clicks": [
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.4379500150680542
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.09565973281860352
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.4758042097091675
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.37670302391052246
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.34839722514152527
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.3906877636909485
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.40319952368736267
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.4517635703086853
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.3743111193180084
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.183068186044693
+    }
+   ]
+  },
+  "test|mixed|17": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.29146045446395874
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.2406490445137024
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.1463175117969513
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.20221811532974243
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.19124826788902283
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.6138535737991333
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.4800404906272888
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.5240137577056885
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.4595456123352051
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.65781569480896
+    }
+   ],
+   "ours": {
+    "identical": true,
+    "ari": 1.0,
+    "F1_with": 0.9635829921235998,
+    "F1_after": 0.9809851776712407,
+    "F1_never": 0.9809851776712407
+   },
+   "frozen": {
+    "identical": false,
+    "ari": 0.986684636621767,
+    "F1_with": 0.9589627927690312,
+    "F1_after": 0.9668534072911074,
+    "F1_never": 0.9763747208845901
+   }
+  },
+  "test|lookalike|21": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.14186805486679077
+    }
+   ]
+  },
+  "test|occlude|28": {
+   "clicks": [
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.15162210166454315
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.22295406460762024
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.26675111055374146
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.2427590936422348
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.3546055853366852
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.1811206340789795
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.3547678589820862
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.3858521282672882
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.2499203085899353
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.17446386814117432
+    }
+   ],
+   "ours": {
+    "identical": true,
+    "ari": 1.0,
+    "F1_with": 0.9536883195192374,
+    "F1_after": 0.9662884872956569,
+    "F1_never": 0.9662884872956569
+   },
+   "frozen": {
+    "identical": false,
+    "ari": 0.9313600111826387,
+    "F1_with": 0.9512632648400946,
+    "F1_after": 0.9332914973877364,
+    "F1_never": 0.9638388350319966
+   }
+  },
+  "test|lookalike|5": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.3405677378177643
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.14921820163726807
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.18829840421676636
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.24705910682678223
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.23387804627418518
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.26920485496520996
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.10276118665933609
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.2570272982120514
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.4114072322845459
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.7428807020187378
+    }
+   ],
+   "ours": {
+    "identical": true,
+    "ari": 1.0,
+    "F1_with": 0.8577407017562773,
+    "F1_after": 0.8816087516237583,
+    "F1_never": 0.8816087516237583
+   },
+   "frozen": {
+    "identical": false,
+    "ari": 0.8220100851033374,
+    "F1_with": 0.8577407017562773,
+    "F1_after": 0.8960174041807223,
+    "F1_never": 0.8816087516237583
+   }
+  },
+  "test|clean|14": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": -0.07235114276409149
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.05989373102784157
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.24908921122550964
+    }
+   ]
+  },
+  "test|blur|18": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": -0.11054478585720062
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.012944324873387814
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.41765108704566956
+    }
+   ]
+  },
+  "test|lookalike|24": {
+   "clicks": []
+  },
+  "test|lowres|15": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.29477426409721375
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": -0.09699569642543793
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.3003886342048645
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.2831052839756012
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.4094560444355011
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.39000385999679565
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.3160533010959625
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.2736413776874542
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.47681331634521484
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.4073762595653534
+    }
+   ]
+  },
+  "test|lowres|11": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.18043455481529236
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.21629831194877625
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.28434866666793823
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.2413184642791748
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.5904170274734497
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.2723258137702942
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.03700495511293411
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.27762851119041443
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.30943015217781067
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.09299612045288086
+    }
+   ],
+   "ours": {
+    "identical": true,
+    "ari": 1.0,
+    "F1_with": 0.958537911896253,
+    "F1_after": 0.9721819033663415,
+    "F1_never": 0.9721819033663415
+   },
+   "frozen": {
+    "identical": true,
+    "ari": 1.0,
+    "F1_with": 0.9556004216247919,
+    "F1_after": 0.9691603242596523,
+    "F1_never": 0.9691603242596523
+   }
+  },
+  "test|blur|29": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": -0.034310076385736465
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": -0.15083715319633484
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.2750055491924286
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.3966093063354492
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.3170624375343323
+    }
+   ]
+  },
+  "test|jpeg|11": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.45564037561416626
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.09377448260784149
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.3646894097328186
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.3546026349067688
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.027033260092139244
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.4377859830856323
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.33607247471809387
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.15360793471336365
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.20406357944011688
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.1872483193874359
+    }
+   ],
+   "ours": {
+    "identical": true,
+    "ari": 1.0,
+    "F1_with": 0.9751363471015692,
+    "F1_after": 0.9889784828708588,
+    "F1_never": 0.9889784828708588
+   },
+   "frozen": {
+    "identical": true,
+    "ari": 1.0,
+    "F1_with": 0.976518606141824,
+    "F1_after": 0.9904002915933262,
+    "F1_never": 0.9904002915933262
+   }
+  },
+  "test|blur|22": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.14729732275009155
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.41765108704566956
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.4633190929889679
+    }
+   ]
+  },
+  "test|blur|3": {
+   "clicks": []
+  },
+  "test|mixed|23": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.19877994060516357
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.21444794535636902
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.08899686485528946
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.026272429153323174
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.13833636045455933
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.12114197760820389
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.46003633737564087
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.21305078268051147
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.4269203543663025
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.3498990535736084
+    }
+   ],
+   "ours": {
+    "identical": true,
+    "ari": 1.0,
+    "F1_with": 0.9850560611833813,
+    "F1_after": 0.9871829805914254,
+    "F1_never": 0.9871829805914254
+   },
+   "frozen": {
+    "identical": false,
+    "ari": 0.9995433538385748,
+    "F1_with": 0.9780760839542467,
+    "F1_after": 0.9774394749826195,
+    "F1_never": 0.980094097326729
+   }
+  },
+  "test|lookalike|9": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.18425562977790833
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.2384578138589859
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.3249701261520386
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.16290907561779022
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.3171418309211731
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.25876951217651367
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.2929078936576843
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.16205893456935883
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.2586207389831543
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.2554055452346802
+    }
+   ],
+   "ours": {
+    "identical": true,
+    "ari": 1.0,
+    "F1_with": 0.936894048053551,
+    "F1_after": 0.9691279885922058,
+    "F1_never": 0.9691279885922058
+   },
+   "frozen": {
+    "identical": false,
+    "ari": 0.990160941029767,
+    "F1_with": 0.936894048053551,
+    "F1_after": 0.9524599035170641,
+    "F1_never": 0.9691279885922058
+   }
+  },
+  "test|lowres|27": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.30242568254470825
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.40485620498657227
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.2843475639820099
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.14838677644729614
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.28348180651664734
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.25953203439712524
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.20667508244514465
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.24379706382751465
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.5413884520530701
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.2493211030960083
+    }
+   ],
+   "ours": {
+    "identical": true,
+    "ari": 1.0,
+    "F1_with": 0.9372423548140072,
+    "F1_after": 0.9408689988702401,
+    "F1_never": 0.9408689988702401
+   },
+   "frozen": {
+    "identical": false,
+    "ari": 0.9984739324989118,
+    "F1_with": 0.9365638299503624,
+    "F1_after": 0.9388885731596551,
+    "F1_never": 0.941690840527848
+   }
+  },
+  "test|mixed|21": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.16950982809066772
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.2802026569843292
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.27620843052864075
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.3757990598678589
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.20059645175933838
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.43237996101379395
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.35635140538215637
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.4148333966732025
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.39049312472343445
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.5424048900604248
+    }
+   ]
+  },
+  "test|lowres|23": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": -0.14806777238845825
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.3565382957458496
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.3193396031856537
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.3118511438369751
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.2779276967048645
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.36192527413368225
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.4240758717060089
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.4287407398223877
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.25122004747390747
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.4240337610244751
+    }
+   ],
+   "ours": {
+    "identical": true,
+    "ari": 1.0,
+    "F1_with": 0.9874303194773725,
+    "F1_after": 0.9901951800604784,
+    "F1_never": 0.9901951800604784
+   },
+   "frozen": {
+    "identical": false,
+    "ari": 0.9986215503542011,
+    "F1_with": 0.9823255150704782,
+    "F1_after": 0.9818693074742361,
+    "F1_never": 0.9876433756302987
+   }
+  },
+  "test|jpeg|15": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.4551776349544525
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.1713567078113556
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.47637689113616943
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.46885132789611816
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.3954010605812073
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.40374451875686646
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.4804302453994751
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.30171334743499756
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.21551145613193512
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.6005432605743408
+    }
+   ],
+   "ours": {
+    "identical": true,
+    "ari": 1.0,
+    "F1_with": 0.9966114821318671,
+    "F1_after": 0.9989062344635578,
+    "F1_never": 0.9989062344635578
+   },
+   "frozen": {
+    "identical": false,
+    "ari": 0.9900140045552542,
+    "F1_with": 0.982169320128188,
+    "F1_after": 0.9854157052936466,
+    "F1_never": 0.9989062344635578
+   }
+  },
+  "test|dark|17": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.1355341076850891
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.4358813762664795
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.24995136260986328
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": -0.004168272018432617
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.7753181457519531
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.6283951997756958
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.32760173082351685
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.19985362887382507
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.3295254707336426
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.30921509861946106
+    }
+   ],
+   "ours": {
+    "identical": true,
+    "ari": 1.0,
+    "F1_with": 0.9924582178855492,
+    "F1_after": 0.9953189035434102,
+    "F1_never": 0.9953189035434102
+   },
+   "frozen": {
+    "identical": false,
+    "ari": 0.9978752709429023,
+    "F1_with": 0.9924582178855492,
+    "F1_after": 0.9934132738741892,
+    "F1_never": 0.9953189035434102
+   }
+  },
+  "test|blur|26": {
+   "clicks": []
+  },
+  "test|blur|15": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": -0.07245334982872009
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": -0.16486410796642303
+    }
+   ]
+  },
+  "test|lookalike|13": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.092399463057518
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.03459416329860687
+    }
+   ]
+  },
+  "test|blur|0": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": -0.037607237696647644
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.16421383619308472
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.2923941910266876
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.012944324873387814
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.4532363712787628
+    }
+   ]
+  },
+  "test|blur|10": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.34100693464279175
+    }
+   ]
+  },
+  "test|jpeg|10": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.14685671031475067
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.2632877826690674
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.4241180121898651
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.4444970488548279
+    }
+   ]
+  },
+  "test|occlude|16": {
+   "clicks": [
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.23049409687519073
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.33174437284469604
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.29900920391082764
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.319586843252182
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.34613966941833496
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.3672406077384949
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.35029804706573486
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.3352873623371124
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.45687568187713623
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.41699740290641785
+    }
+   ],
+   "ours": {
+    "identical": true,
+    "ari": 1.0,
+    "F1_with": 0.9222761493137474,
+    "F1_after": 0.9460128052825513,
+    "F1_never": 0.9460128052825513
+   },
+   "frozen": {
+    "identical": false,
+    "ari": 0.9770086419407076,
+    "F1_with": 0.9426102954579678,
+    "F1_after": 0.9441746131464527,
+    "F1_never": 0.968129289287449
+   }
+  },
+  "test|occlude|14": {
+   "clicks": [
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.36207228899002075
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.21284449100494385
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.42081713676452637
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.22917497158050537
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.3715192675590515
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.2332216203212738
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.4122075140476227
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.31366288661956787
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.41489657759666443
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.5193334817886353
+    }
+   ],
+   "ours": {
+    "identical": true,
+    "ari": 1.0,
+    "F1_with": 0.9633644813276493,
+    "F1_after": 0.9678248015101997,
+    "F1_never": 0.9678248015101997
+   },
+   "frozen": {
+    "identical": false,
+    "ari": 0.9995280431519539,
+    "F1_with": 0.9652833106213594,
+    "F1_after": 0.9661486337789856,
+    "F1_never": 0.9669620796597217
+   }
+  },
+  "test|lowres|8": {
+   "clicks": [
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.33242571353912354
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.35557806491851807
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": -0.03837013244628906
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.5505198240280151
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.39218670129776
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.40023306012153625
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.2737847566604614
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": -0.010040970519185066
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.3446963429450989
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.4523545205593109
+    }
+   ]
+  },
+  "test|clean|9": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.22383944690227509
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.23367366194725037
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.07433229684829712
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.18305090069770813
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.12034320831298828
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.291964054107666
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.2850564122200012
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.37881019711494446
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.08132058382034302
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.20261996984481812
+    }
+   ],
+   "ours": {
+    "identical": true,
+    "ari": 1.0,
+    "F1_with": 0.9781868990803757,
+    "F1_after": 0.9812923197921953,
+    "F1_never": 0.9812923197921953
+   },
+   "frozen": {
+    "identical": false,
+    "ari": 0.9844120449072656,
+    "F1_with": 0.9781868990803757,
+    "F1_after": 0.9882413790743036,
+    "F1_never": 0.9812923197921953
+   }
+  },
+  "test|clean|22": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.05963429808616638
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.4370687007904053
+    }
+   ]
+  },
+  "test|lowres|3": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.0675995945930481
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.35888391733169556
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.187924325466156
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.29096946120262146
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.44884634017944336
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.5140628218650818
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.4039444327354431
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.17598393559455872
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.18195021152496338
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.28001585602760315
+    }
+   ],
+   "ours": {
+    "identical": true,
+    "ari": 1.0,
+    "F1_with": 0.9884857444702135,
+    "F1_after": 0.9946453606137443,
+    "F1_never": 0.9946453606137443
+   },
+   "frozen": {
+    "identical": false,
+    "ari": 0.9904113828161009,
+    "F1_with": 0.9877527656134807,
+    "F1_after": 0.9862759280570459,
+    "F1_never": 0.9939155472750252
+   }
+  },
+  "test|dark|1": {
+   "clicks": []
+  },
+  "test|clean|17": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.09841838479042053
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.32866373658180237
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.17825376987457275
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.15622948110103607
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.12188424170017242
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": -0.04166953265666962
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.676426351070404
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.6726805567741394
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.15530017018318176
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": -0.07420338690280914
+    }
+   ],
+   "ours": {
+    "identical": true,
+    "ari": 1.0,
+    "F1_with": 0.9875845794785376,
+    "F1_after": 0.9894865320722361,
+    "F1_never": 0.9894865320722361
+   },
+   "frozen": {
+    "identical": false,
+    "ari": 0.998626694379747,
+    "F1_with": 0.9875845794785376,
+    "F1_after": 0.988529555744301,
+    "F1_never": 0.9894865320722361
+   }
+  },
+  "test|clean|8": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": -0.029316851869225502
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.15237167477607727
+    }
+   ]
+  },
+  "test|dark|22": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.305832177400589
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.12806284427642822
+    }
+   ]
+  },
+  "test|occlude|22": {
+   "clicks": [
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.4438111186027527
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.24140897393226624
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.1806955635547638
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.3586529493331909
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.08839397132396698
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.3055742383003235
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.2939191460609436
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.449008584022522
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.2134104073047638
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.4146890640258789
+    }
+   ]
+  },
+  "test|mixed|9": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.22843319177627563
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.28899142146110535
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.4354563057422638
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.6041313409805298
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.18966178596019745
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.6419017910957336
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.6488097906112671
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.6432662010192871
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.23774361610412598
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.4463208317756653
+    }
+   ],
+   "ours": {
+    "identical": true,
+    "ari": 1.0,
+    "F1_with": 0.9455858904537242,
+    "F1_after": 0.9639184288662705,
+    "F1_never": 0.9639184288662705
+   },
+   "frozen": {
+    "identical": false,
+    "ari": 0.9352427293122287,
+    "F1_with": 0.940640456479419,
+    "F1_after": 0.9421430362693258,
+    "F1_never": 0.9590582725625346
+   }
+  },
+  "test|lowres|17": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.2773086428642273
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.4622443914413452
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.46271395683288574
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.2955091893672943
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.30494797229766846
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.35774314403533936
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.4519280195236206
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.45703810453414917
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.018664635717868805
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": -0.0032762931659817696
+    }
+   ]
+  },
+  "test|occlude|19": {
+   "clicks": [
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.23612596094608307
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": -0.07519599050283432
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.17060354351997375
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.2877205014228821
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.45967429876327515
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.4462372660636902
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.3507425785064697
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.10619407892227173
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.3472234308719635
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.4688127040863037
+    }
+   ]
+  },
+  "test|occlude|7": {
+   "clicks": [
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.45180371403694153
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.35266268253326416
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.5639909505844116
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.3275052011013031
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.09370884299278259
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.3883429169654846
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.36841684579849243
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.38942646980285645
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.28988802433013916
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.4601573646068573
+    }
+   ],
+   "ours": {
+    "identical": true,
+    "ari": 1.0,
+    "F1_with": 0.947407059911244,
+    "F1_after": 0.9492146343930548,
+    "F1_never": 0.9492146343930548
+   },
+   "frozen": {
+    "identical": false,
+    "ari": 0.9988688198368706,
+    "F1_with": 0.9573687024789417,
+    "F1_after": 0.9568805097616191,
+    "F1_never": 0.9582243592656564
+   }
+  },
+  "test|lookalike|28": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": -0.052638281136751175
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.09251897037029266
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.28951698541641235
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.32438355684280396
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.10594215989112854
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.2573903203010559
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.16657349467277527
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.1902768909931183
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.1838509440422058
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": -0.03412572667002678
+    }
+   ],
+   "ours": {
+    "identical": true,
+    "ari": 1.0,
+    "F1_with": 0.9413961201873425,
+    "F1_after": 0.9744971483190096,
+    "F1_never": 0.9744971483190096
+   },
+   "frozen": {
+    "identical": false,
+    "ari": 0.9811248488715711,
+    "F1_with": 0.936681220761189,
+    "F1_after": 0.9608616416995475,
+    "F1_never": 0.9744971483190096
+   }
+  },
+  "test|mixed|15": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.3697148561477661
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.3593066930770874
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.23732131719589233
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.168732151389122
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": -0.009334884583950043
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.17058637738227844
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.2712676525115967
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.3157626986503601
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.3048437833786011
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.43635424971580505
+    }
+   ],
+   "ours": {
+    "identical": true,
+    "ari": 1.0,
+    "F1_with": 0.9625336307317043,
+    "F1_after": 0.9725227078293845,
+    "F1_never": 0.9725227078293845
+   },
+   "frozen": {
+    "identical": false,
+    "ari": 0.9952719694223331,
+    "F1_with": 0.9577675920853744,
+    "F1_after": 0.9620132887953664,
+    "F1_never": 0.9677691194756647
+   }
+  },
+  "test|occlude|15": {
+   "clicks": [
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.29060888290405273
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.3566324710845947
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.4601573646068573
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.17604084312915802
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.3418819010257721
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.22527536749839783
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.420249342918396
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.3580872118473053
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.22772526741027832
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.20999452471733093
+    }
+   ],
+   "ours": {
+    "identical": true,
+    "ari": 1.0,
+    "F1_with": 0.9323388925613901,
+    "F1_after": 0.9341504706578969,
+    "F1_never": 0.9341504706578969
+   },
+   "frozen": {
+    "identical": false,
+    "ari": 0.9977468986666036,
+    "F1_with": 0.9318194825431166,
+    "F1_after": 0.9335754012827409,
+    "F1_never": 0.933631752531312
+   }
+  },
+  "test|blur|13": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": -0.13326147198677063
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.02158670872449875
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.1621594876050949
+    }
+   ]
+  },
+  "test|mixed|11": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.375133216381073
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.3069409728050232
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.25359785556793213
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.43858546018600464
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.4356631636619568
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.29612475633621216
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": -0.05496290326118469
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.23357586562633514
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.15601299703121185
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.5228559970855713
+    }
+   ],
+   "ours": {
+    "identical": true,
+    "ari": 1.0,
+    "F1_with": 0.9890601858710885,
+    "F1_after": 0.9912182237650679,
+    "F1_never": 0.9912182237650679
+   },
+   "frozen": {
+    "identical": false,
+    "ari": 0.9993657231684286,
+    "F1_with": 0.9852536288044074,
+    "F1_after": 0.9863205806499649,
+    "F1_never": 0.9873711295100124
+   }
+  },
+  "test|occlude|0": {
+   "clicks": [
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.46723073720932007
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.21227940917015076
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.38101446628570557
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.2994844317436218
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.3884120285511017
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.22124287486076355
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.033563412725925446
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": -0.016259612515568733
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.35978323221206665
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.39027124643325806
+    }
+   ],
+   "ours": {
+    "identical": true,
+    "ari": 1.0,
+    "F1_with": 0.9650482992538993,
+    "F1_after": 0.9714180167076544,
+    "F1_never": 0.9714180167076544
+   },
+   "frozen": {
+    "identical": false,
+    "ari": 0.9998179492546069,
+    "F1_with": 0.9671173058595277,
+    "F1_after": 0.9727410420970384,
+    "F1_never": 0.9735292423354587
+   }
+  },
+  "test|lookalike|27": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": -0.06107001379132271
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.11544513702392578
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.001032790169119835
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.7812587022781372
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.6275895833969116
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": -0.06900817155838013
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.057785749435424805
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.7442625761032104
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.13029277324676514
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.052065521478652954
+    }
+   ]
+  },
+  "test|occlude|5": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.20563024282455444
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.36614876985549927
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.42380577325820923
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.311737596988678
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.3310977816581726
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.31088101863861084
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.6708230972290039
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.4836096167564392
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.2843630313873291
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.4006125330924988
+    }
+   ],
+   "ours": {
+    "identical": true,
+    "ari": 1.0,
+    "F1_with": 0.9139454065324778,
+    "F1_after": 0.921113924128122,
+    "F1_never": 0.921113924128122
+   },
+   "frozen": {
+    "identical": false,
+    "ari": 0.9864920170434338,
+    "F1_with": 0.9176290913328434,
+    "F1_after": 0.9215241085754436,
+    "F1_never": 0.9247799648319672
+   }
+  },
+  "test|dark|18": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.2867296636104584
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": -0.013922426849603653
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.08391480147838593
+    }
+   ]
+  },
+  "test|occlude|26": {
+   "clicks": [
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.14395630359649658
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.3761339783668518
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.11534470319747925
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.2608867883682251
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.19516359269618988
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.3199008107185364
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.23697535693645477
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.2059011161327362
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.3186558187007904
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.24997898936271667
+    }
+   ],
+   "ours": {
+    "identical": true,
+    "ari": 1.0,
+    "F1_with": 0.884017803641368,
+    "F1_after": 0.9816412699627567,
+    "F1_never": 0.9816412699627567
+   },
+   "frozen": {
+    "identical": false,
+    "ari": 0.9123742075861118,
+    "F1_with": 0.8850218513105411,
+    "F1_after": 0.9278714986133875,
+    "F1_never": 0.980576732931443
+   }
+  },
+  "test|lowres|1": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.309059202671051
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.4782004952430725
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.2287854552268982
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.3527386784553528
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.5227615833282471
+    }
+   ]
+  },
+  "test|mixed|7": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.18456286191940308
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.2023233324289322
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.3921052813529968
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.2900823950767517
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.35773965716362
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.3205299377441406
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.399272084236145
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.34628742933273315
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.37338903546333313
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.16538596153259277
+    }
+   ],
+   "ours": {
+    "identical": true,
+    "ari": 1.0,
+    "F1_with": 0.9836059386451109,
+    "F1_after": 0.9871216426784719,
+    "F1_never": 0.9871216426784719
+   },
+   "frozen": {
+    "identical": false,
+    "ari": 0.9908813291346406,
+    "F1_with": 0.9836511483166426,
+    "F1_after": 0.9778051760572565,
+    "F1_never": 0.9871668753394748
+   }
+  },
+  "test|lookalike|8": {
+   "clicks": []
+  },
+  "test|lookalike|26": {
+   "clicks": []
+  },
+  "test|blur|14": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": -0.05168994143605232
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.0762951523065567
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": -0.08045133948326111
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.3813250660896301
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.3270445466041565
+    }
+   ]
+  },
+  "test|clean|27": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.11388645321130753
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.12150473892688751
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.42341190576553345
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.17075377702713013
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.3654073476791382
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.3821352422237396
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.29473721981048584
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.7744667530059814
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.7366774678230286
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.5979433059692383
+    }
+   ],
+   "ours": {
+    "identical": true,
+    "ari": 1.0,
+    "F1_with": 0.9887994971458478,
+    "F1_after": 0.996163686654305,
+    "F1_never": 0.996163686654305
+   },
+   "frozen": {
+    "identical": false,
+    "ari": 0.9980381539844243,
+    "F1_with": 0.9887994971458478,
+    "F1_after": 0.992313920250681,
+    "F1_never": 0.996163686654305
+   }
+  },
+  "test|lookalike|22": {
+   "clicks": []
+  },
+  "test|blur|21": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": -0.02852914109826088
+    }
+   ]
+  },
+  "test|clean|20": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.06247567757964134
+    }
+   ]
+  },
+  "test|dark|5": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.23523510992527008
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.2277086228132248
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.37231388688087463
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.12820833921432495
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.7158499956130981
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.18999595940113068
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.3005051016807556
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.6784108877182007
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.6312853097915649
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.5420844554901123
+    }
+   ],
+   "ours": {
+    "identical": true,
+    "ari": 1.0,
+    "F1_with": 0.9892271516216834,
+    "F1_after": 0.9982194653637627,
+    "F1_never": 0.9982194653637627
+   },
+   "frozen": {
+    "identical": false,
+    "ari": 0.9977504175422771,
+    "F1_with": 0.9892271516216834,
+    "F1_after": 0.9930407971285304,
+    "F1_never": 0.9982194653637627
+   }
+  },
+  "test|mixed|5": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.3564026951789856
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.3438277840614319
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.29066240787506104
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.28877735137939453
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.15721087157726288
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.5766041874885559
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.5928197503089905
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.665657639503479
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.519489049911499
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.42041015625
+    }
+   ],
+   "ours": {
+    "identical": true,
+    "ari": 1.0,
+    "F1_with": 0.9786518071669779,
+    "F1_after": 0.9866357450803699,
+    "F1_never": 0.9866357450803699
+   },
+   "frozen": {
+    "identical": false,
+    "ari": 0.9979914477482755,
+    "F1_with": 0.9771660794669099,
+    "F1_after": 0.9802608639101601,
+    "F1_never": 0.985154940064438
+   }
+  },
+  "test|dark|19": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.2642397880554199
+    }
+   ]
+  },
+  "test|lowres|6": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.2433142513036728
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.45857495069503784
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.4294742941856384
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.24175980687141418
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.2872661054134369
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.27428358793258667
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.2695683240890503
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.19906562566757202
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.1291409730911255
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.2600032687187195
+    }
+   ],
+   "ours": {
+    "identical": true,
+    "ari": 1.0,
+    "F1_with": 0.9634237102715908,
+    "F1_after": 0.9832469190374269,
+    "F1_never": 0.9832469190374269
+   },
+   "frozen": {
+    "identical": false,
+    "ari": 0.9900665914558635,
+    "F1_with": 0.9613312419628633,
+    "F1_after": 0.97012488730352,
+    "F1_never": 0.9789748771264198
+   }
+  },
+  "test|blur|1": {
+   "clicks": []
+  },
+  "test|jpeg|24": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.06269979476928711
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.386105477809906
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.2868642807006836
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.26125240325927734
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.24963799118995667
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.3074064254760742
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.38606470823287964
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.31090566515922546
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.24114063382148743
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.23418521881103516
+    }
+   ],
+   "ours": {
+    "identical": true,
+    "ari": 1.0,
+    "F1_with": 0.99454012344633,
+    "F1_after": 0.9961270736689912,
+    "F1_never": 0.9961270736689912
+   },
+   "frozen": {
+    "identical": false,
+    "ari": 0.999282168190995,
+    "F1_with": 0.9836935829884904,
+    "F1_after": 0.9841096051373897,
+    "F1_never": 0.984221619314508
+   }
+  },
+  "test|dark|25": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.033907655626535416
+    }
+   ]
+  },
+  "test|lowres|18": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.22359707951545715
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.32969170808792114
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.31927764415740967
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.11510533839464188
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.35790371894836426
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.30238738656044006
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.39482957124710083
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.10301010310649872
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.43586084246635437
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.34991392493247986
+    }
+   ]
+  },
+  "test|lowres|26": {
+   "clicks": [
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.3471176028251648
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.32821542024612427
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.1636965572834015
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.299017071723938
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.14709845185279846
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.14886100590229034
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.48970043659210205
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.2692376971244812
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.7497225403785706
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.6698888540267944
+    }
+   ],
+   "ours": {
+    "identical": true,
+    "ari": 1.0,
+    "F1_with": 0.9527344486688439,
+    "F1_after": 0.989099079139665,
+    "F1_never": 0.989099079139665
+   },
+   "frozen": {
+    "identical": false,
+    "ari": 0.9474733267886106,
+    "F1_with": 0.9530917599637281,
+    "F1_after": 0.9552107754833864,
+    "F1_never": 0.9882237468634317
+   }
+  },
+  "test|clean|16": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.15237167477607727
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.34821265935897827
+    }
+   ]
+  },
+  "test|blur|2": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.17392383515834808
+    }
+   ]
+  },
+  "test|blur|25": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.0762951523065567
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.3822261393070221
+    }
+   ]
+  },
+  "test|dark|6": {
+   "clicks": []
+  },
+  "test|blur|23": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": -0.18240207433700562
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": -0.0625457838177681
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.32367706298828125
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.17412209510803223
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.45295149087905884
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.05051063746213913
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.4064297080039978
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.23010864853858948
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.4104529917240143
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.38077792525291443
+    }
+   ],
+   "ours": {
+    "identical": true,
+    "ari": 1.0,
+    "F1_with": 0.971832677750538,
+    "F1_after": 0.9827831660211583,
+    "F1_never": 0.9827831660211583
+   },
+   "frozen": {
+    "identical": false,
+    "ari": 0.9988174980390699,
+    "F1_with": 0.9861036403855059,
+    "F1_after": 0.9929821468108486,
+    "F1_never": 0.9977883751710601
+   }
+  },
+  "test|mixed|16": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.18911108374595642
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.3254513740539551
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.4028351902961731
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.15884271264076233
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.41486668586730957
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.3599766492843628
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.30183079838752747
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.4125484824180603
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.3356114625930786
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.17902922630310059
+    }
+   ],
+   "ours": {
+    "identical": true,
+    "ari": 1.0,
+    "F1_with": 0.9796903099444373,
+    "F1_after": 0.9816528544157807,
+    "F1_never": 0.9816528544157807
+   },
+   "frozen": {
+    "identical": false,
+    "ari": 0.9961208980477252,
+    "F1_with": 0.9743001221687215,
+    "F1_after": 0.9713965045505092,
+    "F1_never": 0.9771716128213195
+   }
+  },
+  "test|clean|0": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": -0.005766318179666996
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.14186805486679077
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.1791347861289978
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": -0.018831327557563782
+    }
+   ]
+  },
+  "test|occlude|21": {
+   "clicks": [
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.49695852398872375
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.3833455443382263
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.5506512522697449
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.008731011301279068
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.18450789153575897
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.32425156235694885
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.17965853214263916
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.36928805708885193
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.48616260290145874
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.5836993455886841
+    }
+   ],
+   "ours": {
+    "identical": true,
+    "ari": 1.0,
+    "F1_with": 0.8779018229077816,
+    "F1_after": 0.8848957711230562,
+    "F1_never": 0.8848957711230562
+   },
+   "frozen": {
+    "identical": false,
+    "ari": 0.9940654909246264,
+    "F1_with": 0.9538076129586984,
+    "F1_after": 0.9555119446181009,
+    "F1_never": 0.9614690587055943
+   }
+  },
+  "test|occlude|10": {
+   "clicks": [
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.3408207595348358
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.45456165075302124
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.36283159255981445
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.38588613271713257
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.3636694550514221
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.3665658235549927
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.3733512759208679
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.2925760746002197
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.3730843961238861
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.3556348383426666
+    }
+   ],
+   "ours": {
+    "identical": true,
+    "ari": 1.0,
+    "F1_with": 0.9768871202361041,
+    "F1_after": 0.9848102039035213,
+    "F1_never": 0.9848102039035213
+   },
+   "frozen": {
+    "identical": false,
+    "ari": 0.9987558514546707,
+    "F1_with": 0.978629120273952,
+    "F1_after": 0.9824745482638131,
+    "F1_never": 0.9865528150731865
+   }
+  },
+  "test|mixed|1": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.49460989236831665
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.2186048924922943
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.3943856954574585
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.48982617259025574
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.4107080399990082
+    }
+   ]
+  },
+  "test|jpeg|12": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.08669314533472061
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.19202961027622223
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.1931394338607788
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.18475160002708435
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.2864513695240021
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.22116884589195251
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.28955918550491333
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.3066568970680237
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.27740368247032166
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.3512858748435974
+    }
+   ],
+   "ours": {
+    "identical": true,
+    "ari": 1.0,
+    "F1_with": 0.9898630311650187,
+    "F1_after": 0.9933283374349262,
+    "F1_never": 0.9933283374349262
+   },
+   "frozen": {
+    "identical": false,
+    "ari": 0.9984314884307967,
+    "F1_with": 0.9882041453392411,
+    "F1_after": 0.9899063594300881,
+    "F1_never": 0.9915710070754211
+   }
+  },
+  "test|clean|23": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": -0.11960764229297638
+    }
+   ]
+  },
+  "test|clean|3": {
+   "clicks": []
+  },
+  "test|dark|20": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.0726856142282486
+    }
+   ]
+  },
+  "test|clean|15": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": -0.09050176292657852
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.28163623809814453
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.3552205264568329
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.2919398546218872
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.34628403186798096
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.45642733573913574
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.28033095598220825
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.3965815305709839
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.38498982787132263
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.3862941265106201
+    }
+   ],
+   "ours": {
+    "identical": true,
+    "ari": 1.0,
+    "F1_with": 0.9792772721557887,
+    "F1_after": 0.9977596755780566,
+    "F1_never": 0.9977596755780566
+   },
+   "frozen": {
+    "identical": false,
+    "ari": 0.9946119052888698,
+    "F1_with": 0.9792084380177914,
+    "F1_after": 0.9881493165334394,
+    "F1_never": 0.9977596755780566
+   }
+  },
+  "test|lookalike|23": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.06851799041032791
+    }
+   ]
+  },
+  "test|dark|13": {
+   "clicks": []
+  },
+  "test|jpeg|23": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.4633851945400238
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.3255842626094818
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.3929121494293213
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.45946311950683594
+    }
+   ]
+  },
+  "test|lookalike|16": {
+   "clicks": []
+  },
+  "test|mixed|4": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.40634357929229736
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": -0.03312874957919121
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.10192617774009705
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.4104648232460022
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.47815266251564026
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.6470916271209717
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.3677009344100952
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.2677146792411804
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.39619505405426025
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.45407190918922424
+    }
+   ],
+   "ours": {
+    "identical": true,
+    "ari": 1.0,
+    "F1_with": 0.9757044792860013,
+    "F1_after": 0.9889651060414149,
+    "F1_never": 0.9889651060414149
+   },
+   "frozen": {
+    "identical": false,
+    "ari": 0.9961130383504452,
+    "F1_with": 0.9817762006257627,
+    "F1_after": 0.9814978490436636,
+    "F1_never": 0.9876235133653058
+   }
+  },
+  "test|lowres|22": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.4823561906814575
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.32031604647636414
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.4557289481163025
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.23355497419834137
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.038072485476732254
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.371865451335907
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.3728862404823303
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.22972965240478516
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.5670862197875977
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.2993561923503876
+    }
+   ],
+   "ours": {
+    "identical": true,
+    "ari": 1.0,
+    "F1_with": 0.9673288766041122,
+    "F1_after": 0.9738682563969162,
+    "F1_never": 0.9738682563969162
+   },
+   "frozen": {
+    "identical": false,
+    "ari": 0.9979680205147708,
+    "F1_with": 0.9582455689971737,
+    "F1_after": 0.9590869246234814,
+    "F1_never": 0.9648692930297392
+   }
+  },
+  "test|dark|21": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": -0.028674030676484108
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.30690473318099976
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.41536471247673035
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.11172790825366974
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.611427903175354
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.6919894218444824
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.1894950270652771
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.7900927066802979
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.6983585357666016
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.6980615854263306
+    }
+   ],
+   "ours": {
+    "identical": true,
+    "ari": 1.0,
+    "F1_with": 0.9884819607441804,
+    "F1_after": 0.998302546180729,
+    "F1_never": 0.998302546180729
+   },
+   "frozen": {
+    "identical": false,
+    "ari": 0.9559771842975482,
+    "F1_with": 0.9721838637558267,
+    "F1_after": 0.973073651167861,
+    "F1_never": 0.9965993198639728
+   }
+  },
+  "test|occlude|6": {
+   "clicks": [
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.17949505150318146
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.5112196803092957
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.23167747259140015
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.34427177906036377
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.45445048809051514
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.38426148891448975
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.10639993846416473
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.4154672622680664
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.4074740409851074
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.43833354115486145
+    }
+   ]
+  },
+  "test|blur|20": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": -0.140218585729599
+    }
+   ]
+  },
+  "test|jpeg|21": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.38143324851989746
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.125135600566864
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.17076483368873596
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.36939531564712524
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.2353200614452362
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.5071055889129639
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.4482309818267822
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.42771461606025696
+    }
+   ]
+  },
+  "test|occlude|13": {
+   "clicks": [
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.305461049079895
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.2805076539516449
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.35506656765937805
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.3065911531448364
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.03626618534326553
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.13395492732524872
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.3610442280769348
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.31449180841445923
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.2999485731124878
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.2886049747467041
+    }
+   ],
+   "ours": {
+    "identical": true,
+    "ari": 1.0,
+    "F1_with": 0.9671944015348134,
+    "F1_after": 0.9685710221575325,
+    "F1_never": 0.9685710221575325
+   },
+   "frozen": {
+    "identical": false,
+    "ari": 0.9996393235986852,
+    "F1_with": 0.9685051556768233,
+    "F1_after": 0.9680931106670929,
+    "F1_never": 0.9698816777719675
+   }
+  },
+  "test|lookalike|1": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": -0.13203208148479462
+    }
+   ]
+  },
+  "test|dark|23": {
+   "clicks": [
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.3411334455013275
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": -0.05503743886947632
+    }
+   ]
+  },
+  "test|jpeg|0": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.312498539686203
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": -0.04430060088634491
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.6007477045059204
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.044164203107357025
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.1967872530221939
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.4759860038757324
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.39982107281684875
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.4925233721733093
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.20106551051139832
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.4876686930656433
+    }
+   ]
+  },
+  "test|dark|0": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.041879311203956604
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.1079409047961235
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.12214323878288269
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": -0.007225706707686186
+    }
+   ]
+  },
+  "test|occlude|25": {
+   "clicks": [
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.31574007868766785
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.2538355588912964
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.3349023759365082
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.3757079541683197
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.2113957703113556
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.22849391400814056
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.2233319878578186
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.45867660641670227
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.17749440670013428
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.3840909004211426
+    }
+   ],
+   "ours": {
+    "identical": true,
+    "ari": 1.0,
+    "F1_with": 0.9586995187918639,
+    "F1_after": 0.9637232586652467,
+    "F1_never": 0.9637232586652467
+   },
+   "frozen": {
+    "identical": false,
+    "ari": 0.999027919394281,
+    "F1_with": 0.9638740493901006,
+    "F1_after": 0.9646791070214954,
+    "F1_never": 0.9687471700310966
+   }
+  },
+  "test|clean|18": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": -0.07338671386241913
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": -0.018831327557563782
+    }
+   ]
+  },
+  "test|blur|24": {
+   "clicks": [
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.4506928324699402
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.1621226817369461
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.4623118042945862
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.05912786349654198
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.42561522126197815
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.3746546804904938
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.3888477683067322
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.3882295787334442
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.3994276523590088
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.34536659717559814
+    }
+   ],
+   "ours": {
+    "identical": true,
+    "ari": 1.0,
+    "F1_with": 0.9764365535411574,
+    "F1_after": 0.9908576188819526,
+    "F1_never": 0.9908576188819526
+   },
+   "frozen": {
+    "identical": false,
+    "ari": 0.9965325819961123,
+    "F1_with": 0.9747209720244017,
+    "F1_after": 0.9813512658904517,
+    "F1_never": 0.9908576188819526
+   }
+  },
+  "test|clean|25": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.05989373102784157
+    }
+   ]
+  },
+  "test|blur|19": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.3270445466041565
+    }
+   ]
+  },
+  "test|mixed|6": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.013152668252587318
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.31902608275413513
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.49516141414642334
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.47041282057762146
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.29805731773376465
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.3133295178413391
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.22840535640716553
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.24182192981243134
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.12515486776828766
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.23285597562789917
+    }
+   ],
+   "ours": {
+    "identical": true,
+    "ari": 1.0,
+    "F1_with": 0.9732796876092387,
+    "F1_after": 0.9875597121168387,
+    "F1_never": 0.9875597121168387
+   },
+   "frozen": {
+    "identical": false,
+    "ari": 0.9979749938026108,
+    "F1_with": 0.9732796876092387,
+    "F1_after": 0.9858886896298623,
+    "F1_never": 0.9875597121168387
+   }
+  },
+  "test|lowres|7": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.28542426228523254
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.31223738193511963
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.35015204548835754
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.5106804370880127
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.35256749391555786
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.15040025115013123
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.025647122412919998
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.3963587284088135
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.2937309741973877
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.4420194625854492
+    }
+   ]
+  },
+  "test|mixed|27": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.09808152914047241
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.3049968481063843
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.09144067764282227
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.24153479933738708
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.03644072264432907
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.11740218847990036
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.15682938694953918
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.26920533180236816
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.3334646224975586
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.004869201686233282
+    }
+   ],
+   "ours": {
+    "identical": true,
+    "ari": 1.0,
+    "F1_with": 0.9693613501689248,
+    "F1_after": 0.9710939756930841,
+    "F1_never": 0.9710939756930841
+   },
+   "frozen": {
+    "identical": false,
+    "ari": 0.9995729622438776,
+    "F1_with": 0.969822351032294,
+    "F1_after": 0.9707121756237627,
+    "F1_never": 0.9715748124893168
+   }
+  },
+  "test|occlude|4": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.37434107065200806
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.4347776770591736
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.38077208399772644
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.2992996573448181
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.24527855217456818
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.5414600372314453
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": -0.16014212369918823
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.041280802339315414
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.30050337314605713
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": -0.04237848147749901
+    }
+   ],
+   "ours": {
+    "identical": true,
+    "ari": 1.0,
+    "F1_with": 0.9677949329507409,
+    "F1_after": 0.9735342884122536,
+    "F1_never": 0.9735342884122536
+   },
+   "frozen": {
+    "identical": false,
+    "ari": 0.9996000360674371,
+    "F1_with": 0.9674632151779963,
+    "F1_after": 0.9670505854530425,
+    "F1_never": 0.9688591689250597
+   }
+  },
+  "test|dark|16": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.27878886461257935
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.05618891492486
+    }
+   ]
+  },
+  "test|mixed|0": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.2466207593679428
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.3907214403152466
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.2984538674354553
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.3676977753639221
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": -0.07221338897943497
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.5791640281677246
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.10915765911340714
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.473067045211792
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": -0.07777109742164612
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.1469193547964096
+    }
+   ],
+   "ours": {
+    "identical": true,
+    "ari": 1.0,
+    "F1_with": 0.983639199241382,
+    "F1_after": 0.985801509555693,
+    "F1_never": 0.985801509555693
+   },
+   "frozen": {
+    "identical": false,
+    "ari": 0.9995470477624376,
+    "F1_with": 0.9857591083297307,
+    "F1_after": 0.9868115175308811,
+    "F1_never": 0.9879212864658433
+   }
+  },
+  "test|mixed|24": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.4352028965950012
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.4676241874694824
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.19432853162288666
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.10647623986005783
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.49959659576416016
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.13672082126140594
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.16940182447433472
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.295430064201355
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.3613778054714203
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.1908840835094452
+    }
+   ],
+   "ours": {
+    "identical": true,
+    "ari": 1.0,
+    "F1_with": 0.9645231587714299,
+    "F1_after": 0.9755072176411663,
+    "F1_never": 0.9755072176411663
+   },
+   "frozen": {
+    "identical": false,
+    "ari": 0.996327503185387,
+    "F1_with": 0.9601261046131523,
+    "F1_after": 0.9629843228782092,
+    "F1_never": 0.971079438843954
+   }
+  },
+  "test|blur|4": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.41598421335220337
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.33459484577178955
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.3183552026748657
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": -0.21182981133460999
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.40134328603744507
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.3262749910354614
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.6264507174491882
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.6875346302986145
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.6316846609115601
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.6238125562667847
+    }
+   ],
+   "ours": {
+    "identical": true,
+    "ari": 1.0,
+    "F1_with": 0.9770188049056401,
+    "F1_after": 0.9938011975553451,
+    "F1_never": 0.9938011975553451
+   },
+   "frozen": {
+    "identical": false,
+    "ari": 0.987477412876056,
+    "F1_with": 0.977713186382186,
+    "F1_after": 0.9784087185780938,
+    "F1_never": 0.9944966453711782
+   }
+  },
+  "test|occlude|8": {
+   "clicks": [
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.3422648012638092
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.23896439373493195
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.0832103043794632
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.08812273293733597
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.2577560842037201
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.32308804988861084
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.34234410524368286
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.33704909682273865
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.4353821873664856
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.4462595582008362
+    }
+   ],
+   "ours": {
+    "identical": true,
+    "ari": 1.0,
+    "F1_with": 0.9651013619501734,
+    "F1_after": 0.9733192842361869,
+    "F1_never": 0.9733192842361869
+   },
+   "frozen": {
+    "identical": false,
+    "ari": 0.9987297358246522,
+    "F1_with": 0.9600755943010898,
+    "F1_after": 0.9646185284958598,
+    "F1_never": 0.9682927451456064
+   }
+  },
+  "test|clean|24": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.12123679369688034
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.13740965723991394
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.1599368453025818
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.001032790169119835
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.05685681849718094
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.18351198732852936
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.052371229976415634
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.09014788269996643
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.1140938252210617
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.36360111832618713
+    }
+   ],
+   "ours": {
+    "identical": true,
+    "ari": 1.0,
+    "F1_with": 0.9793045952618118,
+    "F1_after": 0.9899855962387749,
+    "F1_never": 0.9899855962387749
+   },
+   "frozen": {
+    "identical": true,
+    "ari": 1.0,
+    "F1_with": 0.9804239208220522,
+    "F1_after": 0.9910869550524722,
+    "F1_never": 0.9910869550524722
+   }
+  },
+  "test|lookalike|11": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": -0.012490957975387573
+    }
+   ]
+  },
+  "test|mixed|13": {
+   "clicks": [
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.28494930267333984
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.34148991107940674
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.4319368302822113
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.29297930002212524
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.442263126373291
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.44665151834487915
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.2641258239746094
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.4269058108329773
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.2230539470911026
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.42232638597488403
+    }
+   ]
+  },
+  "test|blur|12": {
+   "clicks": [
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.43424296379089355
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.14729732275009155
+    }
+   ]
+  },
+  "test|lowres|5": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.17970944941043854
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.34030354022979736
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.26978549361228943
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.5612689256668091
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.5322067737579346
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.4667735993862152
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.15930765867233276
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.5435070991516113
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.44866132736206055
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.5994737148284912
+    }
+   ],
+   "ours": {
+    "identical": true,
+    "ari": 1.0,
+    "F1_with": 0.9757320183499565,
+    "F1_after": 0.9860674525471835,
+    "F1_never": 0.9860674525471835
+   },
+   "frozen": {
+    "identical": false,
+    "ari": 0.9851058491206128,
+    "F1_with": 0.9631993274848735,
+    "F1_after": 0.9640424856012374,
+    "F1_never": 0.9764407381434698
+   }
+  },
+  "test|dark|9": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.2023574709892273
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.020010102540254593
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.1787172257900238
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.6214151382446289
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.6305615305900574
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.6407461166381836
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.2806463837623596
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.46792200207710266
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.6805135011672974
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.7059847712516785
+    }
+   ],
+   "ours": {
+    "identical": true,
+    "ari": 1.0,
+    "F1_with": 0.9785756622799338,
+    "F1_after": 0.9974110630503389,
+    "F1_never": 0.9974110630503389
+   },
+   "frozen": {
+    "identical": false,
+    "ari": 0.9942061991256955,
+    "F1_with": 0.9901637110009994,
+    "F1_after": 0.9910273479458795,
+    "F1_never": 0.9974110630503389
+   }
+  },
+  "test|dark|29": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": -0.013922426849603653
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.24556006491184235
+    }
+   ]
+  },
+  "test|jpeg|1": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.41791045665740967
+    }
+   ]
+  },
+  "test|dark|2": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.15490467846393585
+    }
+   ]
+  },
+  "test|lowres|25": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.3571385145187378
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.2937811613082886
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.14937856793403625
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.30494797229766846
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.36257344484329224
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.44808775186538696
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.5858670473098755
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.33424001932144165
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.26013463735580444
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.22730329632759094
+    }
+   ],
+   "ours": {
+    "identical": true,
+    "ari": 1.0,
+    "F1_with": 0.9850489587122605,
+    "F1_after": 0.9877418869889678,
+    "F1_never": 0.9877418869889678
+   },
+   "frozen": {
+    "identical": false,
+    "ari": 0.9983928702755811,
+    "F1_with": 0.9816176499180396,
+    "F1_after": 0.9824906066442987,
+    "F1_never": 0.9880889444057005
+   }
+  },
+  "test|lookalike|2": {
+   "clicks": []
+  },
+  "test|mixed|20": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.39748215675354004
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.38480690121650696
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.34610313177108765
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.36735308170318604
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.09841838479042053
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.239045649766922
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.23642605543136597
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.13200902938842773
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.22162020206451416
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.4040727913379669
+    }
+   ],
+   "ours": {
+    "identical": true,
+    "ari": 1.0,
+    "F1_with": 0.988373563647965,
+    "F1_after": 0.9918585197836259,
+    "F1_never": 0.9918585197836259
+   },
+   "frozen": {
+    "identical": false,
+    "ari": 0.9784817889283624,
+    "F1_with": 0.9895538317073962,
+    "F1_after": 0.9800411006788998,
+    "F1_never": 0.9932597493602376
+   }
+  },
+  "test|blur|17": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": -0.05333736166357994
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.31640034914016724
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.23112931847572327
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.03712506219744682
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.1179279088973999
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.007027427665889263
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": -0.03635760396718979
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.5326032638549805
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": -0.04536566138267517
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.7463496327400208
+    }
+   ],
+   "ours": {
+    "identical": true,
+    "ari": 1.0,
+    "F1_with": 0.9911597154684502,
+    "F1_after": 0.9966375519223288,
+    "F1_never": 0.9966375519223288
+   },
+   "frozen": {
+    "identical": false,
+    "ari": 0.9972484395520627,
+    "F1_with": 0.9881686687123363,
+    "F1_after": 0.9918316022472367,
+    "F1_never": 0.995323443984404
+   }
+  },
+  "test|jpeg|13": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.44958382844924927
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.2119026780128479
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.38655632734298706
+    }
+   ]
+  },
+  "test|dark|10": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.26652950048446655
+    }
+   ]
+  },
+  "test|blur|6": {
+   "clicks": []
+  },
+  "test|clean|10": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.30715882778167725
+    }
+   ]
+  },
+  "test|jpeg|17": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.4574846625328064
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.2448013722896576
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.036668501794338226
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.012841632589697838
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.17440110445022583
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": -0.013489670120179653
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.6908820867538452
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.010137843899428844
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.4523959755897522
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.38541728258132935
+    }
+   ]
+  },
+  "test|lookalike|17": {
+   "clicks": []
+  },
+  "test|mixed|14": {
+   "clicks": [
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.25932425260543823
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.36868369579315186
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.41091299057006836
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.37600529193878174
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.48812684416770935
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.020470986142754555
+    },
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.2666209936141968
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.3690248429775238
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.3935315012931824
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.1963101476430893
+    }
+   ],
+   "ours": {
+    "identical": true,
+    "ari": 1.0,
+    "F1_with": 0.9711376561602729,
+    "F1_after": 0.9808563940901815,
+    "F1_never": 0.9808563940901815
+   },
+   "frozen": {
+    "identical": false,
+    "ari": 0.9995517252510493,
+    "F1_with": 0.9739234532877082,
+    "F1_after": 0.9747806352080812,
+    "F1_never": 0.9755190961023025
+   }
+  },
+  "test|dark|4": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": true,
+     "cos": 0.22715096175670624
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": -0.0558830127120018
+    },
+    {
+     "must": false,
+     "wrong": false,
+     "cos": 0.27164945006370544
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.671136200428009
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.43636995553970337
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.5517464280128479
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.5345940589904785
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.4666963815689087
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.5545885562896729
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.6294446587562561
+    }
+   ],
+   "ours": {
+    "identical": true,
+    "ari": 1.0,
+    "F1_with": 0.982909941289216,
+    "F1_after": 0.995877290536071,
+    "F1_never": 0.995877290536071
+   },
+   "frozen": {
+    "identical": false,
+    "ari": 0.9943778305896137,
+    "F1_with": 0.9834729615073867,
+    "F1_after": 0.9873235221383597,
+    "F1_never": 0.995877290536071
+   }
+  },
+  "test|lookalike|6": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.1816982626914978
+    }
+   ]
+  },
+  "test|jpeg|8": {
+   "clicks": [
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.02046567015349865
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.17061564326286316
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.43364790081977844
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.3973347842693329
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.41218870878219604
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.31584277749061584
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.42111241817474365
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.26117441058158875
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.38726168870925903
+    },
+    {
+     "must": true,
+     "wrong": false,
+     "cos": 0.36669111251831055
+    }
+   ]
+  }
+ },
+ "seconds": 875.7334892749786
+}
