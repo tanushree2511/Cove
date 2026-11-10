@@ -137,4 +137,12 @@ chk("abstract: ours minus c-avg, precise user (within 0.002)", 0.0011,
 chk("abstract: ours minus c-avg, casual user", 0.0003, t19["casual|ours"]["later_F1"] - t19["casual|c-avg"]["later_F1"], 4)
 chk("abstract: ours minus c-avg, error-prone user (NOT within 0.002)", -0.0027,
     t19["noisy|ours"]["later_F1"] - t19["noisy|c-avg"]["later_F1"], 4)
+# ---- exp27 faster constrained average linkage (cost paragraph)
+r27 = J("exp27_cavg_fast_timing_edgeface_s.json")["rows"]["8290"]
+chk("exp27 c-avg fast 0 corr s", 32, r27["cavg_fast_0_s"], 0)
+chk("exp27 c-avg fast 10 corr s", 31, r27["cavg_fast_10_s"], 0)
+chk("exp27 ours 0 corr s", 0.6, r27["ours_0_s"], 1)
+chk("exp27 ours 10 corr s", 2.0, r27["ours_10_s"], 1)
+chk("exp27 ratio with corrections (16x)", 16, r27["cavg_fast_10_s"] / r27["ours_10_s"], 0)
+chk("exp27 ratio without corrections (53x)", 53, r27["cavg_fast_0_s"] / r27["ours_0_s"], 0)
 print(f"\n{n_ok} ok, {bad} mismatch")
