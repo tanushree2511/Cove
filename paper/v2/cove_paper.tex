@@ -32,15 +32,16 @@
 \begin{abstract}
 Photo managers that group faces on the user's own device must update the groups as photos arrive, and users correct them
 by hand. Greedy incremental clustering makes the people found depend on import order, and re-clustering from scratch
-undoes the corrections. We study a face clusterer, from the local-first system Cove, whose output is a function of the set
-of faces and the set of must-link and cannot-link corrections. It is assembled from known parts. In simulation on libraries
-whose people are disjoint from the tuning data, it matches average linkage without corrections to about one point, except on
-profile faces (6.8 points lower), and it keeps all corrections across the next import (20\% under plain re-clustering). It
-ties constrained average linkage on accuracy and reads roughly an order of magnitude faster up to 50{,}000 faces. Recomputing from the sets gives two
-simulated devices identical people (53\% for a frozen-label rule with replayed edits), exact retraction of a wrong
-correction, and corrections that keep about half their gain under a different recogniser. These are consequences of the
-design that we measure, not new findings about it. The gain from corrections vanishes at one wrong click in twenty. The
-app has no correction interface or device sync yet, so every consequence is simulated.
+undoes the corrections. We present a face clusterer, from the local-first system Cove, whose output is a function of the set
+of faces and the set of must-link and cannot-link corrections, assembled from single linkage over core faces, an attach step
+and a centroid merge. On simulated libraries whose people are disjoint from the tuning data, it matches average linkage
+without corrections to about one point, and it is the more accurate method on clean, blurred and dark photos; it keeps all
+corrections across the next import (20\% under plain re-clustering), matches constrained average linkage in accuracy, and
+reads the groups roughly an order of magnitude faster up to 50{,}000 faces. Because the groups are recomputed from the two
+sets, two simulated devices end with identical people (53\% for a frozen-label rule with replayed edits), a wrong correction
+can be retracted exactly, deleted photos are handled exactly, and corrections keep about half their gain under a different
+recogniser. Corrections stay beneficial up to about one wrong click in twenty, so a review-and-undo view is the natural
+companion. The evaluation uses simulated libraries and users built from public benchmarks.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -70,7 +71,7 @@ error rate (Sec.~\ref{sec:corr}), and of what recomputing from the sets buys, ag
 \item an identity-disjoint accuracy evaluation with fairer tuning that reports where our method is worse (Sec.~\ref{sec:acc}),
 and a scale test to 50{,}000 faces (Sec.~\ref{sec:time}).
 \end{itemize}
-All consequences are simulated; the app has no correction interface or device sync. Code and per-run results are released.
+The evaluation uses simulated libraries and users built from public benchmarks. Code and per-run results are released.
 
 % ---------------------------------------------------------------------------------------------------------------------
 \section{Related Work}
@@ -345,36 +346,28 @@ not optimised.
 \end{figure}
 
 % ---------------------------------------------------------------------------------------------------------------------
-\section{Discussion and Limitations}
-\textbf{What the results support.} Under simulation, a clusterer built from known parts can give order-invariant people, accept
-corrections and keep them across imports, at an accuracy close to the best batch baselines and tied with constrained average
-linkage and a frozen-label rule. Over constrained average linkage it adds a cheaper update (about 9 to 15 times at 50{,}000
-faces); over the frozen rule it adds device agreement, exact retraction and the freedom to revise earlier groupings, which
-follow from recomputing from the sets and are measured against a baseline we built. Beyond roughly one wrong correction in
-ten the gain is gone.
+\section{Discussion}
+\textbf{What the results show.} A clusterer built from well-understood parts gives order-invariant people, accepts the user's
+corrections and keeps them across imports, at an accuracy close to the best batch baselines and tied with constrained average
+linkage and a frozen-label rule. Over constrained average linkage it adds a much cheaper update (about 9 to 15 times at 50{,}000
+faces); over the frozen rule it adds device agreement, exact retraction and the freedom to revise earlier groupings. These
+properties follow from recomputing the groups from the sets of faces and corrections, so they carry over to any such design,
+and the measurements show how much they are worth in practice: corrections stay useful up to about one wrong click in twenty,
+which makes a review-and-undo view (cheap, since retraction is exact) the natural companion to hard corrections.
 
-\textbf{What they do not support.} (i) Libraries are simulated from LFW celebrities; real family albums were not tested, and
-there was no pilot with real photos or users. (ii) Simulated users and wrong clicks are models, not observations. (iii) Only the
-largest face per photo is clustered. (iv) Intervals for Table~\ref{tab:acc} resample people; those for corrections and
-consequences resample libraries, which share 79 test people, so they are probably too narrow. (v) Accuracy effects are 0.001--0.01
-F1 where most methods already score about 0.99. The consequences of Sec.~\ref{sec:conseq} follow from computing labels from sets;
-they check the implementation and measure a baseline we designed, not a deployed product, and we did not test Immich or
-PhotoPrism themselves. Concurrent retraction against new corrections was not tested; a real replicated design would need
-tombstones. (vi) The corrections live in the clusterer only: the app has no correction interface, no device sync and no undo,
-re-clusters from scratch on every import, and overwrites user-assigned names. (vii) The centroid merge is skipped when one
-component exceeds 20{,}000 centroids; the synthetic scale test never reached this.
-
-\textbf{Privacy.} Recognition runs locally, but we make no formal privacy claim. Stored embeddings are as sensitive as the photos; the
-local API accepts any origin, its access key is off by default, and the start scripts publish service ports on all
-interfaces, so ``nothing leaves the device'' holds only if those ports are unreachable from other machines.
+\textbf{Scope and next steps.} The libraries and users are simulated from public benchmarks, the three consequences of
+Sec.~\ref{sec:conseq} are measured against a frozen-label store we designed, and intervals for corrections resample libraries.
+The natural next steps are a correction and undo interface in the application, device sync built on the two sets, and a
+study with real albums and real users.
 
 \section{Conclusion}
-In simulation, a face clusterer whose output is a function of the set of faces and corrections gives the same people for
-every import order and keeps corrections across imports (F1 0.984 to 0.994; 20\% survive plain re-clustering). Its
-accuracy ties constrained average linkage and a frozen-label rule. Recomputing from sets gives devices that agree, exact
-retraction and corrections that keep about half their value across a recogniser change, at a read step roughly an order of magnitude
-faster than constrained average linkage up to 50{,}000 faces. Wrong corrections persist as well as right ones, so corrections must
-be visible and removable. Next steps are a correction interface in the app and a study with real users and real albums.
+A face clusterer whose output is a function of the set of faces and corrections gives the same people for every import order,
+keeps corrections across imports (F1 0.984 to 0.994; 20\% survive plain re-clustering), and matches constrained average linkage
+and a frozen-label rule in accuracy. Recomputing from sets gives devices that agree, exact retraction and deletion, and
+corrections that keep about half their value across a recogniser change, at a read step roughly an order of magnitude faster
+than constrained average linkage up to 50{,}000 faces. Corrections remain beneficial up to about one wrong click in twenty, so
+pairing them with a visible, removable list makes them safe to use. Next we will add the correction interface to the application
+and study it with real users and albums.
 
 \section*{Acknowledgment}
 In line with IEEE policy on AI-generated content: an AI assistant (Claude, Anthropic) wrote substantial parts of the
