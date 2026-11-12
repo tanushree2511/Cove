@@ -32,16 +32,18 @@
 \begin{abstract}
 Photo managers that group faces on the user's own device must update the groups as photos arrive, and users correct them
 by hand. Greedy incremental clustering makes the people found depend on import order, and re-clustering from scratch
-undoes the corrections. We present a face clusterer, from the local-first system Cove, whose output is a function of the set
-of faces and the set of must-link and cannot-link corrections, assembled from single linkage over core faces, an attach step
-and a centroid merge. On simulated libraries whose people are disjoint from the tuning data, it matches average linkage
-without corrections to about one point, and it is the more accurate method on clean, blurred and dark photos; it keeps all
-corrections across the next import (20\% under plain re-clustering), matches constrained average linkage in accuracy, and
-reads the groups roughly an order of magnitude faster up to 50{,}000 faces. Because the groups are recomputed from the two
-sets, two simulated devices end with identical people (53\% for a frozen-label rule with replayed edits), a wrong correction
-can be retracted exactly, deleted photos are handled exactly, and corrections keep about half their gain under a different
-recogniser. Corrections stay beneficial up to about one wrong click in twenty, so a review-and-undo view is the natural
-companion. The evaluation uses simulated libraries and users built from public benchmarks.
+undoes the corrections. We study the face clusterer of the Cove photo manager, whose output is a function of the set of
+faces and the set of must-link and cannot-link corrections, assembled from single linkage over core faces, an attach step and
+a centroid merge. On simulated libraries whose people are disjoint from the tuning data, its accuracy without corrections is
+within about one point of average linkage (ahead on clean photos, behind on low-resolution and profile ones, by up to 7
+points), and with corrections within 0.003 F1 of constrained average linkage. It keeps every consistent correction across the
+next import, where plain re-clustering keeps 20\%, and its read step is roughly an order of magnitude faster than constrained
+average linkage on synthetic libraries of up to 50{,}000 faces. Recomputing the groups from the two sets gives, in simulation,
+two devices with identical people (53\% for a frozen-label rule of our design), exact retraction of a wrong correction, exact
+handling of deleted photos, and corrections that keep about half their gain under a different recogniser. The gain from
+corrections is largest when clicks are right and is gone by about one wrong click in twenty, so a review-and-undo view
+should accompany them. Only the clusterer is part of the application; corrections, devices and users are simulated from
+public benchmarks.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -71,7 +73,8 @@ error rate (Sec.~\ref{sec:corr}), and of what recomputing from the sets buys, ag
 \item an identity-disjoint accuracy evaluation with fairer tuning that reports where our method is worse (Sec.~\ref{sec:acc}),
 and a scale test to 50{,}000 faces (Sec.~\ref{sec:time}).
 \end{itemize}
-The evaluation uses simulated libraries and users built from public benchmarks. Code and per-run results are released.
+Only the clusterer is part of the application; the corrections, devices and users in the evaluation are simulated from public
+benchmarks. Code and per-run results are released.
 
 % ---------------------------------------------------------------------------------------------------------------------
 \section{Related Work}
@@ -83,7 +86,8 @@ HDBSCAN~\cite{campello2013hdbscan}.
 \textbf{Incremental and constrained clustering.} Incremental DBSCAN~\cite{ester1998incremental} gives the result of
 re-running DBSCAN after each insertion, up to border points; our core-point step builds on it. Constraints have been added
 to density-based clustering~\cite{ruiz2007cdbscan,ruiz2009cdenstream,lasek2019density} (our constrained step is closest to
-C-DBSCAN), to incremental hierarchical clustering~\cite{monath2019grinch}, and to faces~\cite{shi2018conpac,wu2013constrained}.
+C-DBSCAN) and to faces~\cite{shi2018conpac,wu2013constrained}, and incremental hierarchical clustering can repair earlier
+merges~\cite{monath2019grinch}.
 Must-link and cannot-link constraints were brought to $k$-means~\cite{wagstaff2001copkmeans} and agglomerative
 clustering~\cite{davidson2005agglomerative}, and a clustering can be updated as constraints are
 added~\cite{davidson2007incremental}. That constraint sets can lower accuracy~\cite{davidson2006utility} and that imperfect
@@ -93,7 +97,7 @@ dependence for face streams.
 \textbf{Sets, replicas and upgrades.} Computing state from the set of inputs so that replicas that exchange inputs agree is
 the idea of conflict-free replicated data types~\cite{shapiro2011crdt} and local-first software~\cite{kleppmann2019local}.
 Splitting a linkage clustering at the components of a threshold graph is classical for single
-linkage~\cite{gower1969mst}. Backward-compatible embeddings~\cite{shen2020backward} address upgrades for the embeddings
+linkage~\cite{gower1969mst,sibson1973slink}. Backward-compatible embeddings~\cite{shen2020backward} address upgrades for the embeddings
 themselves. In sources searched on 2026-11-10 (SciSpace, Consensus, web search, mostly abstracts) we did not find a measurement
 of whether face-grouping corrections survive re-clustering, converge across devices, can be retracted exactly, or survive a
 change of recogniser; this is bounded to those sources.
@@ -104,7 +108,8 @@ change of recogniser; this is bounded to those sources.
 \centering
 \includegraphics[width=0.92\columnwidth]{figs/pipeline.pdf}
 \caption{The pipeline. Corrections are kept as a set of face pairs next to the face index; the read step is recomputed from
-both sets, so exchanging the two sets between devices, or deleting one pair, gives the same result as starting again.}
+both sets, so devices that exchange the two sets, or a deletion of one pair, give the same result as starting again (simulated; the
+application has no sync).}
 \label{fig:pipeline}
 \end{figure}
 \textbf{Pipeline} (Fig.~\ref{fig:pipeline}). Faces are detected with SCRFD-500M~\cite{guo2022scrfd}, aligned to $112\times112$
@@ -121,11 +126,13 @@ linkage at $\tau_\ell$, so the method is single linkage, plus attachment, plus a
 count reaches $m$ become core, and new core faces are unioned with their core neighbours. Core status and links only switch from
 false to true, so no earlier decision is undone; attachment and the merge are recomputed when labels are read.
 
-\textbf{Exact read step.} Average linkage over centroids never joins two groups unless some cross pair has cosine
-$\ge\tau_g$ (an average cannot exceed its largest term). We split the centroids into components of the graph of pairs with
-cosine $\ge\tau_g$ and agglomerate each alone. This split is classical; we use it for speed. It gave identical partitions
-to the original merge on all 240 test library--condition pairs, for both recognisers, after the real corrections of the
-three simulated users (up to ten each; they changed the result in 99\% of the pairs that received any) and on 8{,}290 faces (Sec.~\ref{sec:time}).
+\textbf{Exact read step.} Here average linkage treats each cluster centroid as one item, and the similarity of two groups of
+centroids is the mean of their pairwise centroid cosines. That mean cannot exceed its largest term, so two groups never join
+unless some cross pair has cosine $\ge\tau_g$. We therefore split the centroids into components of the graph of pairs with
+cosine $\ge\tau_g$ and agglomerate each alone. The split is classical for single linkage; for this average linkage it follows from
+the argument above, and we use it for speed. It gave identical partitions to the original merge on all 240 test library--condition
+pairs, for both recognisers, under the real corrections of three simulated users (up to ten each; 210--216 pairs per user
+received corrections, and they changed the result in all but one of 1{,}276 cases) and on 8{,}290 faces (Sec.~\ref{sec:time}).
 
 \textbf{Corrections and deletion.} A user states that faces $i,j$ are the same person (must-link) or different people
 (cannot-link). Both are stored as sets of face pairs and applied whenever labels are computed. In order: (1) must-links, in
@@ -135,12 +142,14 @@ whose group has no core face attaches to its most similar allowed core face; (4)
 holding a cannot-linked pair. A cannot-link is therefore never violated, and in a conflict ($a{=}b$, $b{=}c$, $a{\ne}c$) the
 less similar must-link is the one dropped. Two non-core faces joined by a must-link attach separately, so the must-link
 can join the two clusters they attach to. Deleting photos removes the faces from the face set, drops corrections that name
-them, recomputes core flags from the stored neighbour lists and rebuilds the union-find, with no new similarity search.
+them, recomputes core flags from the stored neighbour lists and rebuilds the union-find, with no new similarity search. Corrections
+refer to faces by id; an application must key them by photo hash and face box so that they survive deletions and can be exchanged
+between devices.
 
 \begin{proposition}
 For fixed thresholds, the labels after any sequence of insertions and deletions depend only on the final set of faces and
-the corrections that name them, not on the order, batching or deletion history (up to renaming of clusters and to exact
-ties between real-valued similarities).
+the corrections that name them, not on the order, batching or deletion history (in exact arithmetic, up to renaming of clusters and to exact
+ties between similarities, including ties at a threshold).
 \end{proposition}
 \begin{proof}[Proof sketch]
 Each pair of present faces with $s\ge\tau_a$ is found once, when its later face arrives; deletion removes exactly the
@@ -158,7 +167,8 @@ not for a store that keeps labels and edits them (Sec.~\ref{sec:conseq}).
 
 % ---------------------------------------------------------------------------------------------------------------------
 \section{Experimental Protocol}\label{sec:protocol}
-All rules were fixed before any test number was computed.
+The main protocol was fixed before any test number was computed; the later checks (finer grids, identity bootstrap,
+error-rate sweep, scale and deletion tests) are reported as additions.
 
 \textbf{Libraries.} LFW~\cite{huang2007lfw} identities are split once (seed 2026) into a tuning and a test half, for ``family''
 identities ($\ge$10 photos; 79 per half) and ``strangers'' (1{,}844 per half). A library draws 15--40 family people (up to 200
@@ -167,14 +177,14 @@ photos each) and 50--150 strangers (one photo each) from one half: 30 tuning and
 CPLFW~\cite{zheng2018cplfw} (pose) are clustered whole, on test identities (8{,}212 and 7{,}718 faces). Photos are re-embedded after
 degradation: low-res, blur, JPEG (q8), dark, occluded (eyes), and mixed.
 
-\textbf{Equal tuning.} Every method gets a grid over the same similarity range (0.20--0.70, step 0.05) and is tuned on the
-same tuning libraries and conditions to maximise the adjusted Rand index (ARI)~\cite{hubert1985ari}. The recogniser was
+\textbf{Tuning.} Every method gets a grid over the same similarity range (0.20--0.70, step 0.05) and is tuned on the
+same tuning libraries and conditions to maximise the adjusted Rand index (ARI)~\cite{hubert1985ari}; we report B-Cubed F1. The recogniser was
 chosen on tuning data by a pre-declared rule (EdgeFace-S, the faster model, unless its ARI is 0.005 lower; it is not).
 Tuned: $\tau_\ell=0.65$, $m=1$, $\tau_a=0.50$, $\tau_g=0.55$. The terms are equal in data and rule, not in
 freedom: ours has four parameters (360 grid points), one-threshold baselines one (11). Sec.~\ref{sec:acc} repeats the
 comparison with finer baseline grids and with a small budget for ours.
 
-\textbf{Test.} Every method runs in 5 shuffled orders. We report B-Cubed F1~\cite{amigo2009bcubed} and
+\textbf{Test.} Every method runs in 5 shuffled orders. We report B-Cubed~\cite{bagga1998entity,amigo2009bcubed} and
 the \emph{order agreement} (lowest ARI between two orders). Differences use a paired bootstrap over libraries (over
 library--condition pairs for corrections; 10{,}000 resamples, 95\% intervals); for Table~\ref{tab:acc} we also resample
 \emph{people} (Poisson(1) weights on the 1{,}571 identities, 1{,}000 resamples), which keeps the people shared by libraries shared.
@@ -186,7 +196,7 @@ two people; the \emph{error-prone} user is casual, but with probability 0.1 each
 between look-alike clusters. After the ``later'' photos arrive we compare: \emph{ours}; \emph{constrained average
 linkage} (our implementation after~\cite{davidson2005agglomerative}); \emph{re-apply} (cluster without corrections, then
 repair each violated pair); and \emph{frozen} (earlier people kept, each new face joins its most similar face's person at
-cosine $\ge0.5$, Immich's default). We report F1 and the share of corrections still true. Nothing here is tuned.
+cosine $\ge0.5$, Immich's default threshold). We report F1 and the share of corrections still true. No parameter is tuned here.
 \emph{Error rate}: the casual user with wrong-click probability $p\in\{0,0.02,0.05,0.1,0.2\}$.
 \emph{Two devices}: a synced 50\% base, then 25\% more faces per device in its own order and up to five precise corrections,
 then an exchange of faces and corrections. \emph{Retraction}: for libraries where the error-prone user made a wrong ``same
@@ -231,24 +241,25 @@ Order agreement (min) & 0.562 & 0.758 & 1.000 & 0.997 & 0.983 & 1.000 & 1.000 & 
 
 Our method is not clearly ahead on degraded photos. \emph{Fairer tuning.} Re-tuning every baseline on a step-0.01 grid
 (581 configurations, same rule) did not help them: average linkage scored 0.9849 overall on the test libraries against 0.9857
-with the coarse grid, and no other baseline moved by more than 0.002. Giving ours only 51 randomly chosen grid points (5
+with the coarse grid, and none moved by more than 0.0021. Giving ours only 51 randomly chosen grid points (5
 draws, chosen by tuning ARI) scores 0.9809 to 0.9857 (mean 0.9836) against 0.9854 for its full grid. Resampling people
-instead of libraries widens the intervals. Against average linkage, the strongest baseline, ours is better on clean
+instead of libraries widens the intervals (eight conditions; no multiplicity correction). Against average linkage, the strongest baseline, ours is better on clean
 ($+0.0059$, $[+0.0020,+0.0119]$), blur ($+0.0038$) and dark photos ($+0.0022$), worse on low-res ($-0.0061$,
-$[-0.0139,-0.0008]$), and not distinguishable on JPEG, mixed ($-0.0025$, $[-0.0060,+0.0002]$), occluded ($-0.0089$,
+$[-0.0139,-0.0008]$), and not distinguishable on JPEG (0.993 for both), mixed ($-0.0025$, $[-0.0060,+0.0002]$), occluded ($-0.0089$,
 $[-0.0219,+0.0072]$) and look-alike libraries. Against single linkage ours is better on every condition by 0.2 to 14 points,
 except CPLFW, where it is 0.5 points worse (0.841 vs.\ 0.846); the gain is the attach threshold, whose removal costs up to
-3.6 points. With MBF the pattern is similar, but on occluded faces ours is worse (0.928 against 0.954).
+3.6 points on libraries but gains 5.2 on CPLFW. With MBF the pattern is similar, but on occluded faces ours is worse (0.928
+against 0.954).
 
-On whole sets ours trades recall for precision: best on CALFW (0.947), 6.8 points below average linkage on CPLFW (0.841 vs.\
+On whole sets ours trades recall for precision: best on CALFW (0.947), about 7 points below average linkage on CPLFW (0.841 vs.\
 0.909; precision 0.985 vs.\ 0.912, recall 0.733 vs.\ 0.906), because single-linkage cores split profile photos from frontal
-ones. A pose-aware similarity bonus made CPLFW worse (F1 0.841$\to$0.800) and was not adopted.
+ones.
 
 \subsection{Keeping corrections when new photos arrive}\label{sec:corr}
 For the precise user, 207 of 240 library--condition pairs needed a correction (6.3 on average among them, 5.4 over all).
 They raised F1 on the ``now'' photos from 0.984 to 0.994 (gain $+0.010$, $[+0.008,+0.011]$). Table~\ref{tab:corr} shows
 what happens after the ``later'' photos arrive: plain re-clustering keeps 20\% of the corrections and F1 falls back to
-0.985. Ours keeps all of them by construction, so the informative comparison is with other ways of keeping them.
+0.985. Ours keeps every consistent correction by construction, so the informative comparison is with other ways of keeping them.
 
 \emph{Constrained average linkage} also keeps every correction at similar accuracy: ours is $+0.001$ F1 on all faces
 ($[-0.000,+0.002]$), but on the new photos alone it is better for all three users (ours $-0.0014$, $[-0.0026,-0.0002]$ for the
@@ -283,7 +294,7 @@ Method & F1 & precise & casual & error-pr. & (\%) \\
 No corrections kept  & 0.9939 & 0.9854 & 0.9854 & 0.9854 & 20\,/\,23 \\
 Re-apply (ours)      & 0.9925 & 0.9914 & 0.9899 & 0.9893 & 96\,/\,73 \\
 Re-apply (avg.\ link.) & 0.9936 & 0.9914 & 0.9900 & \textbf{0.9896} & 93\,/\,68 \\
-Frozen (Immich-style) & 0.9939 & \textbf{0.9928} & -- & -- & 100\,/\,-- \\
+Frozen-label rule & 0.9939 & \textbf{0.9928} & -- & -- & 100\,/\,-- \\
 Constr.\ avg.\ link. & \textbf{0.9945} & 0.9914 & 0.9917 & 0.9878 & 100\,/\,100 \\
 \textbf{Ours}        & 0.9939 & 0.9925 & \textbf{0.9920} & 0.9851 & 100\,/\,100 \\
 \bottomrule
@@ -311,7 +322,8 @@ F1 if never made & 0.980\,/\,0.981 & n/r & 0.980\,/\,0.969 \\
 \emph{Two devices.} After exchanging faces and corrections, ours gave identical people on both devices in all 240
 library--condition pairs for both recognisers. So did constrained average linkage, which also recomputes from the sets. The
 frozen store with replayed edits agreed in 127 (EdgeFace-S) and 74 (MBF) of 240 pairs (lowest ARI 0.89, 0.91). The property
-is not unique to our clusterer; it is what a plain edit log lacks.
+is not unique to our clusterer; it is what a plain edit log lacks. The frozen store mixes insertion order with edit-replay order
+and its edits carry no timestamps, so 53\% describes a plain edit log, not a deployed sync.
 
 \emph{Retraction.} In the 104 (EdgeFace-S) and 98 (MBF) libraries where the error-prone user made a wrong ``same person'',
 removing it after the ``later'' photos arrived gave exactly the never-made partition (ARI 1; F1 $0.970\to0.980$); the inverse split
@@ -331,12 +343,13 @@ labels, against 7.0\,s to rebuild from the remaining faces, with identical label
 
 Larger libraries are synthetic: the 8{,}290 embeddings are copied up to six times, each copy under its own random rotation,
 so copies are unrelated and the work per copy stays that of real faces; this tests cost, not accuracy (Fig.~\ref{fig:scale}).
-At 49{,}740 faces our read step took 15\,s without and 20\,s with ten corrections. Constrained average linkage (split per
-component; a version that caches each row's best partner, identical labels to our first NumPy version at 1{,}658 and 3{,}316
-faces, which needed 293\,s at 8{,}290 faces) took 234 and 212\,s, and compiled SciPy average linkage without any
-constraints, a lower bound for a constrained version, took 174\,s: our read step is 9 to 15 times faster there, and 16 to 69
-times at 8{,}290 faces. Building the flat FAISS index in one batch took 316\,s at 49{,}740 faces, which is quadratic and was
-not optimised.
+At 49{,}740 faces our read step took 15\,s without and 20\,s with ten corrections. Constrained average linkage, split per
+component and with a best-partner cache (same labels as our first NumPy version, which needed 293\,s at 8{,}290 faces;
+checked at 1{,}658 and 3{,}316 faces), took 234 and 212\,s, and compiled SciPy average linkage with no constraints, a lower
+bound for a constrained version, took 174\,s. Our read step is therefore 9 to 15 times faster at 49{,}740 faces, and 16 to 69
+times at 8{,}290 faces: the lead narrows as libraries grow, and single timings of the same step vary by up to a factor of two
+on this laptop (our 8{,}290-face read took 0.3--0.6\,s across runs). Building the flat FAISS index in one batch took 316\,s at
+49{,}740 faces; it is quadratic and was not optimised, and an incremental or approximate index would replace it.
 
 \begin{figure}[t]
 \centering
@@ -348,26 +361,29 @@ not optimised.
 % ---------------------------------------------------------------------------------------------------------------------
 \section{Discussion}
 \textbf{What the results show.} A clusterer built from well-understood parts gives order-invariant people, accepts the user's
-corrections and keeps them across imports, at an accuracy close to the best batch baselines and tied with constrained average
-linkage and a frozen-label rule. Over constrained average linkage it adds a much cheaper update (about 9 to 15 times at 50{,}000
-faces); over the frozen rule it adds device agreement, exact retraction and the freedom to revise earlier groupings. These
-properties follow from recomputing the groups from the sets of faces and corrections, so they carry over to any such design,
-and the measurements show how much they are worth in practice: corrections stay useful up to about one wrong click in twenty,
-which makes a review-and-undo view (cheap, since retraction is exact) the natural companion to hard corrections.
+corrections and keeps them across imports, at an accuracy close to the best batch baselines and within 0.003 F1 of constrained
+average linkage and a frozen-label rule. Over constrained average linkage it adds a much cheaper read step (9 to 15 times at
+50{,}000 synthetic faces); over the frozen rule it adds device agreement, exact retraction and the freedom to revise earlier
+groupings. These properties follow from recomputing the groups from the sets of faces and corrections, so they carry over to
+any such design; the measurements show what they are worth. The gain from corrections is clear up to about two wrong clicks in a
+hundred, small at five to ten (intervals include zero) and negative at twenty, which makes a review-and-undo view (cheap, since
+retraction is exact) the natural companion to hard corrections.
 
-\textbf{Scope and next steps.} The libraries and users are simulated from public benchmarks, the three consequences of
-Sec.~\ref{sec:conseq} are measured against a frozen-label store we designed, and intervals for corrections resample libraries.
-The natural next steps are a correction and undo interface in the application, device sync built on the two sets, and a
-study with real albums and real users.
+\textbf{Scope and next steps.} Only the clusterer is part of the application. Libraries, users, wrong clicks and devices are
+simulated from public benchmarks; the three consequences of Sec.~\ref{sec:conseq} are measured against a frozen-label store of our
+design; intervals for corrections resample library--condition pairs that share 79 test people; and scaling uses synthetic
+copies. A deployment needs a correction and undo interface, corrections keyed by photo hash and face box, tombstones so that a
+retraction on one device meets a new correction on another (not tested), and a study with real albums, which also needs the
+owners' consent because exchanging faces means exchanging biometric embeddings.
 
 \section{Conclusion}
-A face clusterer whose output is a function of the set of faces and corrections gives the same people for every import order,
-keeps corrections across imports (F1 0.984 to 0.994; 20\% survive plain re-clustering), and matches constrained average linkage
-and a frozen-label rule in accuracy. Recomputing from sets gives devices that agree, exact retraction and deletion, and
-corrections that keep about half their value across a recogniser change, at a read step roughly an order of magnitude faster
-than constrained average linkage up to 50{,}000 faces. Corrections remain beneficial up to about one wrong click in twenty, so
-pairing them with a visible, removable list makes them safe to use. Next we will add the correction interface to the application
-and study it with real users and albums.
+A face clusterer whose output is a function of the set of faces and corrections gives the same people for every import order and
+keeps every consistent correction across imports (F1 0.9925 after the next import, against 0.985 with plain re-clustering),
+within 0.003 F1 of constrained average linkage. Recomputing from the sets gives, in simulation, devices that agree, exact
+retraction and deletion, and corrections that keep about half their value across a recogniser change, with a read step roughly an
+order of magnitude faster than constrained average linkage on synthetic libraries up to 50{,}000 faces. The gain from corrections
+shrinks as wrong clicks grow and is gone at about one in twenty, so pairing them with a visible, removable list is advisable.
+Next we will add the correction interface to the application and study it with real users and albums.
 
 \section*{Acknowledgment}
 In line with IEEE policy on AI-generated content: an AI assistant (Claude, Anthropic) wrote substantial parts of the

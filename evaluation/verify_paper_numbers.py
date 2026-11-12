@@ -132,9 +132,9 @@ chk("exp19 new-face CI lo (oracle)", -0.0026, float(np.percentile(bm, 2.5)), 4)
 chk("exp19 new-face CI hi (oracle)", -0.0002, float(np.percentile(bm, 97.5)), 4)
 # ---- abstract claims
 t19 = J("exp19_correction_baselines_edgeface_s.json")["table"]["ALL"]
-chk("abstract: ours minus c-avg, precise user (within 0.002)", 0.0011,
+chk("abstract: ours minus c-avg, precise user (within 0.002)", 0.0010,
     t19["oracle|ours"]["later_F1"] - t19["oracle|c-avg"]["later_F1"], 4)
-chk("abstract: ours minus c-avg, casual user", 0.0003, t19["casual|ours"]["later_F1"] - t19["casual|c-avg"]["later_F1"], 4)
+chk("abstract: ours minus c-avg, casual user", 0.0004, t19["casual|ours"]["later_F1"] - t19["casual|c-avg"]["later_F1"], 4)
 chk("abstract: ours minus c-avg, error-prone user (NOT within 0.002)", -0.0027,
     t19["noisy|ours"]["later_F1"] - t19["noisy|c-avg"]["later_F1"], 4)
 # ---- exp27 faster constrained average linkage (cost paragraph)
