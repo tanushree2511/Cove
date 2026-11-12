@@ -141,6 +141,36 @@ class StableIncrementalClusterer:
                     self._union(i, j)
         return new_ids
 
+    # ---------------------------------------------------------------- deletion
+    def remove(self, ids):
+        """Delete faces (e.g. the user deletes photos). The state afterwards is exactly the state of a clusterer that
+        was only ever given the remaining faces: the remaining adjacency lists are kept (no new similarity search),
+        core flags and the union-find are recomputed from them, and corrections that name a deleted face are dropped
+        (the others are renumbered). Face ids are compacted in order; the returned dict maps old ids to new ids."""
+        gone = {int(i) for i in ids}
+        n = len(self)
+        keep = [i for i in range(n) if i not in gone]
+        new_id = {old: k for k, old in enumerate(keep)}
+        self.adj = [[(new_id[j], s) for j, s in self.adj[i] if j in new_id] for i in keep]
+        self.eligible = [self.eligible[i] for i in keep]
+        self._yaw = [self._yaw[i] for i in keep]
+        self._X = [self._X[i] for i in keep]
+        self.index.reset()
+        if self._X:
+            self.index.add(np.asarray(self._X, dtype="float32"))
+        lt = self.link_threshold
+        self.core = [bool(self.eligible[i]) and sum(s >= lt for _, s in self.adj[i]) >= self.min_neighbors
+                     for i in range(len(keep))]
+        self.parent = list(range(len(keep)))
+        for i in range(len(keep)):
+            if self.core[i]:
+                for j, s in self.adj[i]:
+                    if s >= lt and self.core[j]:
+                        self._union(i, j)
+        self.must = {(new_id[a], new_id[b]) for a, b in self.must if a in new_id and b in new_id}
+        self.cannot = {(new_id[a], new_id[b]) for a, b in self.cannot if a in new_id and b in new_id}
+        return new_id
+
     # ---------------------------------------------------------------- user corrections
     def add_must_link(self, i, j):
         """The user says faces i and j are the same person."""

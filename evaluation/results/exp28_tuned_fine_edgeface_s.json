@@ -1,0 +1,41 @@
+{
+ "Single linkage": {
+  "params": {
+   "thr": 0.57
+  },
+  "tuning_ARI_mean": 0.9658912795771888
+ },
+ "Two-stage": {
+  "params": {
+   "thr": 0.7,
+   "merge": 0.35
+  },
+  "tuning_ARI_mean": 0.9852829207489064
+ },
+ "HDBSCAN": {
+  "params": {
+   "mcs": 5,
+   "ms": 4
+  },
+  "tuning_ARI_mean": 0.9811693171278237
+ },
+ "First-Leader": {
+  "params": {
+   "thr": 0.33
+  },
+  "tuning_ARI_mean": 0.9424995030195127
+ },
+ "DBSCAN": {
+  "params": {
+   "thr": 0.57,
+   "ms": 2
+  },
+  "tuning_ARI_mean": 0.9658912795771888
+ },
+ "Agglomerative (avg)": {
+  "params": {
+   "thr": 0.34
+  },
+  "tuning_ARI_mean": 0.9855436862742233
+ }
+}

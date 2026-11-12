@@ -1,0 +1,9 @@
+{
+ "protocol": "Experiment 30 - deleting photos (external review, 2026-11-12): cost and exactness of StableIncrementalClusterer.remove().\n\nOn the 8,290 clean LFW faces (EdgeFace-S, shipped setting, one thread) delete a random 10% of the faces and compare with building a\nclusterer from the remaining faces only: labels must be the same partition; time remove() + labels() against a full rebuild.\nRun: COVE_FACE_MODEL=edgeface_s python evaluation/exp30_deletion.py\n",
+ "faces": 8290,
+ "deleted": 829,
+ "remove_s": 0.5886868999805301,
+ "labels_after_s": 0.535702999914065,
+ "rebuild_s": 6.983288099989295,
+ "identical": true
+}

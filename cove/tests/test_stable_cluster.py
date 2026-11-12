@@ -222,3 +222,43 @@ def test_fast_merge_gives_identical_partition_with_and_without_corrections():
     for a, b in zip(*runs):
         assert (np.unique(a, return_inverse=True)[1] == np.unique(b, return_inverse=True)[1]).all() or \
             len({(x, y) for x, y in zip(a, b)}) == len(set(a)) == len(set(b))
+
+
+def test_remove_gives_the_state_of_never_having_added_those_faces():
+    import numpy as np
+    from engines.stable_cluster import StableIncrementalClusterer
+
+    def canon(lab):
+        seen, out = {}, []
+        for v in lab:
+            out.append(seen.setdefault(int(v), len(seen)))
+        return out
+    rng = np.random.RandomState(11)
+    cent = rng.randn(10, 16)
+    X = np.vstack([c + 0.45 * rng.randn(14, 16) for c in cent]).astype("float32")
+    for trial in range(5):
+        gone = set(rng.choice(len(X), 25 + 5 * trial, replace=False).tolist())
+        keep = [i for i in range(len(X)) if i not in gone]
+        kw = dict(link_threshold=0.6, min_neighbors=1, attach_threshold=0.4, merge_threshold=0.3, dim=16)
+        musts = [(int(a), int(b)) for a, b in rng.randint(0, len(X), (6, 2)) if a != b]
+        cants = [(int(a), int(b)) for a, b in rng.randint(0, len(X), (6, 2)) if a != b]
+        a = StableIncrementalClusterer(**kw)
+        a.add(X[: len(X) // 2])
+        a.add(X[len(X) // 2:])
+        for i, j in musts:
+            a.add_must_link(i, j)
+        for i, j in cants:
+            a.add_cannot_link(i, j)
+        new_id = a.remove(gone)
+        b = StableIncrementalClusterer(**kw)
+        b.add(X[keep])
+        for i, j in musts:
+            if i in new_id and j in new_id:
+                b.add_must_link(new_id[i], new_id[j])
+        for i, j in cants:
+            if i in new_id and j in new_id:
+                b.add_cannot_link(new_id[i], new_id[j])
+        assert len(a) == len(b) == len(keep)
+        assert canon(a.labels()) == canon(b.labels())
+        a.add(X[sorted(gone)[:3]])                      # still usable after a deletion
+        assert len(a.labels()) == len(keep) + 3

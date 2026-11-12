@@ -1,0 +1,6454 @@
+{
+ "protocol": "Experiment 28 - fairer tuning, equal shuffles and an identity-level bootstrap (answers the external review of 2026-11-12).\n\nThe review's objections to Table I: (a) ours has four tuned parameters (360 grid points) and the baselines one or two on a\ncoarse 0.05 grid (\"equal terms\" did not hold in freedom); (b) ours ran in 3 shuffled orders, order-dependent baselines in 5;\n(c) the bootstrap resamples libraries, but the 30 test libraries share the same people, so the intervals are too narrow.\nHere, on the same identity-disjoint libraries (EdgeFace-S, exp14 split; nothing about the test half is used for tuning):\n  1. Every baseline is re-tuned on a much finer grid (step 0.01 for similarity thresholds, more values for the other\n     parameters) with exp14's rule (highest mean ARI on the tuning libraries).\n  2. Ours is also run with a SMALL budget: the best of 51 randomly chosen configurations of its own grid (51 = the number of\n     grid points of a one-threshold baseline), for 5 random draws, chosen by tuning ARI only.\n  3. Every method runs in 5 shuffled orders on the test libraries.\n  4. Bootstrap over IDENTITIES: each person (family people and each single-photo stranger) gets a Poisson(1) weight per\n     resample; a library's B-Cubed precision/recall are the weight-averaged per-face values; F1 is formed per library and\n     averaged over the 30 libraries. This keeps the libraries' shared people shared across resamples.\nPre-declared reading: nothing is tuned on test data; every number is reported even if it favours a baseline.\nRun: COVE_FACE_MODEL=edgeface_s python evaluation/exp28_fair_tuning_identity_bootstrap.py\nOutput: results/exp28_fair_tuning_edgeface_s.json (+ cache npz of per-face scores)\n",
+ "fine_tuned": {
+  "Single linkage": {
+   "params": {
+    "thr": 0.57
+   },
+   "tuning_ARI_mean": 0.9658912795771888
+  },
+  "Two-stage": {
+   "params": {
+    "thr": 0.7,
+    "merge": 0.35
+   },
+   "tuning_ARI_mean": 0.9852829207489064
+  },
+  "HDBSCAN": {
+   "params": {
+    "mcs": 5,
+    "ms": 4
+   },
+   "tuning_ARI_mean": 0.9811693171278237
+  },
+  "First-Leader": {
+   "params": {
+    "thr": 0.33
+   },
+   "tuning_ARI_mean": 0.9424995030195127
+  },
+  "DBSCAN": {
+   "params": {
+    "thr": 0.57,
+    "ms": 2
+   },
+   "tuning_ARI_mean": 0.9658912795771888
+  },
+  "Agglomerative (avg)": {
+   "params": {
+    "thr": 0.34
+   },
+   "tuning_ARI_mean": 0.9855436862742233
+  }
+ },
+ "budget_configs": {
+  "Ours (budget 51, draw 0)": {
+   "link": 0.6,
+   "m": 1,
+   "attach": 0.5,
+   "merge": 0.55,
+   "tuning_ARI_mean": 0.9813747104809004
+  },
+  "Ours (budget 51, draw 1)": {
+   "link": 0.6,
+   "m": 2,
+   "attach": 0.45,
+   "merge": 0.6,
+   "tuning_ARI_mean": 0.9808958171689257
+  },
+  "Ours (budget 51, draw 2)": {
+   "link": 0.65,
+   "m": 1,
+   "attach": 0.45,
+   "merge": 0.55,
+   "tuning_ARI_mean": 0.9812430947163434
+  },
+  "Ours (budget 51, draw 3)": {
+   "link": 0.65,
+   "m": 1,
+   "attach": 0.5,
+   "merge": 0.55,
+   "tuning_ARI_mean": 0.9822322327332509
+  },
+  "Ours (budget 51, draw 4)": {
+   "link": 0.65,
+   "m": 1,
+   "attach": 0.5,
+   "merge": 0.6,
+   "tuning_ARI_mean": 0.9806028267809349
+  }
+ },
+ "table_F1": {
+  "blur": {
+   "Ours, no attach": 0.9900028084123653,
+   "Ours (budget 51, draw 3)": 0.9967716499084699,
+   "Agglomerative (avg) [coarse grid]": 0.9929932459932055,
+   "Ours (budget 51, draw 1)": 0.9953265543092289,
+   "Ours": 0.9967716499084699,
+   "DBSCAN [coarse grid]": 0.9857445483669905,
+   "Single linkage [coarse grid]": 0.9857712766228026,
+   "Ours (budget 51, draw 4)": 0.9967716499084699,
+   "Agglomerative (avg) [fine grid]": 0.9906585949534686,
+   "Ours (budget 51, draw 0)": 0.99647079134055,
+   "First-Leader [fine grid]": 0.9761236076485527,
+   "Two-stage [fine grid]": 0.9913484446251188,
+   "First-Leader [coarse grid]": 0.9800199591178985,
+   "Ours (budget 51, draw 2)": 0.9956279823646671,
+   "Single linkage [fine grid]": 0.9853491082250794,
+   "Two-stage [coarse grid]": 0.9913484446251188,
+   "DBSCAN [fine grid]": 0.9853491082250794,
+   "HDBSCAN [coarse grid]": 0.9949002552147709,
+   "HDBSCAN [fine grid]": 0.9942575414987159
+  },
+  "clean": {
+   "Ours, no attach": 0.9866836718370561,
+   "Ours (budget 51, draw 3)": 0.9977418283749783,
+   "Agglomerative (avg) [coarse grid]": 0.9918817145255441,
+   "Ours (budget 51, draw 1)": 0.9935221775353816,
+   "Ours": 0.9977418283749783,
+   "DBSCAN [coarse grid]": 0.9937659199055902,
+   "Single linkage [coarse grid]": 0.9937928207310563,
+   "Ours (budget 51, draw 4)": 0.9977418283749783,
+   "Agglomerative (avg) [fine grid]": 0.9911156714238825,
+   "Ours (budget 51, draw 0)": 0.9939588379551616,
+   "First-Leader [fine grid]": 0.986984844541764,
+   "Two-stage [fine grid]": 0.985448817050232,
+   "First-Leader [coarse grid]": 0.9918584132238534,
+   "Ours (budget 51, draw 2)": 0.9973076215263155,
+   "Single linkage [fine grid]": 0.9937928207310563,
+   "Two-stage [coarse grid]": 0.985448817050232,
+   "DBSCAN [fine grid]": 0.9937928207310563,
+   "HDBSCAN [coarse grid]": 0.9956080082287972,
+   "HDBSCAN [fine grid]": 0.9944880237434348
+  },
+  "dark": {
+   "Ours, no attach": 0.9883305627679655,
+   "Ours (budget 51, draw 3)": 0.9973097126725302,
+   "Agglomerative (avg) [coarse grid]": 0.9951071017933806,
+   "Ours (budget 51, draw 1)": 0.9933127611341585,
+   "Ours": 0.9973097126725302,
+   "DBSCAN [coarse grid]": 0.9932400959372162,
+   "Single linkage [coarse grid]": 0.9932670868022,
+   "Ours (budget 51, draw 4)": 0.9966383394810433,
+   "Agglomerative (avg) [fine grid]": 0.9946174797027008,
+   "Ours (budget 51, draw 0)": 0.9937179596365826,
+   "First-Leader [fine grid]": 0.9850085031402551,
+   "Two-stage [fine grid]": 0.9927087890758213,
+   "First-Leader [coarse grid]": 0.9890855139280749,
+   "Ours (budget 51, draw 2)": 0.9969308278292174,
+   "Single linkage [fine grid]": 0.9925315064341321,
+   "Two-stage [coarse grid]": 0.9927087890758213,
+   "DBSCAN [fine grid]": 0.9925315064341321,
+   "HDBSCAN [coarse grid]": 0.9930445078393517,
+   "HDBSCAN [fine grid]": 0.9935764817728556
+  },
+  "jpeg": {
+   "Ours, no attach": 0.9849232120606164,
+   "Ours (budget 51, draw 3)": 0.9926258797787224,
+   "Agglomerative (avg) [coarse grid]": 0.9931662003883294,
+   "Ours (budget 51, draw 1)": 0.9944445142151979,
+   "Ours": 0.9926258797787224,
+   "DBSCAN [coarse grid]": 0.9790543532617964,
+   "Single linkage [coarse grid]": 0.9790818826098462,
+   "Ours (budget 51, draw 4)": 0.9922872875193492,
+   "Agglomerative (avg) [fine grid]": 0.9929420809121283,
+   "Ours (budget 51, draw 0)": 0.9937803595453117,
+   "First-Leader [fine grid]": 0.9639903324584004,
+   "Two-stage [fine grid]": 0.9931801472501761,
+   "First-Leader [coarse grid]": 0.960916630164064,
+   "Ours (budget 51, draw 2)": 0.994470061300291,
+   "Single linkage [fine grid]": 0.97512385341096,
+   "Two-stage [coarse grid]": 0.9931801472501761,
+   "DBSCAN [fine grid]": 0.97512385341096,
+   "HDBSCAN [coarse grid]": 0.9907779465017758,
+   "HDBSCAN [fine grid]": 0.9936727211332389
+  },
+  "lookalike": {
+   "Ours, no attach": 0.9920274878473705,
+   "Ours (budget 51, draw 3)": 0.9976251493774608,
+   "Agglomerative (avg) [coarse grid]": 0.9938793396992224,
+   "Ours (budget 51, draw 1)": 0.9938793396992224,
+   "Ours": 0.9976251493774608,
+   "DBSCAN [coarse grid]": 0.9928393216861898,
+   "Single linkage [coarse grid]": 0.9928439582939418,
+   "Ours (budget 51, draw 4)": 0.9976251493774608,
+   "Agglomerative (avg) [fine grid]": 0.9938793396992224,
+   "Ours (budget 51, draw 0)": 0.9938793396992224,
+   "First-Leader [fine grid]": 0.99145733746591,
+   "Two-stage [fine grid]": 0.9843744861917387,
+   "First-Leader [coarse grid]": 0.9929874261672733,
+   "Ours (budget 51, draw 2)": 0.9976251493774608,
+   "Single linkage [fine grid]": 0.9928439582939418,
+   "Two-stage [coarse grid]": 0.9843744861917387,
+   "DBSCAN [fine grid]": 0.9928439582939418,
+   "HDBSCAN [coarse grid]": 0.9973518969159545,
+   "HDBSCAN [fine grid]": 0.9973518969159545
+  },
+  "lowres": {
+   "Ours, no attach": 0.9776390134089669,
+   "Ours (budget 51, draw 3)": 0.979798571168827,
+   "Agglomerative (avg) [coarse grid]": 0.9859464636800968,
+   "Ours (budget 51, draw 1)": 0.9825515726512777,
+   "Ours": 0.979798571168827,
+   "DBSCAN [coarse grid]": 0.9584178982943351,
+   "Single linkage [coarse grid]": 0.9631984333398701,
+   "Ours (budget 51, draw 4)": 0.9744107262802173,
+   "Agglomerative (avg) [fine grid]": 0.9868633919970248,
+   "Ours (budget 51, draw 0)": 0.9817078493476974,
+   "First-Leader [fine grid]": 0.9228596848993663,
+   "Two-stage [fine grid]": 0.986236144837246,
+   "First-Leader [coarse grid]": 0.9174476548254622,
+   "Ours (budget 51, draw 2)": 0.9867178821541059,
+   "Single linkage [fine grid]": 0.9530234536149734,
+   "Two-stage [coarse grid]": 0.986236144837246,
+   "DBSCAN [fine grid]": 0.9530234536149734,
+   "HDBSCAN [coarse grid]": 0.9745747062166996,
+   "HDBSCAN [fine grid]": 0.9807473215409621
+  },
+  "mixed": {
+   "Ours, no attach": 0.9775524639328014,
+   "Ours (budget 51, draw 3)": 0.9782303346448314,
+   "Agglomerative (avg) [coarse grid]": 0.9807790665455547,
+   "Ours (budget 51, draw 1)": 0.9805937966464617,
+   "Ours": 0.9782303346448314,
+   "DBSCAN [coarse grid]": 0.9552104980856063,
+   "Single linkage [coarse grid]": 0.9557729572820016,
+   "Ours (budget 51, draw 4)": 0.9737834705845934,
+   "Agglomerative (avg) [fine grid]": 0.9816082796934847,
+   "Ours (budget 51, draw 0)": 0.9797400269330901,
+   "First-Leader [fine grid]": 0.9102273602663703,
+   "Two-stage [fine grid]": 0.9810520117721623,
+   "First-Leader [coarse grid]": 0.9020619100521394,
+   "Ours (budget 51, draw 2)": 0.9825862006050264,
+   "Single linkage [fine grid]": 0.9507085677734406,
+   "Two-stage [coarse grid]": 0.9810520117721623,
+   "DBSCAN [fine grid]": 0.9507085677734406,
+   "HDBSCAN [coarse grid]": 0.9472335711718672,
+   "HDBSCAN [fine grid]": 0.9450895600897781
+  },
+  "occlude": {
+   "Ours, no attach": 0.9072474089725472,
+   "Ours (budget 51, draw 3)": 0.9431276662970483,
+   "Agglomerative (avg) [coarse grid]": 0.9519946063962755,
+   "Ours (budget 51, draw 1)": 0.9134447260267177,
+   "Ours": 0.9431276662970483,
+   "DBSCAN [coarse grid]": 0.8045205822941789,
+   "Single linkage [coarse grid]": 0.7999675795341703,
+   "Ours (budget 51, draw 4)": 0.944591294556361,
+   "Agglomerative (avg) [fine grid]": 0.9476031898512965,
+   "Ours (budget 51, draw 0)": 0.9223257278259944,
+   "First-Leader [fine grid]": 0.8399015776470322,
+   "Two-stage [fine grid]": 0.9519840126505142,
+   "First-Leader [coarse grid]": 0.8518441684381399,
+   "Ours (budget 51, draw 2)": 0.9343932184568974,
+   "Single linkage [fine grid]": 0.8361418903472014,
+   "Two-stage [coarse grid]": 0.9519840126505142,
+   "DBSCAN [fine grid]": 0.8361418903472014,
+   "HDBSCAN [coarse grid]": 0.9249340331284621,
+   "HDBSCAN [fine grid]": 0.9360756623462325
+  },
+  "ALL": {
+   "Ours, no attach": 0.9755508286549612,
+   "Ours (budget 51, draw 3)": 0.9854038490278586,
+   "Agglomerative (avg) [coarse grid]": 0.9857184673777011,
+   "Ours (budget 51, draw 1)": 0.9808844302772056,
+   "Ours": 0.9854038490278586,
+   "DBSCAN [coarse grid]": 0.9578491522289879,
+   "Single linkage [coarse grid]": 0.9579619994019861,
+   "Ours (budget 51, draw 4)": 0.984231218260309,
+   "Agglomerative (avg) [fine grid]": 0.9849110035291511,
+   "Ours (budget 51, draw 0)": 0.9819476115354514,
+   "First-Leader [fine grid]": 0.9470691560084565,
+   "Two-stage [fine grid]": 0.9832916066816261,
+   "First-Leader [coarse grid]": 0.9482777094896131,
+   "Ours (budget 51, draw 2)": 0.9857073679517476,
+   "Single linkage [fine grid]": 0.9599393948538479,
+   "Two-stage [coarse grid]": 0.9832916066816261,
+   "DBSCAN [fine grid]": 0.9599393948538479,
+   "HDBSCAN [coarse grid]": 0.97730311565221,
+   "HDBSCAN [fine grid]": 0.9794074011301466
+  }
+ },
+ "bootstrap_identity_ours_minus": {
+  "Ours": {
+   "blur": {
+    "Ours, no attach": {
+     "diff": 0.006768841496104572,
+     "ci95_identity": [
+      0.003056890716155361,
+      0.012012004752953791
+     ]
+    },
+    "Ours (budget 51, draw 3)": {
+     "diff": 0.0,
+     "ci95_identity": [
+      0.0,
+      0.0
+     ]
+    },
+    "Agglomerative (avg) [coarse grid]": {
+     "diff": 0.0037784039152644056,
+     "ci95_identity": [
+      0.0023830310006937054,
+      0.005947823921839399
+     ]
+    },
+    "Ours (budget 51, draw 1)": {
+     "diff": 0.0014450955992409975,
+     "ci95_identity": [
+      0.00040869409839308646,
+      0.0024268116056918587
+     ]
+    },
+    "DBSCAN [coarse grid]": {
+     "diff": 0.011027101541479345,
+     "ci95_identity": [
+      0.00552833194533984,
+      0.018304625699917455
+     ]
+    },
+    "Single linkage [coarse grid]": {
+     "diff": 0.011000373285667275,
+     "ci95_identity": [
+      0.005527435392141386,
+      0.018263423194487833
+     ]
+    },
+    "Ours (budget 51, draw 4)": {
+     "diff": 0.0,
+     "ci95_identity": [
+      0.0,
+      0.0
+     ]
+    },
+    "Agglomerative (avg) [fine grid]": {
+     "diff": 0.006113054955001251,
+     "ci95_identity": [
+      0.0034646522005398863,
+      0.010525061637163149
+     ]
+    },
+    "Ours (budget 51, draw 0)": {
+     "diff": 0.00030085856791983723,
+     "ci95_identity": [
+      0.0,
+      0.0007714205980301064
+     ]
+    },
+    "First-Leader [fine grid]": {
+     "diff": 0.020648042259917232,
+     "ci95_identity": [
+      0.014530548950036273,
+      0.024773366749286603
+     ]
+    },
+    "Two-stage [fine grid]": {
+     "diff": 0.005423205283351051,
+     "ci95_identity": [
+      0.0030703992644945414,
+      0.008890946408112764
+     ]
+    },
+    "First-Leader [coarse grid]": {
+     "diff": 0.016751690790571372,
+     "ci95_identity": [
+      0.011528884569803865,
+      0.019111926903327327
+     ]
+    },
+    "Ours (budget 51, draw 2)": {
+     "diff": 0.0011436675438027954,
+     "ci95_identity": [
+      0.00011799479524298162,
+      0.0020785660545031086
+     ]
+    },
+    "Single linkage [fine grid]": {
+     "diff": 0.011422541683390519,
+     "ci95_identity": [
+      0.005572394182284629,
+      0.01872912978132574
+     ]
+    },
+    "Two-stage [coarse grid]": {
+     "diff": 0.005423205283351051,
+     "ci95_identity": [
+      0.0030703992644945414,
+      0.008890946408112764
+     ]
+    },
+    "DBSCAN [fine grid]": {
+     "diff": 0.011422541683390519,
+     "ci95_identity": [
+      0.005572394182284629,
+      0.01872912978132574
+     ]
+    },
+    "HDBSCAN [coarse grid]": {
+     "diff": 0.0018713946936990133,
+     "ci95_identity": [
+      0.0006664257248242183,
+      0.0036938272913296876
+     ]
+    },
+    "HDBSCAN [fine grid]": {
+     "diff": 0.002514108409753968,
+     "ci95_identity": [
+      0.0011989062527816452,
+      0.004343436857064484
+     ]
+    }
+   },
+   "clean": {
+    "Ours, no attach": {
+     "diff": 0.011058156537922192,
+     "ci95_identity": [
+      0.00492995043595632,
+      0.018874064137538345
+     ]
+    },
+    "Ours (budget 51, draw 3)": {
+     "diff": 0.0,
+     "ci95_identity": [
+      0.0,
+      0.0
+     ]
+    },
+    "Agglomerative (avg) [coarse grid]": {
+     "diff": 0.00586011384943419,
+     "ci95_identity": [
+      0.0019549168646335684,
+      0.01189726109306023
+     ]
+    },
+    "Ours (budget 51, draw 1)": {
+     "diff": 0.004219650839596634,
+     "ci95_identity": [
+      0.00035107453664137423,
+      0.009883321225643157
+     ]
+    },
+    "DBSCAN [coarse grid]": {
+     "diff": 0.003975908469388112,
+     "ci95_identity": [
+      -0.00011445611715317494,
+      0.009743092606465028
+     ]
+    },
+    "Single linkage [coarse grid]": {
+     "diff": 0.00394900764392192,
+     "ci95_identity": [
+      -0.00014170726140340926,
+      0.009728204409281436
+     ]
+    },
+    "Ours (budget 51, draw 4)": {
+     "diff": 0.0,
+     "ci95_identity": [
+      0.0,
+      0.0
+     ]
+    },
+    "Agglomerative (avg) [fine grid]": {
+     "diff": 0.006626156951095807,
+     "ci95_identity": [
+      0.002705188492933902,
+      0.012765609771013294
+     ]
+    },
+    "Ours (budget 51, draw 0)": {
+     "diff": 0.0037829904198166675,
+     "ci95_identity": [
+      0.0,
+      0.009487403084834466
+     ]
+    },
+    "First-Leader [fine grid]": {
+     "diff": 0.010756983833214218,
+     "ci95_identity": [
+      0.00948566759626065,
+      0.01716024254759157
+     ]
+    },
+    "Two-stage [fine grid]": {
+     "diff": 0.01229301132474625,
+     "ci95_identity": [
+      0.0072068737447262225,
+      0.019482997705539056
+     ]
+    },
+    "First-Leader [coarse grid]": {
+     "diff": 0.005883415151124893,
+     "ci95_identity": [
+      0.004783333937327089,
+      0.010045514702796977
+     ]
+    },
+    "Ours (budget 51, draw 2)": {
+     "diff": 0.00043420684866279924,
+     "ci95_identity": [
+      0.0002628700435162029,
+      0.0006792324781417974
+     ]
+    },
+    "Single linkage [fine grid]": {
+     "diff": 0.00394900764392192,
+     "ci95_identity": [
+      -0.00014170726140340926,
+      0.009728204409281436
+     ]
+    },
+    "Two-stage [coarse grid]": {
+     "diff": 0.01229301132474625,
+     "ci95_identity": [
+      0.0072068737447262225,
+      0.019482997705539056
+     ]
+    },
+    "DBSCAN [fine grid]": {
+     "diff": 0.00394900764392192,
+     "ci95_identity": [
+      -0.00014170726140340926,
+      0.009728204409281436
+     ]
+    },
+    "HDBSCAN [coarse grid]": {
+     "diff": 0.0021338201461810202,
+     "ci95_identity": [
+      0.0014145731429259622,
+      0.003241537859042429
+     ]
+    },
+    "HDBSCAN [fine grid]": {
+     "diff": 0.0032538046315434555,
+     "ci95_identity": [
+      0.0023348017036914663,
+      0.004755894343058233
+     ]
+    }
+   },
+   "dark": {
+    "Ours, no attach": {
+     "diff": 0.00897914990456472,
+     "ci95_identity": [
+      0.003932427316903966,
+      0.015432700216770083
+     ]
+    },
+    "Ours (budget 51, draw 3)": {
+     "diff": 0.0,
+     "ci95_identity": [
+      0.0,
+      0.0
+     ]
+    },
+    "Agglomerative (avg) [coarse grid]": {
+     "diff": 0.0022026108791496357,
+     "ci95_identity": [
+      0.0016342211266358402,
+      0.0033076695601145065
+     ]
+    },
+    "Ours (budget 51, draw 1)": {
+     "diff": 0.003996951538371762,
+     "ci95_identity": [
+      0.0006732552250226121,
+      0.009110642224550224
+     ]
+    },
+    "DBSCAN [coarse grid]": {
+     "diff": 0.00406961673531403,
+     "ci95_identity": [
+      0.00012690633535392405,
+      0.00955313727259631
+     ]
+    },
+    "Single linkage [coarse grid]": {
+     "diff": 0.004042625870330219,
+     "ci95_identity": [
+      9.907136360804982e-05,
+      0.00953003838658329
+     ]
+    },
+    "Ours (budget 51, draw 4)": {
+     "diff": 0.0006713731914869125,
+     "ci95_identity": [
+      0.0,
+      0.0024943419794241748
+     ]
+    },
+    "Agglomerative (avg) [fine grid]": {
+     "diff": 0.0026922329698294556,
+     "ci95_identity": [
+      0.001681786278883618,
+      0.004378628035386345
+     ]
+    },
+    "Ours (budget 51, draw 0)": {
+     "diff": 0.003591753035947609,
+     "ci95_identity": [
+      0.0,
+      0.008968941718339984
+     ]
+    },
+    "First-Leader [fine grid]": {
+     "diff": 0.012301209532275093,
+     "ci95_identity": [
+      0.009609142641226486,
+      0.016824406385421785
+     ]
+    },
+    "Two-stage [fine grid]": {
+     "diff": 0.004600923596708939,
+     "ci95_identity": [
+      0.00294472972551984,
+      0.008684235910574562
+     ]
+    },
+    "First-Leader [coarse grid]": {
+     "diff": 0.008224198744455347,
+     "ci95_identity": [
+      0.00678259521722803,
+      0.013042888144652076
+     ]
+    },
+    "Ours (budget 51, draw 2)": {
+     "diff": 0.00037888484331283223,
+     "ci95_identity": [
+      -0.0005751468737919679,
+      0.001156396170457205
+     ]
+    },
+    "Single linkage [fine grid]": {
+     "diff": 0.004778206238398086,
+     "ci95_identity": [
+      0.0002697749435901981,
+      0.01077130014697709
+     ]
+    },
+    "Two-stage [coarse grid]": {
+     "diff": 0.004600923596708939,
+     "ci95_identity": [
+      0.00294472972551984,
+      0.008684235910574562
+     ]
+    },
+    "DBSCAN [fine grid]": {
+     "diff": 0.004778206238398086,
+     "ci95_identity": [
+      0.0002697749435901981,
+      0.01077130014697709
+     ]
+    },
+    "HDBSCAN [coarse grid]": {
+     "diff": 0.004265204833178493,
+     "ci95_identity": [
+      0.001662344634532928,
+      0.008295764277378792
+     ]
+    },
+    "HDBSCAN [fine grid]": {
+     "diff": 0.003733230899674589,
+     "ci95_identity": [
+      0.0018835179507732975,
+      0.005953995734453143
+     ]
+    }
+   },
+   "jpeg": {
+    "Ours, no attach": {
+     "diff": 0.0077026677181060155,
+     "ci95_identity": [
+      0.0026812571783860458,
+      0.013079418987035765
+     ]
+    },
+    "Ours (budget 51, draw 3)": {
+     "diff": 0.0,
+     "ci95_identity": [
+      0.0,
+      0.0
+     ]
+    },
+    "Agglomerative (avg) [coarse grid]": {
+     "diff": -0.000540320609606959,
+     "ci95_identity": [
+      -0.0028723635276158787,
+      0.0016973390181858976
+     ]
+    },
+    "Ours (budget 51, draw 1)": {
+     "diff": -0.0018186344364754525,
+     "ci95_identity": [
+      -0.004557049870490984,
+      0.0003024072448412267
+     ]
+    },
+    "DBSCAN [coarse grid]": {
+     "diff": 0.013571526516926058,
+     "ci95_identity": [
+      0.007014501144488638,
+      0.02138933122158054
+     ]
+    },
+    "Single linkage [coarse grid]": {
+     "diff": 0.01354399716887622,
+     "ci95_identity": [
+      0.007000158180793132,
+      0.02134964848558115
+     ]
+    },
+    "Ours (budget 51, draw 4)": {
+     "diff": 0.0003385922593731605,
+     "ci95_identity": [
+      0.0,
+      0.0011474135021368875
+     ]
+    },
+    "Agglomerative (avg) [fine grid]": {
+     "diff": -0.0003162011334059134,
+     "ci95_identity": [
+      -0.00362388854225478,
+      0.002502846916516612
+     ]
+    },
+    "Ours (budget 51, draw 0)": {
+     "diff": -0.0011544797665893336,
+     "ci95_identity": [
+      -0.0027115202446778897,
+      -3.2440970341299256e-05
+     ]
+    },
+    "First-Leader [fine grid]": {
+     "diff": 0.02863554732032203,
+     "ci95_identity": [
+      0.02253883888324107,
+      0.037276786963144896
+     ]
+    },
+    "Two-stage [fine grid]": {
+     "diff": -0.0005542674714537066,
+     "ci95_identity": [
+      -0.002843792935212458,
+      0.001694195965925851
+     ]
+    },
+    "First-Leader [coarse grid]": {
+     "diff": 0.031709249614658375,
+     "ci95_identity": [
+      0.02306843479474389,
+      0.03826701064904529
+     ]
+    },
+    "Ours (budget 51, draw 2)": {
+     "diff": -0.001844181521568622,
+     "ci95_identity": [
+      -0.004631090263525675,
+      0.0001484235624472158
+     ]
+    },
+    "Single linkage [fine grid]": {
+     "diff": 0.017502026367762435,
+     "ci95_identity": [
+      0.011119146247704824,
+      0.026344267378250734
+     ]
+    },
+    "Two-stage [coarse grid]": {
+     "diff": -0.0005542674714537066,
+     "ci95_identity": [
+      -0.002843792935212458,
+      0.001694195965925851
+     ]
+    },
+    "DBSCAN [fine grid]": {
+     "diff": 0.017502026367762435,
+     "ci95_identity": [
+      0.011119146247704824,
+      0.026344267378250734
+     ]
+    },
+    "HDBSCAN [coarse grid]": {
+     "diff": 0.001847933276946656,
+     "ci95_identity": [
+      -0.0025957645972570554,
+      0.006430818686882627
+     ]
+    },
+    "HDBSCAN [fine grid]": {
+     "diff": -0.0010468413545164923,
+     "ci95_identity": [
+      -0.004510957598686213,
+      0.0019179482261340185
+     ]
+    }
+   },
+   "lookalike": {
+    "Ours, no attach": {
+     "diff": 0.0055976615300903365,
+     "ci95_identity": [
+      0.0008011333147685013,
+      0.012701448450485894
+     ]
+    },
+    "Ours (budget 51, draw 3)": {
+     "diff": 0.0,
+     "ci95_identity": [
+      0.0,
+      0.0
+     ]
+    },
+    "Agglomerative (avg) [coarse grid]": {
+     "diff": 0.0037458096782384542,
+     "ci95_identity": [
+      0.0,
+      0.01038222670555122
+     ]
+    },
+    "Ours (budget 51, draw 1)": {
+     "diff": 0.0037458096782384542,
+     "ci95_identity": [
+      0.0,
+      0.01038222670555122
+     ]
+    },
+    "DBSCAN [coarse grid]": {
+     "diff": 0.004785827691271005,
+     "ci95_identity": [
+      0.0,
+      0.01167745520671212
+     ]
+    },
+    "Single linkage [coarse grid]": {
+     "diff": 0.004781191083519043,
+     "ci95_identity": [
+      0.0,
+      0.011677288711071048
+     ]
+    },
+    "Ours (budget 51, draw 4)": {
+     "diff": 0.0,
+     "ci95_identity": [
+      0.0,
+      0.0
+     ]
+    },
+    "Agglomerative (avg) [fine grid]": {
+     "diff": 0.0037458096782384542,
+     "ci95_identity": [
+      0.0,
+      0.01038222670555122
+     ]
+    },
+    "Ours (budget 51, draw 0)": {
+     "diff": 0.0037458096782384542,
+     "ci95_identity": [
+      0.0,
+      0.01038222670555122
+     ]
+    },
+    "First-Leader [fine grid]": {
+     "diff": 0.006167811911550802,
+     "ci95_identity": [
+      0.004934057195981382,
+      0.01670904273788133
+     ]
+    },
+    "Two-stage [fine grid]": {
+     "diff": 0.0132506631857221,
+     "ci95_identity": [
+      0.0050146956245104264,
+      0.02177275190750756
+     ]
+    },
+    "First-Leader [coarse grid]": {
+     "diff": 0.0046377232101875165,
+     "ci95_identity": [
+      0.0031582095722357097,
+      0.014061145434776942
+     ]
+    },
+    "Ours (budget 51, draw 2)": {
+     "diff": 0.0,
+     "ci95_identity": [
+      0.0,
+      0.0
+     ]
+    },
+    "Single linkage [fine grid]": {
+     "diff": 0.004781191083519043,
+     "ci95_identity": [
+      0.0,
+      0.011677288711071048
+     ]
+    },
+    "Two-stage [coarse grid]": {
+     "diff": 0.0132506631857221,
+     "ci95_identity": [
+      0.0050146956245104264,
+      0.02177275190750756
+     ]
+    },
+    "DBSCAN [fine grid]": {
+     "diff": 0.004781191083519043,
+     "ci95_identity": [
+      0.0,
+      0.011677288711071048
+     ]
+    },
+    "HDBSCAN [coarse grid]": {
+     "diff": 0.00027325246150633475,
+     "ci95_identity": [
+      0.0,
+      0.0009864390393098637
+     ]
+    },
+    "HDBSCAN [fine grid]": {
+     "diff": 0.00027325246150633475,
+     "ci95_identity": [
+      0.0,
+      0.0009864390393098637
+     ]
+    }
+   },
+   "lowres": {
+    "Ours, no attach": {
+     "diff": 0.002159557759860098,
+     "ci95_identity": [
+      -0.0035716089109579657,
+      0.007631676991780633
+     ]
+    },
+    "Ours (budget 51, draw 3)": {
+     "diff": 0.0,
+     "ci95_identity": [
+      0.0,
+      0.0
+     ]
+    },
+    "Agglomerative (avg) [coarse grid]": {
+     "diff": -0.006147892511269792,
+     "ci95_identity": [
+      -0.013874556769927299,
+      -0.0007934264341989656
+     ]
+    },
+    "Ours (budget 51, draw 1)": {
+     "diff": -0.002753001482450723,
+     "ci95_identity": [
+      -0.009833125025033921,
+      0.0042926320433617484
+     ]
+    },
+    "DBSCAN [coarse grid]": {
+     "diff": 0.021380672874491857,
+     "ci95_identity": [
+      0.013498317996660878,
+      0.03317881335814794
+     ]
+    },
+    "Single linkage [coarse grid]": {
+     "diff": 0.016600137828956862,
+     "ci95_identity": [
+      0.009731961538394344,
+      0.02635909607013072
+     ]
+    },
+    "Ours (budget 51, draw 4)": {
+     "diff": 0.005387844888609661,
+     "ci95_identity": [
+      0.0018096538384754864,
+      0.011049345036347689
+     ]
+    },
+    "Agglomerative (avg) [fine grid]": {
+     "diff": -0.007064820828197815,
+     "ci95_identity": [
+      -0.014385258307059534,
+      -0.0017483933269977576
+     ]
+    },
+    "Ours (budget 51, draw 0)": {
+     "diff": -0.0019092781788704327,
+     "ci95_identity": [
+      -0.004908489932616558,
+      0.0009822570284208187
+     ]
+    },
+    "First-Leader [fine grid]": {
+     "diff": 0.05693888626946064,
+     "ci95_identity": [
+      0.047249648322661694,
+      0.07323820273081459
+     ]
+    },
+    "Two-stage [fine grid]": {
+     "diff": -0.006437573668419017,
+     "ci95_identity": [
+      -0.013430947065353444,
+      -0.001736004700263342
+     ]
+    },
+    "First-Leader [coarse grid]": {
+     "diff": 0.06235091634336476,
+     "ci95_identity": [
+      0.04977129037181531,
+      0.08404500544071193
+     ]
+    },
+    "Ours (budget 51, draw 2)": {
+     "diff": -0.006919310985278981,
+     "ci95_identity": [
+      -0.012868072440226915,
+      -0.002950392911831479
+     ]
+    },
+    "Single linkage [fine grid]": {
+     "diff": 0.026775117553853534,
+     "ci95_identity": [
+      0.018101517409086235,
+      0.03906292468309406
+     ]
+    },
+    "Two-stage [coarse grid]": {
+     "diff": -0.006437573668419017,
+     "ci95_identity": [
+      -0.013430947065353444,
+      -0.001736004700263342
+     ]
+    },
+    "DBSCAN [fine grid]": {
+     "diff": 0.026775117553853534,
+     "ci95_identity": [
+      0.018101517409086235,
+      0.03906292468309406
+     ]
+    },
+    "HDBSCAN [coarse grid]": {
+     "diff": 0.005223864952127344,
+     "ci95_identity": [
+      -0.0032737975815932295,
+      0.013377257237831716
+     ]
+    },
+    "HDBSCAN [fine grid]": {
+     "diff": -0.0009487503721351542,
+     "ci95_identity": [
+      -0.009583999464909228,
+      0.006229972740014385
+     ]
+    }
+   },
+   "mixed": {
+    "Ours, no attach": {
+     "diff": 0.0006778707120300709,
+     "ci95_identity": [
+      -0.0031499534845352726,
+      0.00427001496156058
+     ]
+    },
+    "Ours (budget 51, draw 3)": {
+     "diff": 0.0,
+     "ci95_identity": [
+      0.0,
+      0.0
+     ]
+    },
+    "Agglomerative (avg) [coarse grid]": {
+     "diff": -0.0025487319007232445,
+     "ci95_identity": [
+      -0.006047248542308794,
+      0.00024077365795776803
+     ]
+    },
+    "Ours (budget 51, draw 1)": {
+     "diff": -0.00236346200163029,
+     "ci95_identity": [
+      -0.005268047551314092,
+      -4.3323685725526266e-05
+     ]
+    },
+    "DBSCAN [coarse grid]": {
+     "diff": 0.023019836559225126,
+     "ci95_identity": [
+      0.01814852386713026,
+      0.029662134846051458
+     ]
+    },
+    "Single linkage [coarse grid]": {
+     "diff": 0.022457377362829822,
+     "ci95_identity": [
+      0.017314422577619618,
+      0.02838391462961828
+     ]
+    },
+    "Ours (budget 51, draw 4)": {
+     "diff": 0.004446864060238087,
+     "ci95_identity": [
+      0.002835810333490352,
+      0.0067435776690641745
+     ]
+    },
+    "Agglomerative (avg) [fine grid]": {
+     "diff": -0.003377945048653297,
+     "ci95_identity": [
+      -0.007099567403396001,
+      -0.00015560512741398253
+     ]
+    },
+    "Ours (budget 51, draw 0)": {
+     "diff": -0.0015096922882587016,
+     "ci95_identity": [
+      -0.0030622234443823866,
+      0.00023290589451787518
+     ]
+    },
+    "First-Leader [fine grid]": {
+     "diff": 0.06800297437846115,
+     "ci95_identity": [
+      0.05260836998621623,
+      0.08032616352041556
+     ]
+    },
+    "Two-stage [fine grid]": {
+     "diff": -0.002821677127330835,
+     "ci95_identity": [
+      -0.006044617146253645,
+      0.0003733330965041469
+     ]
+    },
+    "First-Leader [coarse grid]": {
+     "diff": 0.07616842459269202,
+     "ci95_identity": [
+      0.0575227650006613,
+      0.08984938775499664
+     ]
+    },
+    "Ours (budget 51, draw 2)": {
+     "diff": -0.004355865960194993,
+     "ci95_identity": [
+      -0.0070159537096818134,
+      -0.00235103264451024
+     ]
+    },
+    "Single linkage [fine grid]": {
+     "diff": 0.02752176687139085,
+     "ci95_identity": [
+      0.022087997049093238,
+      0.03537905866901088
+     ]
+    },
+    "Two-stage [coarse grid]": {
+     "diff": -0.002821677127330835,
+     "ci95_identity": [
+      -0.006044617146253645,
+      0.0003733330965041469
+     ]
+    },
+    "DBSCAN [fine grid]": {
+     "diff": 0.02752176687139085,
+     "ci95_identity": [
+      0.022087997049093238,
+      0.03537905866901088
+     ]
+    },
+    "HDBSCAN [coarse grid]": {
+     "diff": 0.030996763472964206,
+     "ci95_identity": [
+      0.011273111204306269,
+      0.04514181539416313
+     ]
+    },
+    "HDBSCAN [fine grid]": {
+     "diff": 0.033140774555053376,
+     "ci95_identity": [
+      0.008520209888617207,
+      0.05326752707362171
+     ]
+    }
+   },
+   "occlude": {
+    "Ours, no attach": {
+     "diff": 0.035880257324501064,
+     "ci95_identity": [
+      0.021548320800065975,
+      0.05067369297146802
+     ]
+    },
+    "Ours (budget 51, draw 3)": {
+     "diff": 0.0,
+     "ci95_identity": [
+      0.0,
+      0.0
+     ]
+    },
+    "Agglomerative (avg) [coarse grid]": {
+     "diff": -0.008866940099227283,
+     "ci95_identity": [
+      -0.02189748436212533,
+      0.007161910831928323
+     ]
+    },
+    "Ours (budget 51, draw 1)": {
+     "diff": 0.029682940270330582,
+     "ci95_identity": [
+      0.01602080633242925,
+      0.04301881248752284
+     ]
+    },
+    "DBSCAN [coarse grid]": {
+     "diff": 0.13860708400286936,
+     "ci95_identity": [
+      0.08853090057770412,
+      0.1803866799672444
+     ]
+    },
+    "Single linkage [coarse grid]": {
+     "diff": 0.14316008676287795,
+     "ci95_identity": [
+      0.09151942138870559,
+      0.18580040415128077
+     ]
+    },
+    "Ours (budget 51, draw 4)": {
+     "diff": -0.001463628259312788,
+     "ci95_identity": [
+      -0.0037615556518236807,
+      0.0004981337487697604
+     ]
+    },
+    "Agglomerative (avg) [fine grid]": {
+     "diff": -0.004475523554248295,
+     "ci95_identity": [
+      -0.01707171390453975,
+      0.011630994081497193
+     ]
+    },
+    "Ours (budget 51, draw 0)": {
+     "diff": 0.020801938471053827,
+     "ci95_identity": [
+      0.006986519048611301,
+      0.03337702845533695
+     ]
+    },
+    "First-Leader [fine grid]": {
+     "diff": 0.10322608865001603,
+     "ci95_identity": [
+      0.0928059115012487,
+      0.13692763159672414
+     ]
+    },
+    "Two-stage [fine grid]": {
+     "diff": -0.008856346353465994,
+     "ci95_identity": [
+      -0.02088826005657516,
+      0.009484570374091452
+     ]
+    },
+    "First-Leader [coarse grid]": {
+     "diff": 0.09128349785890832,
+     "ci95_identity": [
+      0.07948145151138311,
+      0.11503566026687614
+     ]
+    },
+    "Ours (budget 51, draw 2)": {
+     "diff": 0.008734447840150872,
+     "ci95_identity": [
+      0.00411229958136877,
+      0.013374591122070944
+     ]
+    },
+    "Single linkage [fine grid]": {
+     "diff": 0.10698577594984682,
+     "ci95_identity": [
+      0.0698208732903003,
+      0.13839211935798326
+     ]
+    },
+    "Two-stage [coarse grid]": {
+     "diff": -0.008856346353465994,
+     "ci95_identity": [
+      -0.02088826005657516,
+      0.009484570374091452
+     ]
+    },
+    "DBSCAN [fine grid]": {
+     "diff": 0.10698577594984682,
+     "ci95_identity": [
+      0.0698208732903003,
+      0.13839211935798326
+     ]
+    },
+    "HDBSCAN [coarse grid]": {
+     "diff": 0.018193633168586132,
+     "ci95_identity": [
+      0.00747744744022689,
+      0.03136923183997472
+     ]
+    },
+    "HDBSCAN [fine grid]": {
+     "diff": 0.007052003950815733,
+     "ci95_identity": [
+      -0.0032937196393807294,
+      0.01876358807086951
+     ]
+    }
+   }
+  },
+  "Ours (budget 51, draw 3)": {
+   "blur": {
+    "Ours, no attach": {
+     "diff": 0.006768841496104572,
+     "ci95_identity": [
+      0.003056890716155361,
+      0.012012004752953791
+     ]
+    },
+    "Agglomerative (avg) [coarse grid]": {
+     "diff": 0.0037784039152644056,
+     "ci95_identity": [
+      0.0023830310006937054,
+      0.005947823921839399
+     ]
+    },
+    "Ours (budget 51, draw 1)": {
+     "diff": 0.0014450955992409975,
+     "ci95_identity": [
+      0.00040869409839308646,
+      0.0024268116056918587
+     ]
+    },
+    "Ours": {
+     "diff": 0.0,
+     "ci95_identity": [
+      0.0,
+      0.0
+     ]
+    },
+    "DBSCAN [coarse grid]": {
+     "diff": 0.011027101541479345,
+     "ci95_identity": [
+      0.00552833194533984,
+      0.018304625699917455
+     ]
+    },
+    "Single linkage [coarse grid]": {
+     "diff": 0.011000373285667275,
+     "ci95_identity": [
+      0.005527435392141386,
+      0.018263423194487833
+     ]
+    },
+    "Ours (budget 51, draw 4)": {
+     "diff": 0.0,
+     "ci95_identity": [
+      0.0,
+      0.0
+     ]
+    },
+    "Agglomerative (avg) [fine grid]": {
+     "diff": 0.006113054955001251,
+     "ci95_identity": [
+      0.0034646522005398863,
+      0.010525061637163149
+     ]
+    },
+    "Ours (budget 51, draw 0)": {
+     "diff": 0.00030085856791983723,
+     "ci95_identity": [
+      0.0,
+      0.0007714205980301064
+     ]
+    },
+    "First-Leader [fine grid]": {
+     "diff": 0.020648042259917232,
+     "ci95_identity": [
+      0.014530548950036273,
+      0.024773366749286603
+     ]
+    },
+    "Two-stage [fine grid]": {
+     "diff": 0.005423205283351051,
+     "ci95_identity": [
+      0.0030703992644945414,
+      0.008890946408112764
+     ]
+    },
+    "First-Leader [coarse grid]": {
+     "diff": 0.016751690790571372,
+     "ci95_identity": [
+      0.011528884569803865,
+      0.019111926903327327
+     ]
+    },
+    "Ours (budget 51, draw 2)": {
+     "diff": 0.0011436675438027954,
+     "ci95_identity": [
+      0.00011799479524298162,
+      0.0020785660545031086
+     ]
+    },
+    "Single linkage [fine grid]": {
+     "diff": 0.011422541683390519,
+     "ci95_identity": [
+      0.005572394182284629,
+      0.01872912978132574
+     ]
+    },
+    "Two-stage [coarse grid]": {
+     "diff": 0.005423205283351051,
+     "ci95_identity": [
+      0.0030703992644945414,
+      0.008890946408112764
+     ]
+    },
+    "DBSCAN [fine grid]": {
+     "diff": 0.011422541683390519,
+     "ci95_identity": [
+      0.005572394182284629,
+      0.01872912978132574
+     ]
+    },
+    "HDBSCAN [coarse grid]": {
+     "diff": 0.0018713946936990133,
+     "ci95_identity": [
+      0.0006664257248242183,
+      0.0036938272913296876
+     ]
+    },
+    "HDBSCAN [fine grid]": {
+     "diff": 0.002514108409753968,
+     "ci95_identity": [
+      0.0011989062527816452,
+      0.004343436857064484
+     ]
+    }
+   },
+   "clean": {
+    "Ours, no attach": {
+     "diff": 0.011058156537922192,
+     "ci95_identity": [
+      0.00492995043595632,
+      0.018874064137538345
+     ]
+    },
+    "Agglomerative (avg) [coarse grid]": {
+     "diff": 0.00586011384943419,
+     "ci95_identity": [
+      0.0019549168646335684,
+      0.01189726109306023
+     ]
+    },
+    "Ours (budget 51, draw 1)": {
+     "diff": 0.004219650839596634,
+     "ci95_identity": [
+      0.00035107453664137423,
+      0.009883321225643157
+     ]
+    },
+    "Ours": {
+     "diff": 0.0,
+     "ci95_identity": [
+      0.0,
+      0.0
+     ]
+    },
+    "DBSCAN [coarse grid]": {
+     "diff": 0.003975908469388112,
+     "ci95_identity": [
+      -0.00011445611715317494,
+      0.009743092606465028
+     ]
+    },
+    "Single linkage [coarse grid]": {
+     "diff": 0.00394900764392192,
+     "ci95_identity": [
+      -0.00014170726140340926,
+      0.009728204409281436
+     ]
+    },
+    "Ours (budget 51, draw 4)": {
+     "diff": 0.0,
+     "ci95_identity": [
+      0.0,
+      0.0
+     ]
+    },
+    "Agglomerative (avg) [fine grid]": {
+     "diff": 0.006626156951095807,
+     "ci95_identity": [
+      0.002705188492933902,
+      0.012765609771013294
+     ]
+    },
+    "Ours (budget 51, draw 0)": {
+     "diff": 0.0037829904198166675,
+     "ci95_identity": [
+      0.0,
+      0.009487403084834466
+     ]
+    },
+    "First-Leader [fine grid]": {
+     "diff": 0.010756983833214218,
+     "ci95_identity": [
+      0.00948566759626065,
+      0.01716024254759157
+     ]
+    },
+    "Two-stage [fine grid]": {
+     "diff": 0.01229301132474625,
+     "ci95_identity": [
+      0.0072068737447262225,
+      0.019482997705539056
+     ]
+    },
+    "First-Leader [coarse grid]": {
+     "diff": 0.005883415151124893,
+     "ci95_identity": [
+      0.004783333937327089,
+      0.010045514702796977
+     ]
+    },
+    "Ours (budget 51, draw 2)": {
+     "diff": 0.00043420684866279924,
+     "ci95_identity": [
+      0.0002628700435162029,
+      0.0006792324781417974
+     ]
+    },
+    "Single linkage [fine grid]": {
+     "diff": 0.00394900764392192,
+     "ci95_identity": [
+      -0.00014170726140340926,
+      0.009728204409281436
+     ]
+    },
+    "Two-stage [coarse grid]": {
+     "diff": 0.01229301132474625,
+     "ci95_identity": [
+      0.0072068737447262225,
+      0.019482997705539056
+     ]
+    },
+    "DBSCAN [fine grid]": {
+     "diff": 0.00394900764392192,
+     "ci95_identity": [
+      -0.00014170726140340926,
+      0.009728204409281436
+     ]
+    },
+    "HDBSCAN [coarse grid]": {
+     "diff": 0.0021338201461810202,
+     "ci95_identity": [
+      0.0014145731429259622,
+      0.003241537859042429
+     ]
+    },
+    "HDBSCAN [fine grid]": {
+     "diff": 0.0032538046315434555,
+     "ci95_identity": [
+      0.0023348017036914663,
+      0.004755894343058233
+     ]
+    }
+   },
+   "dark": {
+    "Ours, no attach": {
+     "diff": 0.00897914990456472,
+     "ci95_identity": [
+      0.003932427316903966,
+      0.015432700216770083
+     ]
+    },
+    "Agglomerative (avg) [coarse grid]": {
+     "diff": 0.0022026108791496357,
+     "ci95_identity": [
+      0.0016342211266358402,
+      0.0033076695601145065
+     ]
+    },
+    "Ours (budget 51, draw 1)": {
+     "diff": 0.003996951538371762,
+     "ci95_identity": [
+      0.0006732552250226121,
+      0.009110642224550224
+     ]
+    },
+    "Ours": {
+     "diff": 0.0,
+     "ci95_identity": [
+      0.0,
+      0.0
+     ]
+    },
+    "DBSCAN [coarse grid]": {
+     "diff": 0.00406961673531403,
+     "ci95_identity": [
+      0.00012690633535392405,
+      0.00955313727259631
+     ]
+    },
+    "Single linkage [coarse grid]": {
+     "diff": 0.004042625870330219,
+     "ci95_identity": [
+      9.907136360804982e-05,
+      0.00953003838658329
+     ]
+    },
+    "Ours (budget 51, draw 4)": {
+     "diff": 0.0006713731914869125,
+     "ci95_identity": [
+      0.0,
+      0.0024943419794241748
+     ]
+    },
+    "Agglomerative (avg) [fine grid]": {
+     "diff": 0.0026922329698294556,
+     "ci95_identity": [
+      0.001681786278883618,
+      0.004378628035386345
+     ]
+    },
+    "Ours (budget 51, draw 0)": {
+     "diff": 0.003591753035947609,
+     "ci95_identity": [
+      0.0,
+      0.008968941718339984
+     ]
+    },
+    "First-Leader [fine grid]": {
+     "diff": 0.012301209532275093,
+     "ci95_identity": [
+      0.009609142641226486,
+      0.016824406385421785
+     ]
+    },
+    "Two-stage [fine grid]": {
+     "diff": 0.004600923596708939,
+     "ci95_identity": [
+      0.00294472972551984,
+      0.008684235910574562
+     ]
+    },
+    "First-Leader [coarse grid]": {
+     "diff": 0.008224198744455347,
+     "ci95_identity": [
+      0.00678259521722803,
+      0.013042888144652076
+     ]
+    },
+    "Ours (budget 51, draw 2)": {
+     "diff": 0.00037888484331283223,
+     "ci95_identity": [
+      -0.0005751468737919679,
+      0.001156396170457205
+     ]
+    },
+    "Single linkage [fine grid]": {
+     "diff": 0.004778206238398086,
+     "ci95_identity": [
+      0.0002697749435901981,
+      0.01077130014697709
+     ]
+    },
+    "Two-stage [coarse grid]": {
+     "diff": 0.004600923596708939,
+     "ci95_identity": [
+      0.00294472972551984,
+      0.008684235910574562
+     ]
+    },
+    "DBSCAN [fine grid]": {
+     "diff": 0.004778206238398086,
+     "ci95_identity": [
+      0.0002697749435901981,
+      0.01077130014697709
+     ]
+    },
+    "HDBSCAN [coarse grid]": {
+     "diff": 0.004265204833178493,
+     "ci95_identity": [
+      0.001662344634532928,
+      0.008295764277378792
+     ]
+    },
+    "HDBSCAN [fine grid]": {
+     "diff": 0.003733230899674589,
+     "ci95_identity": [
+      0.0018835179507732975,
+      0.005953995734453143
+     ]
+    }
+   },
+   "jpeg": {
+    "Ours, no attach": {
+     "diff": 0.0077026677181060155,
+     "ci95_identity": [
+      0.0026812571783860458,
+      0.013079418987035765
+     ]
+    },
+    "Agglomerative (avg) [coarse grid]": {
+     "diff": -0.000540320609606959,
+     "ci95_identity": [
+      -0.0028723635276158787,
+      0.0016973390181858976
+     ]
+    },
+    "Ours (budget 51, draw 1)": {
+     "diff": -0.0018186344364754525,
+     "ci95_identity": [
+      -0.004557049870490984,
+      0.0003024072448412267
+     ]
+    },
+    "Ours": {
+     "diff": 0.0,
+     "ci95_identity": [
+      0.0,
+      0.0
+     ]
+    },
+    "DBSCAN [coarse grid]": {
+     "diff": 0.013571526516926058,
+     "ci95_identity": [
+      0.007014501144488638,
+      0.02138933122158054
+     ]
+    },
+    "Single linkage [coarse grid]": {
+     "diff": 0.01354399716887622,
+     "ci95_identity": [
+      0.007000158180793132,
+      0.02134964848558115
+     ]
+    },
+    "Ours (budget 51, draw 4)": {
+     "diff": 0.0003385922593731605,
+     "ci95_identity": [
+      0.0,
+      0.0011474135021368875
+     ]
+    },
+    "Agglomerative (avg) [fine grid]": {
+     "diff": -0.0003162011334059134,
+     "ci95_identity": [
+      -0.00362388854225478,
+      0.002502846916516612
+     ]
+    },
+    "Ours (budget 51, draw 0)": {
+     "diff": -0.0011544797665893336,
+     "ci95_identity": [
+      -0.0027115202446778897,
+      -3.2440970341299256e-05
+     ]
+    },
+    "First-Leader [fine grid]": {
+     "diff": 0.02863554732032203,
+     "ci95_identity": [
+      0.02253883888324107,
+      0.037276786963144896
+     ]
+    },
+    "Two-stage [fine grid]": {
+     "diff": -0.0005542674714537066,
+     "ci95_identity": [
+      -0.002843792935212458,
+      0.001694195965925851
+     ]
+    },
+    "First-Leader [coarse grid]": {
+     "diff": 0.031709249614658375,
+     "ci95_identity": [
+      0.02306843479474389,
+      0.03826701064904529
+     ]
+    },
+    "Ours (budget 51, draw 2)": {
+     "diff": -0.001844181521568622,
+     "ci95_identity": [
+      -0.004631090263525675,
+      0.0001484235624472158
+     ]
+    },
+    "Single linkage [fine grid]": {
+     "diff": 0.017502026367762435,
+     "ci95_identity": [
+      0.011119146247704824,
+      0.026344267378250734
+     ]
+    },
+    "Two-stage [coarse grid]": {
+     "diff": -0.0005542674714537066,
+     "ci95_identity": [
+      -0.002843792935212458,
+      0.001694195965925851
+     ]
+    },
+    "DBSCAN [fine grid]": {
+     "diff": 0.017502026367762435,
+     "ci95_identity": [
+      0.011119146247704824,
+      0.026344267378250734
+     ]
+    },
+    "HDBSCAN [coarse grid]": {
+     "diff": 0.001847933276946656,
+     "ci95_identity": [
+      -0.0025957645972570554,
+      0.006430818686882627
+     ]
+    },
+    "HDBSCAN [fine grid]": {
+     "diff": -0.0010468413545164923,
+     "ci95_identity": [
+      -0.004510957598686213,
+      0.0019179482261340185
+     ]
+    }
+   },
+   "lookalike": {
+    "Ours, no attach": {
+     "diff": 0.0055976615300903365,
+     "ci95_identity": [
+      0.0008011333147685013,
+      0.012701448450485894
+     ]
+    },
+    "Agglomerative (avg) [coarse grid]": {
+     "diff": 0.0037458096782384542,
+     "ci95_identity": [
+      0.0,
+      0.01038222670555122
+     ]
+    },
+    "Ours (budget 51, draw 1)": {
+     "diff": 0.0037458096782384542,
+     "ci95_identity": [
+      0.0,
+      0.01038222670555122
+     ]
+    },
+    "Ours": {
+     "diff": 0.0,
+     "ci95_identity": [
+      0.0,
+      0.0
+     ]
+    },
+    "DBSCAN [coarse grid]": {
+     "diff": 0.004785827691271005,
+     "ci95_identity": [
+      0.0,
+      0.01167745520671212
+     ]
+    },
+    "Single linkage [coarse grid]": {
+     "diff": 0.004781191083519043,
+     "ci95_identity": [
+      0.0,
+      0.011677288711071048
+     ]
+    },
+    "Ours (budget 51, draw 4)": {
+     "diff": 0.0,
+     "ci95_identity": [
+      0.0,
+      0.0
+     ]
+    },
+    "Agglomerative (avg) [fine grid]": {
+     "diff": 0.0037458096782384542,
+     "ci95_identity": [
+      0.0,
+      0.01038222670555122
+     ]
+    },
+    "Ours (budget 51, draw 0)": {
+     "diff": 0.0037458096782384542,
+     "ci95_identity": [
+      0.0,
+      0.01038222670555122
+     ]
+    },
+    "First-Leader [fine grid]": {
+     "diff": 0.006167811911550802,
+     "ci95_identity": [
+      0.004934057195981382,
+      0.01670904273788133
+     ]
+    },
+    "Two-stage [fine grid]": {
+     "diff": 0.0132506631857221,
+     "ci95_identity": [
+      0.0050146956245104264,
+      0.02177275190750756
+     ]
+    },
+    "First-Leader [coarse grid]": {
+     "diff": 0.0046377232101875165,
+     "ci95_identity": [
+      0.0031582095722357097,
+      0.014061145434776942
+     ]
+    },
+    "Ours (budget 51, draw 2)": {
+     "diff": 0.0,
+     "ci95_identity": [
+      0.0,
+      0.0
+     ]
+    },
+    "Single linkage [fine grid]": {
+     "diff": 0.004781191083519043,
+     "ci95_identity": [
+      0.0,
+      0.011677288711071048
+     ]
+    },
+    "Two-stage [coarse grid]": {
+     "diff": 0.0132506631857221,
+     "ci95_identity": [
+      0.0050146956245104264,
+      0.02177275190750756
+     ]
+    },
+    "DBSCAN [fine grid]": {
+     "diff": 0.004781191083519043,
+     "ci95_identity": [
+      0.0,
+      0.011677288711071048
+     ]
+    },
+    "HDBSCAN [coarse grid]": {
+     "diff": 0.00027325246150633475,
+     "ci95_identity": [
+      0.0,
+      0.0009864390393098637
+     ]
+    },
+    "HDBSCAN [fine grid]": {
+     "diff": 0.00027325246150633475,
+     "ci95_identity": [
+      0.0,
+      0.0009864390393098637
+     ]
+    }
+   },
+   "lowres": {
+    "Ours, no attach": {
+     "diff": 0.002159557759860098,
+     "ci95_identity": [
+      -0.0035716089109579657,
+      0.007631676991780633
+     ]
+    },
+    "Agglomerative (avg) [coarse grid]": {
+     "diff": -0.006147892511269792,
+     "ci95_identity": [
+      -0.013874556769927299,
+      -0.0007934264341989656
+     ]
+    },
+    "Ours (budget 51, draw 1)": {
+     "diff": -0.002753001482450723,
+     "ci95_identity": [
+      -0.009833125025033921,
+      0.0042926320433617484
+     ]
+    },
+    "Ours": {
+     "diff": 0.0,
+     "ci95_identity": [
+      0.0,
+      0.0
+     ]
+    },
+    "DBSCAN [coarse grid]": {
+     "diff": 0.021380672874491857,
+     "ci95_identity": [
+      0.013498317996660878,
+      0.03317881335814794
+     ]
+    },
+    "Single linkage [coarse grid]": {
+     "diff": 0.016600137828956862,
+     "ci95_identity": [
+      0.009731961538394344,
+      0.02635909607013072
+     ]
+    },
+    "Ours (budget 51, draw 4)": {
+     "diff": 0.005387844888609661,
+     "ci95_identity": [
+      0.0018096538384754864,
+      0.011049345036347689
+     ]
+    },
+    "Agglomerative (avg) [fine grid]": {
+     "diff": -0.007064820828197815,
+     "ci95_identity": [
+      -0.014385258307059534,
+      -0.0017483933269977576
+     ]
+    },
+    "Ours (budget 51, draw 0)": {
+     "diff": -0.0019092781788704327,
+     "ci95_identity": [
+      -0.004908489932616558,
+      0.0009822570284208187
+     ]
+    },
+    "First-Leader [fine grid]": {
+     "diff": 0.05693888626946064,
+     "ci95_identity": [
+      0.047249648322661694,
+      0.07323820273081459
+     ]
+    },
+    "Two-stage [fine grid]": {
+     "diff": -0.006437573668419017,
+     "ci95_identity": [
+      -0.013430947065353444,
+      -0.001736004700263342
+     ]
+    },
+    "First-Leader [coarse grid]": {
+     "diff": 0.06235091634336476,
+     "ci95_identity": [
+      0.04977129037181531,
+      0.08404500544071193
+     ]
+    },
+    "Ours (budget 51, draw 2)": {
+     "diff": -0.006919310985278981,
+     "ci95_identity": [
+      -0.012868072440226915,
+      -0.002950392911831479
+     ]
+    },
+    "Single linkage [fine grid]": {
+     "diff": 0.026775117553853534,
+     "ci95_identity": [
+      0.018101517409086235,
+      0.03906292468309406
+     ]
+    },
+    "Two-stage [coarse grid]": {
+     "diff": -0.006437573668419017,
+     "ci95_identity": [
+      -0.013430947065353444,
+      -0.001736004700263342
+     ]
+    },
+    "DBSCAN [fine grid]": {
+     "diff": 0.026775117553853534,
+     "ci95_identity": [
+      0.018101517409086235,
+      0.03906292468309406
+     ]
+    },
+    "HDBSCAN [coarse grid]": {
+     "diff": 0.005223864952127344,
+     "ci95_identity": [
+      -0.0032737975815932295,
+      0.013377257237831716
+     ]
+    },
+    "HDBSCAN [fine grid]": {
+     "diff": -0.0009487503721351542,
+     "ci95_identity": [
+      -0.009583999464909228,
+      0.006229972740014385
+     ]
+    }
+   },
+   "mixed": {
+    "Ours, no attach": {
+     "diff": 0.0006778707120300709,
+     "ci95_identity": [
+      -0.0031499534845352726,
+      0.00427001496156058
+     ]
+    },
+    "Agglomerative (avg) [coarse grid]": {
+     "diff": -0.0025487319007232445,
+     "ci95_identity": [
+      -0.006047248542308794,
+      0.00024077365795776803
+     ]
+    },
+    "Ours (budget 51, draw 1)": {
+     "diff": -0.00236346200163029,
+     "ci95_identity": [
+      -0.005268047551314092,
+      -4.3323685725526266e-05
+     ]
+    },
+    "Ours": {
+     "diff": 0.0,
+     "ci95_identity": [
+      0.0,
+      0.0
+     ]
+    },
+    "DBSCAN [coarse grid]": {
+     "diff": 0.023019836559225126,
+     "ci95_identity": [
+      0.01814852386713026,
+      0.029662134846051458
+     ]
+    },
+    "Single linkage [coarse grid]": {
+     "diff": 0.022457377362829822,
+     "ci95_identity": [
+      0.017314422577619618,
+      0.02838391462961828
+     ]
+    },
+    "Ours (budget 51, draw 4)": {
+     "diff": 0.004446864060238087,
+     "ci95_identity": [
+      0.002835810333490352,
+      0.0067435776690641745
+     ]
+    },
+    "Agglomerative (avg) [fine grid]": {
+     "diff": -0.003377945048653297,
+     "ci95_identity": [
+      -0.007099567403396001,
+      -0.00015560512741398253
+     ]
+    },
+    "Ours (budget 51, draw 0)": {
+     "diff": -0.0015096922882587016,
+     "ci95_identity": [
+      -0.0030622234443823866,
+      0.00023290589451787518
+     ]
+    },
+    "First-Leader [fine grid]": {
+     "diff": 0.06800297437846115,
+     "ci95_identity": [
+      0.05260836998621623,
+      0.08032616352041556
+     ]
+    },
+    "Two-stage [fine grid]": {
+     "diff": -0.002821677127330835,
+     "ci95_identity": [
+      -0.006044617146253645,
+      0.0003733330965041469
+     ]
+    },
+    "First-Leader [coarse grid]": {
+     "diff": 0.07616842459269202,
+     "ci95_identity": [
+      0.0575227650006613,
+      0.08984938775499664
+     ]
+    },
+    "Ours (budget 51, draw 2)": {
+     "diff": -0.004355865960194993,
+     "ci95_identity": [
+      -0.0070159537096818134,
+      -0.00235103264451024
+     ]
+    },
+    "Single linkage [fine grid]": {
+     "diff": 0.02752176687139085,
+     "ci95_identity": [
+      0.022087997049093238,
+      0.03537905866901088
+     ]
+    },
+    "Two-stage [coarse grid]": {
+     "diff": -0.002821677127330835,
+     "ci95_identity": [
+      -0.006044617146253645,
+      0.0003733330965041469
+     ]
+    },
+    "DBSCAN [fine grid]": {
+     "diff": 0.02752176687139085,
+     "ci95_identity": [
+      0.022087997049093238,
+      0.03537905866901088
+     ]
+    },
+    "HDBSCAN [coarse grid]": {
+     "diff": 0.030996763472964206,
+     "ci95_identity": [
+      0.011273111204306269,
+      0.04514181539416313
+     ]
+    },
+    "HDBSCAN [fine grid]": {
+     "diff": 0.033140774555053376,
+     "ci95_identity": [
+      0.008520209888617207,
+      0.05326752707362171
+     ]
+    }
+   },
+   "occlude": {
+    "Ours, no attach": {
+     "diff": 0.035880257324501064,
+     "ci95_identity": [
+      0.021548320800065975,
+      0.05067369297146802
+     ]
+    },
+    "Agglomerative (avg) [coarse grid]": {
+     "diff": -0.008866940099227283,
+     "ci95_identity": [
+      -0.02189748436212533,
+      0.007161910831928323
+     ]
+    },
+    "Ours (budget 51, draw 1)": {
+     "diff": 0.029682940270330582,
+     "ci95_identity": [
+      0.01602080633242925,
+      0.04301881248752284
+     ]
+    },
+    "Ours": {
+     "diff": 0.0,
+     "ci95_identity": [
+      0.0,
+      0.0
+     ]
+    },
+    "DBSCAN [coarse grid]": {
+     "diff": 0.13860708400286936,
+     "ci95_identity": [
+      0.08853090057770412,
+      0.1803866799672444
+     ]
+    },
+    "Single linkage [coarse grid]": {
+     "diff": 0.14316008676287795,
+     "ci95_identity": [
+      0.09151942138870559,
+      0.18580040415128077
+     ]
+    },
+    "Ours (budget 51, draw 4)": {
+     "diff": -0.001463628259312788,
+     "ci95_identity": [
+      -0.0037615556518236807,
+      0.0004981337487697604
+     ]
+    },
+    "Agglomerative (avg) [fine grid]": {
+     "diff": -0.004475523554248295,
+     "ci95_identity": [
+      -0.01707171390453975,
+      0.011630994081497193
+     ]
+    },
+    "Ours (budget 51, draw 0)": {
+     "diff": 0.020801938471053827,
+     "ci95_identity": [
+      0.006986519048611301,
+      0.03337702845533695
+     ]
+    },
+    "First-Leader [fine grid]": {
+     "diff": 0.10322608865001603,
+     "ci95_identity": [
+      0.0928059115012487,
+      0.13692763159672414
+     ]
+    },
+    "Two-stage [fine grid]": {
+     "diff": -0.008856346353465994,
+     "ci95_identity": [
+      -0.02088826005657516,
+      0.009484570374091452
+     ]
+    },
+    "First-Leader [coarse grid]": {
+     "diff": 0.09128349785890832,
+     "ci95_identity": [
+      0.07948145151138311,
+      0.11503566026687614
+     ]
+    },
+    "Ours (budget 51, draw 2)": {
+     "diff": 0.008734447840150872,
+     "ci95_identity": [
+      0.00411229958136877,
+      0.013374591122070944
+     ]
+    },
+    "Single linkage [fine grid]": {
+     "diff": 0.10698577594984682,
+     "ci95_identity": [
+      0.0698208732903003,
+      0.13839211935798326
+     ]
+    },
+    "Two-stage [coarse grid]": {
+     "diff": -0.008856346353465994,
+     "ci95_identity": [
+      -0.02088826005657516,
+      0.009484570374091452
+     ]
+    },
+    "DBSCAN [fine grid]": {
+     "diff": 0.10698577594984682,
+     "ci95_identity": [
+      0.0698208732903003,
+      0.13839211935798326
+     ]
+    },
+    "HDBSCAN [coarse grid]": {
+     "diff": 0.018193633168586132,
+     "ci95_identity": [
+      0.00747744744022689,
+      0.03136923183997472
+     ]
+    },
+    "HDBSCAN [fine grid]": {
+     "diff": 0.007052003950815733,
+     "ci95_identity": [
+      -0.0032937196393807294,
+      0.01876358807086951
+     ]
+    }
+   }
+  },
+  "Ours (budget 51, draw 1)": {
+   "blur": {
+    "Ours, no attach": {
+     "diff": 0.005323745896863574,
+     "ci95_identity": [
+      0.0014212068418661904,
+      0.010602945933739377
+     ]
+    },
+    "Ours (budget 51, draw 3)": {
+     "diff": -0.0014450955992409975,
+     "ci95_identity": [
+      -0.0024268116056918587,
+      -0.0004086940983930867
+     ]
+    },
+    "Agglomerative (avg) [coarse grid]": {
+     "diff": 0.002333308316023408,
+     "ci95_identity": [
+      0.0011353132625421258,
+      0.0045181028048198015
+     ]
+    },
+    "Ours": {
+     "diff": -0.0014450955992409975,
+     "ci95_identity": [
+      -0.0024268116056918587,
+      -0.0004086940983930867
+     ]
+    },
+    "DBSCAN [coarse grid]": {
+     "diff": 0.009582005942238347,
+     "ci95_identity": [
+      0.003655953903992901,
+      0.016986156950394318
+     ]
+    },
+    "Single linkage [coarse grid]": {
+     "diff": 0.009555277686426278,
+     "ci95_identity": [
+      0.0036339207490284826,
+      0.01695717717210445
+     ]
+    },
+    "Ours (budget 51, draw 4)": {
+     "diff": -0.0014450955992409975,
+     "ci95_identity": [
+      -0.0024268116056918587,
+      -0.0004086940983930867
+     ]
+    },
+    "Agglomerative (avg) [fine grid]": {
+     "diff": 0.004667959355760254,
+     "ci95_identity": [
+      0.002112915019194228,
+      0.008926653514305764
+     ]
+    },
+    "Ours (budget 51, draw 0)": {
+     "diff": -0.0011442370313211603,
+     "ci95_identity": [
+      -0.002078953484694221,
+      -0.00011852587262792273
+     ]
+    },
+    "First-Leader [fine grid]": {
+     "diff": 0.019202946660676234,
+     "ci95_identity": [
+      0.013248200168212227,
+      0.023160329808791475
+     ]
+    },
+    "Two-stage [fine grid]": {
+     "diff": 0.003978109684110054,
+     "ci95_identity": [
+      0.0017610372602939683,
+      0.007396931101878453
+     ]
+    },
+    "First-Leader [coarse grid]": {
+     "diff": 0.015306595191330374,
+     "ci95_identity": [
+      0.010002262194951395,
+      0.017843330204486824
+     ]
+    },
+    "Ours (budget 51, draw 2)": {
+     "diff": -0.00030142805543820206,
+     "ci95_identity": [
+      -0.0007723308602969131,
+      0.0
+     ]
+    },
+    "Single linkage [fine grid]": {
+     "diff": 0.009977446084149522,
+     "ci95_identity": [
+      0.003817401826381706,
+      0.017196771353483235
+     ]
+    },
+    "Two-stage [coarse grid]": {
+     "diff": 0.003978109684110054,
+     "ci95_identity": [
+      0.0017610372602939683,
+      0.007396931101878453
+     ]
+    },
+    "DBSCAN [fine grid]": {
+     "diff": 0.009977446084149522,
+     "ci95_identity": [
+      0.003817401826381706,
+      0.017196771353483235
+     ]
+    },
+    "HDBSCAN [coarse grid]": {
+     "diff": 0.00042629909445801584,
+     "ci95_identity": [
+      -0.0009437458217143701,
+      0.0024475271503130165
+     ]
+    },
+    "HDBSCAN [fine grid]": {
+     "diff": 0.0010690128105129704,
+     "ci95_identity": [
+      -0.00031278898318604087,
+      0.0029396770397822065
+     ]
+    }
+   },
+   "clean": {
+    "Ours, no attach": {
+     "diff": 0.006838505698325559,
+     "ci95_identity": [
+      0.0023012712597847707,
+      0.01273902758955957
+     ]
+    },
+    "Ours (budget 51, draw 3)": {
+     "diff": -0.004219650839596634,
+     "ci95_identity": [
+      -0.009883321225643157,
+      -0.00035107453664137434
+     ]
+    },
+    "Agglomerative (avg) [coarse grid]": {
+     "diff": 0.001640463009837556,
+     "ci95_identity": [
+      0.0011675249040126955,
+      0.002556383262077924
+     ]
+    },
+    "Ours": {
+     "diff": -0.004219650839596634,
+     "ci95_identity": [
+      -0.009883321225643157,
+      -0.00035107453664137434
+     ]
+    },
+    "DBSCAN [coarse grid]": {
+     "diff": -0.00024374237020852174,
+     "ci95_identity": [
+      -0.0007522528866926475,
+      0.0005557817220687933
+     ]
+    },
+    "Single linkage [coarse grid]": {
+     "diff": -0.0002706431956747135,
+     "ci95_identity": [
+      -0.0007809452712535719,
+      0.000522211045026763
+     ]
+    },
+    "Ours (budget 51, draw 4)": {
+     "diff": -0.004219650839596634,
+     "ci95_identity": [
+      -0.009883321225643157,
+      -0.00035107453664137434
+     ]
+    },
+    "Agglomerative (avg) [fine grid]": {
+     "diff": 0.0024065061114991737,
+     "ci95_identity": [
+      0.0017915834486485482,
+      0.0035404847562312933
+     ]
+    },
+    "Ours (budget 51, draw 0)": {
+     "diff": -0.00043666041977996617,
+     "ci95_identity": [
+      -0.0006838019688924446,
+      -0.0002643394966919982
+     ]
+    },
+    "First-Leader [fine grid]": {
+     "diff": 0.006537332993617584,
+     "ci95_identity": [
+      0.0053109194338322565,
+      0.01230275581280391
+     ]
+    },
+    "Two-stage [fine grid]": {
+     "diff": 0.008073360485149617,
+     "ci95_identity": [
+      0.004868299166361448,
+      0.012553331454594894
+     ]
+    },
+    "First-Leader [coarse grid]": {
+     "diff": 0.0016637643115282597,
+     "ci95_identity": [
+      -0.0009115731716155872,
+      0.006061681459347479
+     ]
+    },
+    "Ours (budget 51, draw 2)": {
+     "diff": -0.0037854439909338344,
+     "ci95_identity": [
+      -0.009492792089780192,
+      0.0
+     ]
+    },
+    "Single linkage [fine grid]": {
+     "diff": -0.0002706431956747135,
+     "ci95_identity": [
+      -0.0007809452712535719,
+      0.000522211045026763
+     ]
+    },
+    "Two-stage [coarse grid]": {
+     "diff": 0.008073360485149617,
+     "ci95_identity": [
+      0.004868299166361448,
+      0.012553331454594894
+     ]
+    },
+    "DBSCAN [fine grid]": {
+     "diff": -0.0002706431956747135,
+     "ci95_identity": [
+      -0.0007809452712535719,
+      0.000522211045026763
+     ]
+    },
+    "HDBSCAN [coarse grid]": {
+     "diff": -0.0020858306934156134,
+     "ci95_identity": [
+      -0.007559798161188761,
+      0.0017733601729075315
+     ]
+    },
+    "HDBSCAN [fine grid]": {
+     "diff": -0.0009658462080531782,
+     "ci95_identity": [
+      -0.0064227817952632275,
+      0.00319254497687014
+     ]
+    }
+   },
+   "dark": {
+    "Ours, no attach": {
+     "diff": 0.004982198366192958,
+     "ci95_identity": [
+      0.0016746069490909232,
+      0.008617823570966777
+     ]
+    },
+    "Ours (budget 51, draw 3)": {
+     "diff": -0.003996951538371762,
+     "ci95_identity": [
+      -0.009110642224550224,
+      -0.0006732552250226121
+     ]
+    },
+    "Agglomerative (avg) [coarse grid]": {
+     "diff": -0.0017943406592221267,
+     "ci95_identity": [
+      -0.006587491631507925,
+      0.0018672752380371165
+     ]
+    },
+    "Ours": {
+     "diff": -0.003996951538371762,
+     "ci95_identity": [
+      -0.009110642224550224,
+      -0.0006732552250226121
+     ]
+    },
+    "DBSCAN [coarse grid]": {
+     "diff": 7.266519694226758e-05,
+     "ci95_identity": [
+      -0.0009716245532036038,
+      0.0012030615905920243
+     ]
+    },
+    "Single linkage [coarse grid]": {
+     "diff": 4.567433195845627e-05,
+     "ci95_identity": [
+      -0.0010119401415189465,
+      0.0011838402847449193
+     ]
+    },
+    "Ours (budget 51, draw 4)": {
+     "diff": -0.00332557834688485,
+     "ci95_identity": [
+      -0.008640937109788194,
+      0.0005829246342182679
+     ]
+    },
+    "Agglomerative (avg) [fine grid]": {
+     "diff": -0.0013047185685423068,
+     "ci95_identity": [
+      -0.00653086572885519,
+      0.0029417626559734263
+     ]
+    },
+    "Ours (budget 51, draw 0)": {
+     "diff": -0.00040519850242415334,
+     "ci95_identity": [
+      -0.001163448045651125,
+      0.00048409834504118673
+     ]
+    },
+    "First-Leader [fine grid]": {
+     "diff": 0.00830425799390333,
+     "ci95_identity": [
+      0.0036542146901289456,
+      0.014035180360078734
+     ]
+    },
+    "Two-stage [fine grid]": {
+     "diff": 0.0006039720583371766,
+     "ci95_identity": [
+      -0.0027344550192356237,
+      0.0051210157076517215
+     ]
+    },
+    "First-Leader [coarse grid]": {
+     "diff": 0.004227247206083584,
+     "ci95_identity": [
+      0.0019365542630354782,
+      0.009546283632516925
+     ]
+    },
+    "Ours (budget 51, draw 2)": {
+     "diff": -0.00361806669505893,
+     "ci95_identity": [
+      -0.00907283713420235,
+      0.0
+     ]
+    },
+    "Single linkage [fine grid]": {
+     "diff": 0.0007812547000263237,
+     "ci95_identity": [
+      -0.0006756238639355067,
+      0.0022655828297138544
+     ]
+    },
+    "Two-stage [coarse grid]": {
+     "diff": 0.0006039720583371766,
+     "ci95_identity": [
+      -0.0027344550192356237,
+      0.0051210157076517215
+     ]
+    },
+    "DBSCAN [fine grid]": {
+     "diff": 0.0007812547000263237,
+     "ci95_identity": [
+      -0.0006756238639355067,
+      0.0022655828297138544
+     ]
+    },
+    "HDBSCAN [coarse grid]": {
+     "diff": 0.00026825329480673066,
+     "ci95_identity": [
+      -0.0009628967940807614,
+      0.0017663415769735595
+     ]
+    },
+    "HDBSCAN [fine grid]": {
+     "diff": -0.00026372063869717355,
+     "ci95_identity": [
+      -0.0035783514877160832,
+      0.0019281654059886907
+     ]
+    }
+   },
+   "jpeg": {
+    "Ours, no attach": {
+     "diff": 0.009521302154581468,
+     "ci95_identity": [
+      0.004111263702313106,
+      0.015221972217162462
+     ]
+    },
+    "Ours (budget 51, draw 3)": {
+     "diff": 0.0018186344364754525,
+     "ci95_identity": [
+      -0.0003024072448412268,
+      0.004557049870490984
+     ]
+    },
+    "Agglomerative (avg) [coarse grid]": {
+     "diff": 0.0012783138268684935,
+     "ci95_identity": [
+      6.435270110764503e-05,
+      0.0029112786054611567
+     ]
+    },
+    "Ours": {
+     "diff": 0.0018186344364754525,
+     "ci95_identity": [
+      -0.0003024072448412268,
+      0.004557049870490984
+     ]
+    },
+    "DBSCAN [coarse grid]": {
+     "diff": 0.01539016095340151,
+     "ci95_identity": [
+      0.008843117256959302,
+      0.024184915771087036
+     ]
+    },
+    "Single linkage [coarse grid]": {
+     "diff": 0.015362631605351673,
+     "ci95_identity": [
+      0.00880089392264674,
+      0.024152470131715127
+     ]
+    },
+    "Ours (budget 51, draw 4)": {
+     "diff": 0.002157226695848613,
+     "ci95_identity": [
+      -9.092494845398257e-05,
+      0.0048752268652121145
+     ]
+    },
+    "Agglomerative (avg) [fine grid]": {
+     "diff": 0.0015024333030695391,
+     "ci95_identity": [
+      -0.00041562745968498627,
+      0.003558034549156846
+     ]
+    },
+    "Ours (budget 51, draw 0)": {
+     "diff": 0.0006641546698861189,
+     "ci95_identity": [
+      -0.0011616423726081182,
+      0.003001536726951636
+     ]
+    },
+    "First-Leader [fine grid]": {
+     "diff": 0.030454181756797483,
+     "ci95_identity": [
+      0.024553695172071434,
+      0.038918157865603834
+     ]
+    },
+    "Two-stage [fine grid]": {
+     "diff": 0.001264366965021746,
+     "ci95_identity": [
+      3.370891014740087e-05,
+      0.0029224172731240304
+     ]
+    },
+    "First-Leader [coarse grid]": {
+     "diff": 0.03352788405113383,
+     "ci95_identity": [
+      0.02512003014485043,
+      0.0399660774568717
+     ]
+    },
+    "Ours (budget 51, draw 2)": {
+     "diff": -2.5547085093169386e-05,
+     "ci95_identity": [
+      -0.0009644337991873364,
+      0.0010173844297727212
+     ]
+    },
+    "Single linkage [fine grid]": {
+     "diff": 0.019320660804237888,
+     "ci95_identity": [
+      0.0122046142816543,
+      0.02895955135424939
+     ]
+    },
+    "Two-stage [coarse grid]": {
+     "diff": 0.001264366965021746,
+     "ci95_identity": [
+      3.370891014740087e-05,
+      0.0029224172731240304
+     ]
+    },
+    "DBSCAN [fine grid]": {
+     "diff": 0.019320660804237888,
+     "ci95_identity": [
+      0.0122046142816543,
+      0.02895955135424939
+     ]
+    },
+    "HDBSCAN [coarse grid]": {
+     "diff": 0.0036665677134221086,
+     "ci95_identity": [
+      0.00010752831896147509,
+      0.00819316456715271
+     ]
+    },
+    "HDBSCAN [fine grid]": {
+     "diff": 0.0007717930819589602,
+     "ci95_identity": [
+      -0.0013139259318510677,
+      0.002935339709122997
+     ]
+    }
+   },
+   "lookalike": {
+    "Ours, no attach": {
+     "diff": 0.0018518518518518823,
+     "ci95_identity": [
+      0.0,
+      0.005263157685597711
+     ]
+    },
+    "Ours (budget 51, draw 3)": {
+     "diff": -0.0037458096782384542,
+     "ci95_identity": [
+      -0.01038222670555122,
+      0.0
+     ]
+    },
+    "Agglomerative (avg) [coarse grid]": {
+     "diff": 0.0,
+     "ci95_identity": [
+      0.0,
+      0.0
+     ]
+    },
+    "Ours": {
+     "diff": -0.0037458096782384542,
+     "ci95_identity": [
+      -0.01038222670555122,
+      0.0
+     ]
+    },
+    "DBSCAN [coarse grid]": {
+     "diff": 0.001040018013032551,
+     "ci95_identity": [
+      0.0,
+      0.004118762761354475
+     ]
+    },
+    "Single linkage [coarse grid]": {
+     "diff": 0.0010353814052805888,
+     "ci95_identity": [
+      0.0,
+      0.004118657161792147
+     ]
+    },
+    "Ours (budget 51, draw 4)": {
+     "diff": -0.0037458096782384542,
+     "ci95_identity": [
+      -0.01038222670555122,
+      0.0
+     ]
+    },
+    "Agglomerative (avg) [fine grid]": {
+     "diff": 0.0,
+     "ci95_identity": [
+      0.0,
+      0.0
+     ]
+    },
+    "Ours (budget 51, draw 0)": {
+     "diff": 0.0,
+     "ci95_identity": [
+      0.0,
+      0.0
+     ]
+    },
+    "First-Leader [fine grid]": {
+     "diff": 0.002422002233312348,
+     "ci95_identity": [
+      0.0021551368137200737,
+      0.011291109919547997
+     ]
+    },
+    "Two-stage [fine grid]": {
+     "diff": 0.009504853507483646,
+     "ci95_identity": [
+      0.0027179268499215067,
+      0.015259441882371981
+     ]
+    },
+    "First-Leader [coarse grid]": {
+     "diff": 0.0008919135319490623,
+     "ci95_identity": [
+      0.0006720807651678791,
+      0.008472633113463806
+     ]
+    },
+    "Ours (budget 51, draw 2)": {
+     "diff": -0.0037458096782384542,
+     "ci95_identity": [
+      -0.01038222670555122,
+      0.0
+     ]
+    },
+    "Single linkage [fine grid]": {
+     "diff": 0.0010353814052805888,
+     "ci95_identity": [
+      0.0,
+      0.004118657161792147
+     ]
+    },
+    "Two-stage [coarse grid]": {
+     "diff": 0.009504853507483646,
+     "ci95_identity": [
+      0.0027179268499215067,
+      0.015259441882371981
+     ]
+    },
+    "DBSCAN [fine grid]": {
+     "diff": 0.0010353814052805888,
+     "ci95_identity": [
+      0.0,
+      0.004118657161792147
+     ]
+    },
+    "HDBSCAN [coarse grid]": {
+     "diff": -0.0034725572167321195,
+     "ci95_identity": [
+      -0.009593584338823869,
+      1.0001957416586048e-05
+     ]
+    },
+    "HDBSCAN [fine grid]": {
+     "diff": -0.0034725572167321195,
+     "ci95_identity": [
+      -0.009593584338823869,
+      1.0001957416586048e-05
+     ]
+    }
+   },
+   "lowres": {
+    "Ours, no attach": {
+     "diff": 0.004912559242310821,
+     "ci95_identity": [
+      -0.0046953664720058574,
+      0.012941336085398955
+     ]
+    },
+    "Ours (budget 51, draw 3)": {
+     "diff": 0.002753001482450723,
+     "ci95_identity": [
+      -0.004292632043361749,
+      0.00983312502503392
+     ]
+    },
+    "Agglomerative (avg) [coarse grid]": {
+     "diff": -0.0033948910288190692,
+     "ci95_identity": [
+      -0.014607670009136155,
+      0.0032878749569257735
+     ]
+    },
+    "Ours": {
+     "diff": 0.002753001482450723,
+     "ci95_identity": [
+      -0.004292632043361749,
+      0.00983312502503392
+     ]
+    },
+    "DBSCAN [coarse grid]": {
+     "diff": 0.02413367435694258,
+     "ci95_identity": [
+      0.014891197284062732,
+      0.03684397468964257
+     ]
+    },
+    "Single linkage [coarse grid]": {
+     "diff": 0.019353139311407586,
+     "ci95_identity": [
+      0.011056269456942904,
+      0.0298650117715199
+     ]
+    },
+    "Ours (budget 51, draw 4)": {
+     "diff": 0.008140846371060384,
+     "ci95_identity": [
+      0.001340637604395556,
+      0.01640059327085813
+     ]
+    },
+    "Agglomerative (avg) [fine grid]": {
+     "diff": -0.004311819345747092,
+     "ci95_identity": [
+      -0.01531699523329732,
+      0.0019059170285861287
+     ]
+    },
+    "Ours (budget 51, draw 0)": {
+     "diff": 0.0008437233035802905,
+     "ci95_identity": [
+      -0.007331904371579534,
+      0.007780911972125298
+     ]
+    },
+    "First-Leader [fine grid]": {
+     "diff": 0.059691887751911366,
+     "ci95_identity": [
+      0.048140635838111324,
+      0.07659408340851469
+     ]
+    },
+    "Two-stage [fine grid]": {
+     "diff": -0.0036845721859682934,
+     "ci95_identity": [
+      -0.0147775312761465,
+      0.002744074116150521
+     ]
+    },
+    "First-Leader [coarse grid]": {
+     "diff": 0.06510391782581548,
+     "ci95_identity": [
+      0.05086069852113716,
+      0.0875810128450393
+     ]
+    },
+    "Ours (budget 51, draw 2)": {
+     "diff": -0.004166309502828258,
+     "ci95_identity": [
+      -0.013761773109436094,
+      0.0016275619963804081
+     ]
+    },
+    "Single linkage [fine grid]": {
+     "diff": 0.029528119036304257,
+     "ci95_identity": [
+      0.019144902875026147,
+      0.044631983737150785
+     ]
+    },
+    "Two-stage [coarse grid]": {
+     "diff": -0.0036845721859682934,
+     "ci95_identity": [
+      -0.0147775312761465,
+      0.002744074116150521
+     ]
+    },
+    "DBSCAN [fine grid]": {
+     "diff": 0.029528119036304257,
+     "ci95_identity": [
+      0.019144902875026147,
+      0.044631983737150785
+     ]
+    },
+    "HDBSCAN [coarse grid]": {
+     "diff": 0.007976866434578067,
+     "ci95_identity": [
+      -0.004161472817261957,
+      0.01827040741840995
+     ]
+    },
+    "HDBSCAN [fine grid]": {
+     "diff": 0.001804251110315569,
+     "ci95_identity": [
+      -0.010033457279205365,
+      0.010917486846446955
+     ]
+    }
+   },
+   "mixed": {
+    "Ours, no attach": {
+     "diff": 0.0030413327136603607,
+     "ci95_identity": [
+      -0.00047197525699931296,
+      0.0069479749600092205
+     ]
+    },
+    "Ours (budget 51, draw 3)": {
+     "diff": 0.00236346200163029,
+     "ci95_identity": [
+      4.3323685725524376e-05,
+      0.005268047551314092
+     ]
+    },
+    "Agglomerative (avg) [coarse grid]": {
+     "diff": -0.00018526989909295466,
+     "ci95_identity": [
+      -0.0029152054588000185,
+      0.0022756824394066784
+     ]
+    },
+    "Ours": {
+     "diff": 0.00236346200163029,
+     "ci95_identity": [
+      4.3323685725524376e-05,
+      0.005268047551314092
+     ]
+    },
+    "DBSCAN [coarse grid]": {
+     "diff": 0.025383298560855416,
+     "ci95_identity": [
+      0.02014751791954047,
+      0.032499866435925104
+     ]
+    },
+    "Single linkage [coarse grid]": {
+     "diff": 0.024820839364460112,
+     "ci95_identity": [
+      0.019855040758848103,
+      0.031222417702277537
+     ]
+    },
+    "Ours (budget 51, draw 4)": {
+     "diff": 0.006810326061868377,
+     "ci95_identity": [
+      0.004021572371323934,
+      0.010823298444350505
+     ]
+    },
+    "Agglomerative (avg) [fine grid]": {
+     "diff": -0.001014483047023007,
+     "ci95_identity": [
+      -0.00414338946342461,
+      0.0017458532750605654
+     ]
+    },
+    "Ours (budget 51, draw 0)": {
+     "diff": 0.0008537697133715882,
+     "ci95_identity": [
+      -0.0012934346497058878,
+      0.0035572807490825945
+     ]
+    },
+    "First-Leader [fine grid]": {
+     "diff": 0.07036643638009143,
+     "ci95_identity": [
+      0.055471863498290336,
+      0.08278743435939151
+     ]
+    },
+    "Two-stage [fine grid]": {
+     "diff": -0.0004582151257005451,
+     "ci95_identity": [
+      -0.0026822573939958546,
+      0.00257292672991759
+     ]
+    },
+    "First-Leader [coarse grid]": {
+     "diff": 0.07853188659432231,
+     "ci95_identity": [
+      0.06023752182722097,
+      0.09216958716511718
+     ]
+    },
+    "Ours (budget 51, draw 2)": {
+     "diff": -0.0019924039585647035,
+     "ci95_identity": [
+      -0.004334722012281455,
+      -9.070023894312301e-05
+     ]
+    },
+    "Single linkage [fine grid]": {
+     "diff": 0.02988522887302114,
+     "ci95_identity": [
+      0.023442311386267366,
+      0.039187859843174605
+     ]
+    },
+    "Two-stage [coarse grid]": {
+     "diff": -0.0004582151257005451,
+     "ci95_identity": [
+      -0.0026822573939958546,
+      0.00257292672991759
+     ]
+    },
+    "DBSCAN [fine grid]": {
+     "diff": 0.02988522887302114,
+     "ci95_identity": [
+      0.023442311386267366,
+      0.039187859843174605
+     ]
+    },
+    "HDBSCAN [coarse grid]": {
+     "diff": 0.033360225474594496,
+     "ci95_identity": [
+      0.014807791858911536,
+      0.04667995994289724
+     ]
+    },
+    "HDBSCAN [fine grid]": {
+     "diff": 0.035504236556683666,
+     "ci95_identity": [
+      0.011657051642735792,
+      0.05536965573827426
+     ]
+    }
+   },
+   "occlude": {
+    "Ours, no attach": {
+     "diff": 0.006197317054170481,
+     "ci95_identity": [
+      -0.0006663831075031684,
+      0.014696749548117317
+     ]
+    },
+    "Ours (budget 51, draw 3)": {
+     "diff": -0.029682940270330582,
+     "ci95_identity": [
+      -0.043018812487522845,
+      -0.016020806332429256
+     ]
+    },
+    "Agglomerative (avg) [coarse grid]": {
+     "diff": -0.038549880369557865,
+     "ci95_identity": [
+      -0.056170551429192195,
+      -0.01551604370276138
+     ]
+    },
+    "Ours": {
+     "diff": -0.029682940270330582,
+     "ci95_identity": [
+      -0.043018812487522845,
+      -0.016020806332429256
+     ]
+    },
+    "DBSCAN [coarse grid]": {
+     "diff": 0.10892414373253878,
+     "ci95_identity": [
+      0.06318765675028169,
+      0.1470333918432394
+     ]
+    },
+    "Single linkage [coarse grid]": {
+     "diff": 0.11347714649254736,
+     "ci95_identity": [
+      0.06738324234882993,
+      0.15284723723928134
+     ]
+    },
+    "Ours (budget 51, draw 4)": {
+     "diff": -0.03114656852964337,
+     "ci95_identity": [
+      -0.04467673718929295,
+      -0.01687847062945364
+     ]
+    },
+    "Agglomerative (avg) [fine grid]": {
+     "diff": -0.03415846382457888,
+     "ci95_identity": [
+      -0.05247111638387052,
+      -0.010838324576616345
+     ]
+    },
+    "Ours (budget 51, draw 0)": {
+     "diff": -0.008881001799276755,
+     "ci95_identity": [
+      -0.013282814919948571,
+      -0.005023479710022602
+     ]
+    },
+    "First-Leader [fine grid]": {
+     "diff": 0.07354314837968545,
+     "ci95_identity": [
+      0.06259474426507947,
+      0.10881734346350032
+     ]
+    },
+    "Two-stage [fine grid]": {
+     "diff": -0.038539286623796576,
+     "ci95_identity": [
+      -0.055701646606127496,
+      -0.01341525435447685
+     ]
+    },
+    "First-Leader [coarse grid]": {
+     "diff": 0.06160055758857774,
+     "ci95_identity": [
+      0.048767797052860246,
+      0.08816396638751027
+     ]
+    },
+    "Ours (budget 51, draw 2)": {
+     "diff": -0.02094849243017971,
+     "ci95_identity": [
+      -0.03346240585048999,
+      -0.007699081450700761
+     ]
+    },
+    "Single linkage [fine grid]": {
+     "diff": 0.07730283567951624,
+     "ci95_identity": [
+      0.046033312280972856,
+      0.1042335489888987
+     ]
+    },
+    "Two-stage [coarse grid]": {
+     "diff": -0.038539286623796576,
+     "ci95_identity": [
+      -0.055701646606127496,
+      -0.01341525435447685
+     ]
+    },
+    "DBSCAN [fine grid]": {
+     "diff": 0.07730283567951624,
+     "ci95_identity": [
+      0.046033312280972856,
+      0.1042335489888987
+     ]
+    },
+    "HDBSCAN [coarse grid]": {
+     "diff": -0.01148930710174445,
+     "ci95_identity": [
+      -0.026935279965400623,
+      0.005949234316746434
+     ]
+    },
+    "HDBSCAN [fine grid]": {
+     "diff": -0.02263093631951485,
+     "ci95_identity": [
+      -0.03782679155468945,
+      -0.006441886921723709
+     ]
+    }
+   }
+  },
+  "Ours (budget 51, draw 4)": {
+   "blur": {
+    "Ours, no attach": {
+     "diff": 0.006768841496104572,
+     "ci95_identity": [
+      0.003056890716155361,
+      0.012012004752953791
+     ]
+    },
+    "Ours (budget 51, draw 3)": {
+     "diff": 0.0,
+     "ci95_identity": [
+      0.0,
+      0.0
+     ]
+    },
+    "Agglomerative (avg) [coarse grid]": {
+     "diff": 0.0037784039152644056,
+     "ci95_identity": [
+      0.0023830310006937054,
+      0.005947823921839399
+     ]
+    },
+    "Ours (budget 51, draw 1)": {
+     "diff": 0.0014450955992409975,
+     "ci95_identity": [
+      0.00040869409839308646,
+      0.0024268116056918587
+     ]
+    },
+    "Ours": {
+     "diff": 0.0,
+     "ci95_identity": [
+      0.0,
+      0.0
+     ]
+    },
+    "DBSCAN [coarse grid]": {
+     "diff": 0.011027101541479345,
+     "ci95_identity": [
+      0.00552833194533984,
+      0.018304625699917455
+     ]
+    },
+    "Single linkage [coarse grid]": {
+     "diff": 0.011000373285667275,
+     "ci95_identity": [
+      0.005527435392141386,
+      0.018263423194487833
+     ]
+    },
+    "Agglomerative (avg) [fine grid]": {
+     "diff": 0.006113054955001251,
+     "ci95_identity": [
+      0.0034646522005398863,
+      0.010525061637163149
+     ]
+    },
+    "Ours (budget 51, draw 0)": {
+     "diff": 0.00030085856791983723,
+     "ci95_identity": [
+      0.0,
+      0.0007714205980301064
+     ]
+    },
+    "First-Leader [fine grid]": {
+     "diff": 0.020648042259917232,
+     "ci95_identity": [
+      0.014530548950036273,
+      0.024773366749286603
+     ]
+    },
+    "Two-stage [fine grid]": {
+     "diff": 0.005423205283351051,
+     "ci95_identity": [
+      0.0030703992644945414,
+      0.008890946408112764
+     ]
+    },
+    "First-Leader [coarse grid]": {
+     "diff": 0.016751690790571372,
+     "ci95_identity": [
+      0.011528884569803865,
+      0.019111926903327327
+     ]
+    },
+    "Ours (budget 51, draw 2)": {
+     "diff": 0.0011436675438027954,
+     "ci95_identity": [
+      0.00011799479524298162,
+      0.0020785660545031086
+     ]
+    },
+    "Single linkage [fine grid]": {
+     "diff": 0.011422541683390519,
+     "ci95_identity": [
+      0.005572394182284629,
+      0.01872912978132574
+     ]
+    },
+    "Two-stage [coarse grid]": {
+     "diff": 0.005423205283351051,
+     "ci95_identity": [
+      0.0030703992644945414,
+      0.008890946408112764
+     ]
+    },
+    "DBSCAN [fine grid]": {
+     "diff": 0.011422541683390519,
+     "ci95_identity": [
+      0.005572394182284629,
+      0.01872912978132574
+     ]
+    },
+    "HDBSCAN [coarse grid]": {
+     "diff": 0.0018713946936990133,
+     "ci95_identity": [
+      0.0006664257248242183,
+      0.0036938272913296876
+     ]
+    },
+    "HDBSCAN [fine grid]": {
+     "diff": 0.002514108409753968,
+     "ci95_identity": [
+      0.0011989062527816452,
+      0.004343436857064484
+     ]
+    }
+   },
+   "clean": {
+    "Ours, no attach": {
+     "diff": 0.011058156537922192,
+     "ci95_identity": [
+      0.00492995043595632,
+      0.018874064137538345
+     ]
+    },
+    "Ours (budget 51, draw 3)": {
+     "diff": 0.0,
+     "ci95_identity": [
+      0.0,
+      0.0
+     ]
+    },
+    "Agglomerative (avg) [coarse grid]": {
+     "diff": 0.00586011384943419,
+     "ci95_identity": [
+      0.0019549168646335684,
+      0.01189726109306023
+     ]
+    },
+    "Ours (budget 51, draw 1)": {
+     "diff": 0.004219650839596634,
+     "ci95_identity": [
+      0.00035107453664137423,
+      0.009883321225643157
+     ]
+    },
+    "Ours": {
+     "diff": 0.0,
+     "ci95_identity": [
+      0.0,
+      0.0
+     ]
+    },
+    "DBSCAN [coarse grid]": {
+     "diff": 0.003975908469388112,
+     "ci95_identity": [
+      -0.00011445611715317494,
+      0.009743092606465028
+     ]
+    },
+    "Single linkage [coarse grid]": {
+     "diff": 0.00394900764392192,
+     "ci95_identity": [
+      -0.00014170726140340926,
+      0.009728204409281436
+     ]
+    },
+    "Agglomerative (avg) [fine grid]": {
+     "diff": 0.006626156951095807,
+     "ci95_identity": [
+      0.002705188492933902,
+      0.012765609771013294
+     ]
+    },
+    "Ours (budget 51, draw 0)": {
+     "diff": 0.0037829904198166675,
+     "ci95_identity": [
+      0.0,
+      0.009487403084834466
+     ]
+    },
+    "First-Leader [fine grid]": {
+     "diff": 0.010756983833214218,
+     "ci95_identity": [
+      0.00948566759626065,
+      0.01716024254759157
+     ]
+    },
+    "Two-stage [fine grid]": {
+     "diff": 0.01229301132474625,
+     "ci95_identity": [
+      0.0072068737447262225,
+      0.019482997705539056
+     ]
+    },
+    "First-Leader [coarse grid]": {
+     "diff": 0.005883415151124893,
+     "ci95_identity": [
+      0.004783333937327089,
+      0.010045514702796977
+     ]
+    },
+    "Ours (budget 51, draw 2)": {
+     "diff": 0.00043420684866279924,
+     "ci95_identity": [
+      0.0002628700435162029,
+      0.0006792324781417974
+     ]
+    },
+    "Single linkage [fine grid]": {
+     "diff": 0.00394900764392192,
+     "ci95_identity": [
+      -0.00014170726140340926,
+      0.009728204409281436
+     ]
+    },
+    "Two-stage [coarse grid]": {
+     "diff": 0.01229301132474625,
+     "ci95_identity": [
+      0.0072068737447262225,
+      0.019482997705539056
+     ]
+    },
+    "DBSCAN [fine grid]": {
+     "diff": 0.00394900764392192,
+     "ci95_identity": [
+      -0.00014170726140340926,
+      0.009728204409281436
+     ]
+    },
+    "HDBSCAN [coarse grid]": {
+     "diff": 0.0021338201461810202,
+     "ci95_identity": [
+      0.0014145731429259622,
+      0.003241537859042429
+     ]
+    },
+    "HDBSCAN [fine grid]": {
+     "diff": 0.0032538046315434555,
+     "ci95_identity": [
+      0.0023348017036914663,
+      0.004755894343058233
+     ]
+    }
+   },
+   "dark": {
+    "Ours, no attach": {
+     "diff": 0.008307776713077808,
+     "ci95_identity": [
+      0.002756176441907904,
+      0.01496619765957195
+     ]
+    },
+    "Ours (budget 51, draw 3)": {
+     "diff": -0.0006713731914869125,
+     "ci95_identity": [
+      -0.002494341979424175,
+      0.0
+     ]
+    },
+    "Agglomerative (avg) [coarse grid]": {
+     "diff": 0.0015312376876627232,
+     "ci95_identity": [
+      -0.0003025374313195384,
+      0.0029971874256927962
+     ]
+    },
+    "Ours (budget 51, draw 1)": {
+     "diff": 0.00332557834688485,
+     "ci95_identity": [
+      -0.0005829246342182681,
+      0.008640937109788194
+     ]
+    },
+    "Ours": {
+     "diff": -0.0006713731914869125,
+     "ci95_identity": [
+      -0.002494341979424175,
+      0.0
+     ]
+    },
+    "DBSCAN [coarse grid]": {
+     "diff": 0.0033982435438271175,
+     "ci95_identity": [
+      -0.0009687435626983153,
+      0.009023167441288659
+     ]
+    },
+    "Single linkage [coarse grid]": {
+     "diff": 0.003371252678843306,
+     "ci95_identity": [
+      -0.0010081583261489584,
+      0.00902232969800634
+     ]
+    },
+    "Agglomerative (avg) [fine grid]": {
+     "diff": 0.002020859778342543,
+     "ci95_identity": [
+      0.00020751699805261206,
+      0.0039310140907765296
+     ]
+    },
+    "Ours (budget 51, draw 0)": {
+     "diff": 0.0029203798444606965,
+     "ci95_identity": [
+      -0.001415847390890171,
+      0.008584612508614843
+     ]
+    },
+    "First-Leader [fine grid]": {
+     "diff": 0.01162983634078818,
+     "ci95_identity": [
+      0.008969617486000147,
+      0.015913174649079626
+     ]
+    },
+    "Two-stage [fine grid]": {
+     "diff": 0.0039295504052220265,
+     "ci95_identity": [
+      0.001662273456652952,
+      0.007963893711566963
+     ]
+    },
+    "First-Leader [coarse grid]": {
+     "diff": 0.007552825552968434,
+     "ci95_identity": [
+      0.005982917000850035,
+      0.01230937734246251
+     ]
+    },
+    "Ours (budget 51, draw 2)": {
+     "diff": -0.0002924883481740803,
+     "ci95_identity": [
+      -0.0021108541886011994,
+      0.0010268130401769769
+     ]
+    },
+    "Single linkage [fine grid]": {
+     "diff": 0.004106833046911174,
+     "ci95_identity": [
+      -0.0007585160930951573,
+      0.010248708426952398
+     ]
+    },
+    "Two-stage [coarse grid]": {
+     "diff": 0.0039295504052220265,
+     "ci95_identity": [
+      0.001662273456652952,
+      0.007963893711566963
+     ]
+    },
+    "DBSCAN [fine grid]": {
+     "diff": 0.004106833046911174,
+     "ci95_identity": [
+      -0.0007585160930951573,
+      0.010248708426952398
+     ]
+    },
+    "HDBSCAN [coarse grid]": {
+     "diff": 0.0035938316416915805,
+     "ci95_identity": [
+      0.0007891943057378421,
+      0.007953046957651793
+     ]
+    },
+    "HDBSCAN [fine grid]": {
+     "diff": 0.0030618577081876763,
+     "ci95_identity": [
+      0.0008744926750659992,
+      0.005467765629291512
+     ]
+    }
+   },
+   "jpeg": {
+    "Ours, no attach": {
+     "diff": 0.007364075458732855,
+     "ci95_identity": [
+      0.002255263030528987,
+      0.012954933146635648
+     ]
+    },
+    "Ours (budget 51, draw 3)": {
+     "diff": -0.0003385922593731605,
+     "ci95_identity": [
+      -0.0011474135021368875,
+      0.0
+     ]
+    },
+    "Agglomerative (avg) [coarse grid]": {
+     "diff": -0.0008789128689801196,
+     "ci95_identity": [
+      -0.0035346398254235355,
+      0.0015316378573576397
+     ]
+    },
+    "Ours (budget 51, draw 1)": {
+     "diff": -0.002157226695848613,
+     "ci95_identity": [
+      -0.004875226865212115,
+      9.092494845398242e-05
+     ]
+    },
+    "Ours": {
+     "diff": -0.0003385922593731605,
+     "ci95_identity": [
+      -0.0011474135021368875,
+      0.0
+     ]
+    },
+    "DBSCAN [coarse grid]": {
+     "diff": 0.013232934257552897,
+     "ci95_identity": [
+      0.006783182322979031,
+      0.021303631464640243
+     ]
+    },
+    "Single linkage [coarse grid]": {
+     "diff": 0.01320540490950306,
+     "ci95_identity": [
+      0.006765692035357138,
+      0.02128856192032487
+     ]
+    },
+    "Agglomerative (avg) [fine grid]": {
+     "diff": -0.0006547933927790739,
+     "ci95_identity": [
+      -0.004146295040845851,
+      0.0024165786802768287
+     ]
+    },
+    "Ours (budget 51, draw 0)": {
+     "diff": -0.0014930720259624941,
+     "ci95_identity": [
+      -0.0032684045533339255,
+      -0.00034309446811665867
+     ]
+    },
+    "First-Leader [fine grid]": {
+     "diff": 0.02829695506094887,
+     "ci95_identity": [
+      0.02213539515932402,
+      0.03682521169384323
+     ]
+    },
+    "Two-stage [fine grid]": {
+     "diff": -0.0008928597308268671,
+     "ci95_identity": [
+      -0.003564962049325243,
+      0.001582852949698746
+     ]
+    },
+    "First-Leader [coarse grid]": {
+     "diff": 0.031370657355285214,
+     "ci95_identity": [
+      0.022732300659020793,
+      0.037874752978483785
+     ]
+    },
+    "Ours (budget 51, draw 2)": {
+     "diff": -0.0021827737809417824,
+     "ci95_identity": [
+      -0.004855293432871499,
+      -0.00010979687174164949
+     ]
+    },
+    "Single linkage [fine grid]": {
+     "diff": 0.017163434108389275,
+     "ci95_identity": [
+      0.010669761151075369,
+      0.02597157955169681
+     ]
+    },
+    "Two-stage [coarse grid]": {
+     "diff": -0.0008928597308268671,
+     "ci95_identity": [
+      -0.003564962049325243,
+      0.001582852949698746
+     ]
+    },
+    "DBSCAN [fine grid]": {
+     "diff": 0.017163434108389275,
+     "ci95_identity": [
+      0.010669761151075369,
+      0.02597157955169681
+     ]
+    },
+    "HDBSCAN [coarse grid]": {
+     "diff": 0.0015093410175734956,
+     "ci95_identity": [
+      -0.0031025376915931628,
+      0.006320567429065804
+     ]
+    },
+    "HDBSCAN [fine grid]": {
+     "diff": -0.0013854336138896528,
+     "ci95_identity": [
+      -0.005185109078884131,
+      0.0016480908791223492
+     ]
+    }
+   },
+   "lookalike": {
+    "Ours, no attach": {
+     "diff": 0.0055976615300903365,
+     "ci95_identity": [
+      0.0008011333147685013,
+      0.012701448450485894
+     ]
+    },
+    "Ours (budget 51, draw 3)": {
+     "diff": 0.0,
+     "ci95_identity": [
+      0.0,
+      0.0
+     ]
+    },
+    "Agglomerative (avg) [coarse grid]": {
+     "diff": 0.0037458096782384542,
+     "ci95_identity": [
+      0.0,
+      0.01038222670555122
+     ]
+    },
+    "Ours (budget 51, draw 1)": {
+     "diff": 0.0037458096782384542,
+     "ci95_identity": [
+      0.0,
+      0.01038222670555122
+     ]
+    },
+    "Ours": {
+     "diff": 0.0,
+     "ci95_identity": [
+      0.0,
+      0.0
+     ]
+    },
+    "DBSCAN [coarse grid]": {
+     "diff": 0.004785827691271005,
+     "ci95_identity": [
+      0.0,
+      0.01167745520671212
+     ]
+    },
+    "Single linkage [coarse grid]": {
+     "diff": 0.004781191083519043,
+     "ci95_identity": [
+      0.0,
+      0.011677288711071048
+     ]
+    },
+    "Agglomerative (avg) [fine grid]": {
+     "diff": 0.0037458096782384542,
+     "ci95_identity": [
+      0.0,
+      0.01038222670555122
+     ]
+    },
+    "Ours (budget 51, draw 0)": {
+     "diff": 0.0037458096782384542,
+     "ci95_identity": [
+      0.0,
+      0.01038222670555122
+     ]
+    },
+    "First-Leader [fine grid]": {
+     "diff": 0.006167811911550802,
+     "ci95_identity": [
+      0.004934057195981382,
+      0.01670904273788133
+     ]
+    },
+    "Two-stage [fine grid]": {
+     "diff": 0.0132506631857221,
+     "ci95_identity": [
+      0.0050146956245104264,
+      0.02177275190750756
+     ]
+    },
+    "First-Leader [coarse grid]": {
+     "diff": 0.0046377232101875165,
+     "ci95_identity": [
+      0.0031582095722357097,
+      0.014061145434776942
+     ]
+    },
+    "Ours (budget 51, draw 2)": {
+     "diff": 0.0,
+     "ci95_identity": [
+      0.0,
+      0.0
+     ]
+    },
+    "Single linkage [fine grid]": {
+     "diff": 0.004781191083519043,
+     "ci95_identity": [
+      0.0,
+      0.011677288711071048
+     ]
+    },
+    "Two-stage [coarse grid]": {
+     "diff": 0.0132506631857221,
+     "ci95_identity": [
+      0.0050146956245104264,
+      0.02177275190750756
+     ]
+    },
+    "DBSCAN [fine grid]": {
+     "diff": 0.004781191083519043,
+     "ci95_identity": [
+      0.0,
+      0.011677288711071048
+     ]
+    },
+    "HDBSCAN [coarse grid]": {
+     "diff": 0.00027325246150633475,
+     "ci95_identity": [
+      0.0,
+      0.0009864390393098637
+     ]
+    },
+    "HDBSCAN [fine grid]": {
+     "diff": 0.00027325246150633475,
+     "ci95_identity": [
+      0.0,
+      0.0009864390393098637
+     ]
+    }
+   },
+   "lowres": {
+    "Ours, no attach": {
+     "diff": -0.003228287128749563,
+     "ci95_identity": [
+      -0.012284628450870522,
+      0.0037699226041634205
+     ]
+    },
+    "Ours (budget 51, draw 3)": {
+     "diff": -0.005387844888609661,
+     "ci95_identity": [
+      -0.01104934503634769,
+      -0.0018096538384754872
+     ]
+    },
+    "Agglomerative (avg) [coarse grid]": {
+     "diff": -0.011535737399879453,
+     "ci95_identity": [
+      -0.022538860291242573,
+      -0.004304835647344561
+     ]
+    },
+    "Ours (budget 51, draw 1)": {
+     "diff": -0.008140846371060384,
+     "ci95_identity": [
+      -0.01640059327085813,
+      -0.0013406376043955583
+     ]
+    },
+    "Ours": {
+     "diff": -0.005387844888609661,
+     "ci95_identity": [
+      -0.01104934503634769,
+      -0.0018096538384754872
+     ]
+    },
+    "DBSCAN [coarse grid]": {
+     "diff": 0.015992827985882196,
+     "ci95_identity": [
+      0.008852328906456607,
+      0.02573830838004742
+     ]
+    },
+    "Single linkage [coarse grid]": {
+     "diff": 0.011212292940347202,
+     "ci95_identity": [
+      0.003543860812981886,
+      0.019870722194512698
+     ]
+    },
+    "Agglomerative (avg) [fine grid]": {
+     "diff": -0.012452665716807476,
+     "ci95_identity": [
+      -0.022853288650512667,
+      -0.005427673806746773
+     ]
+    },
+    "Ours (budget 51, draw 0)": {
+     "diff": -0.0072971230674800935,
+     "ci95_identity": [
+      -0.013040276120106428,
+      -0.003414188325405157
+     ]
+    },
+    "First-Leader [fine grid]": {
+     "diff": 0.05155104138085098,
+     "ci95_identity": [
+      0.04141150186459226,
+      0.06741709296902022
+     ]
+    },
+    "Two-stage [fine grid]": {
+     "diff": -0.011825418557028677,
+     "ci95_identity": [
+      -0.021943480223417335,
+      -0.00496832564473155
+     ]
+    },
+    "First-Leader [coarse grid]": {
+     "diff": 0.0569630714547551,
+     "ci95_identity": [
+      0.04322522754470517,
+      0.07823400035500529
+     ]
+    },
+    "Ours (budget 51, draw 2)": {
+     "diff": -0.012307155873888642,
+     "ci95_identity": [
+      -0.021559919615586527,
+      -0.006616053829590468
+     ]
+    },
+    "Single linkage [fine grid]": {
+     "diff": 0.021387272665243873,
+     "ci95_identity": [
+      0.013565656344095808,
+      0.031361926247676274
+     ]
+    },
+    "Two-stage [coarse grid]": {
+     "diff": -0.011825418557028677,
+     "ci95_identity": [
+      -0.021943480223417335,
+      -0.00496832564473155
+     ]
+    },
+    "DBSCAN [fine grid]": {
+     "diff": 0.021387272665243873,
+     "ci95_identity": [
+      0.013565656344095808,
+      0.031361926247676274
+     ]
+    },
+    "HDBSCAN [coarse grid]": {
+     "diff": -0.0001639799364823169,
+     "ci95_identity": [
+      -0.010328465551137925,
+      0.007611185808976478
+     ]
+    },
+    "HDBSCAN [fine grid]": {
+     "diff": -0.006336595260744815,
+     "ci95_identity": [
+      -0.016896409640709546,
+      0.0007481965422629463
+     ]
+    }
+   },
+   "mixed": {
+    "Ours, no attach": {
+     "diff": -0.0037689933482080162,
+     "ci95_identity": [
+      -0.009083470702171276,
+      3.7714093923618576e-05
+     ]
+    },
+    "Ours (budget 51, draw 3)": {
+     "diff": -0.004446864060238087,
+     "ci95_identity": [
+      -0.0067435776690641745,
+      -0.002835810333490352
+     ]
+    },
+    "Agglomerative (avg) [coarse grid]": {
+     "diff": -0.006995595960961332,
+     "ci95_identity": [
+      -0.012025417735179192,
+      -0.00312310685714081
+     ]
+    },
+    "Ours (budget 51, draw 1)": {
+     "diff": -0.006810326061868377,
+     "ci95_identity": [
+      -0.010823298444350505,
+      -0.0040215723713239344
+     ]
+    },
+    "Ours": {
+     "diff": -0.004446864060238087,
+     "ci95_identity": [
+      -0.0067435776690641745,
+      -0.002835810333490352
+     ]
+    },
+    "DBSCAN [coarse grid]": {
+     "diff": 0.01857297249898704,
+     "ci95_identity": [
+      0.01347551832596464,
+      0.024633529086907753
+     ]
+    },
+    "Single linkage [coarse grid]": {
+     "diff": 0.018010513302591735,
+     "ci95_identity": [
+      0.012476471116145488,
+      0.0237915762762228
+     ]
+    },
+    "Agglomerative (avg) [fine grid]": {
+     "diff": -0.007824809108891384,
+     "ci95_identity": [
+      -0.013230923314889296,
+      -0.0035296448568503504
+     ]
+    },
+    "Ours (budget 51, draw 0)": {
+     "diff": -0.005956556348496789,
+     "ci95_identity": [
+      -0.00907686541477834,
+      -0.0035586080948511543
+     ]
+    },
+    "First-Leader [fine grid]": {
+     "diff": 0.06355611031822306,
+     "ci95_identity": [
+      0.047110343029101734,
+      0.07647456775108973
+     ]
+    },
+    "Two-stage [fine grid]": {
+     "diff": -0.007268541187568922,
+     "ci95_identity": [
+      -0.011758238921562816,
+      -0.0032889750103155487
+     ]
+    },
+    "First-Leader [coarse grid]": {
+     "diff": 0.07172156053245393,
+     "ci95_identity": [
+      0.05161130234599114,
+      0.08568402459224066
+     ]
+    },
+    "Ours (budget 51, draw 2)": {
+     "diff": -0.00880273002043308,
+     "ci95_identity": [
+      -0.013051182130972509,
+      -0.005715108364820438
+     ]
+    },
+    "Single linkage [fine grid]": {
+     "diff": 0.023074902811152764,
+     "ci95_identity": [
+      0.0179514128466448,
+      0.029839822500944135
+     ]
+    },
+    "Two-stage [coarse grid]": {
+     "diff": -0.007268541187568922,
+     "ci95_identity": [
+      -0.011758238921562816,
+      -0.0032889750103155487
+     ]
+    },
+    "DBSCAN [fine grid]": {
+     "diff": 0.023074902811152764,
+     "ci95_identity": [
+      0.0179514128466448,
+      0.029839822500944135
+     ]
+    },
+    "HDBSCAN [coarse grid]": {
+     "diff": 0.02654989941272612,
+     "ci95_identity": [
+      0.0059241267542044255,
+      0.041550833731889766
+     ]
+    },
+    "HDBSCAN [fine grid]": {
+     "diff": 0.02869391049481529,
+     "ci95_identity": [
+      0.0028706955413023653,
+      0.04931940113504721
+     ]
+    }
+   },
+   "occlude": {
+    "Ours, no attach": {
+     "diff": 0.03734388558381385,
+     "ci95_identity": [
+      0.02220612774292633,
+      0.05281078462799392
+     ]
+    },
+    "Ours (budget 51, draw 3)": {
+     "diff": 0.001463628259312788,
+     "ci95_identity": [
+      -0.0004981337487697607,
+      0.0037615556518236807
+     ]
+    },
+    "Agglomerative (avg) [coarse grid]": {
+     "diff": -0.007403311839914495,
+     "ci95_identity": [
+      -0.02086530710260075,
+      0.009683362344900822
+     ]
+    },
+    "Ours (budget 51, draw 1)": {
+     "diff": 0.03114656852964337,
+     "ci95_identity": [
+      0.016878470629453638,
+      0.04467673718929295
+     ]
+    },
+    "Ours": {
+     "diff": 0.001463628259312788,
+     "ci95_identity": [
+      -0.0004981337487697607,
+      0.0037615556518236807
+     ]
+    },
+    "DBSCAN [coarse grid]": {
+     "diff": 0.14007071226218215,
+     "ci95_identity": [
+      0.08994048858682319,
+      0.18151171738902733
+     ]
+    },
+    "Single linkage [coarse grid]": {
+     "diff": 0.14462371502219074,
+     "ci95_identity": [
+      0.09288147752483686,
+      0.18695902183651922
+     ]
+    },
+    "Agglomerative (avg) [fine grid]": {
+     "diff": -0.003011895294935507,
+     "ci95_identity": [
+      -0.016322752932707414,
+      0.014052269309759138
+     ]
+    },
+    "Ours (budget 51, draw 0)": {
+     "diff": 0.022265566730366615,
+     "ci95_identity": [
+      0.00836734026670459,
+      0.03531247253219282
+     ]
+    },
+    "First-Leader [fine grid]": {
+     "diff": 0.10468971690932882,
+     "ci95_identity": [
+      0.09392346118887268,
+      0.13841159542401635
+     ]
+    },
+    "Two-stage [fine grid]": {
+     "diff": -0.007392718094153206,
+     "ci95_identity": [
+      -0.020235679199298192,
+      0.011902503371238694
+     ]
+    },
+    "First-Leader [coarse grid]": {
+     "diff": 0.09274712611822111,
+     "ci95_identity": [
+      0.08037524362405143,
+      0.11670255204041796
+     ]
+    },
+    "Ours (budget 51, draw 2)": {
+     "diff": 0.01019807609946366,
+     "ci95_identity": [
+      0.00513990819454189,
+      0.01599794139464695
+     ]
+    },
+    "Single linkage [fine grid]": {
+     "diff": 0.1084494042091596,
+     "ci95_identity": [
+      0.07130009169379868,
+      0.13971019441882762
+     ]
+    },
+    "Two-stage [coarse grid]": {
+     "diff": -0.007392718094153206,
+     "ci95_identity": [
+      -0.020235679199298192,
+      0.011902503371238694
+     ]
+    },
+    "DBSCAN [fine grid]": {
+     "diff": 0.1084494042091596,
+     "ci95_identity": [
+      0.07130009169379868,
+      0.13971019441882762
+     ]
+    },
+    "HDBSCAN [coarse grid]": {
+     "diff": 0.01965726142789892,
+     "ci95_identity": [
+      0.008645710845788246,
+      0.03355675215522443
+     ]
+    },
+    "HDBSCAN [fine grid]": {
+     "diff": 0.008515632210128521,
+     "ci95_identity": [
+      -0.0024006592730680593,
+      0.021006171802679777
+     ]
+    }
+   }
+  },
+  "Ours (budget 51, draw 0)": {
+   "blur": {
+    "Ours, no attach": {
+     "diff": 0.0064679829281847345,
+     "ci95_identity": [
+      0.0028867326180140817,
+      0.01168585444490116
+     ]
+    },
+    "Ours (budget 51, draw 3)": {
+     "diff": -0.00030085856791983723,
+     "ci95_identity": [
+      -0.0007714205980301064,
+      0.0
+     ]
+    },
+    "Agglomerative (avg) [coarse grid]": {
+     "diff": 0.0034775453473445683,
+     "ci95_identity": [
+      0.002021911392609263,
+      0.005758640517791141
+     ]
+    },
+    "Ours (budget 51, draw 1)": {
+     "diff": 0.0011442370313211603,
+     "ci95_identity": [
+      0.00011852587262792259,
+      0.0020789534846942207
+     ]
+    },
+    "Ours": {
+     "diff": -0.00030085856791983723,
+     "ci95_identity": [
+      -0.0007714205980301064,
+      0.0
+     ]
+    },
+    "DBSCAN [coarse grid]": {
+     "diff": 0.010726242973559508,
+     "ci95_identity": [
+      0.005239992390076284,
+      0.017963821738958368
+     ]
+    },
+    "Single linkage [coarse grid]": {
+     "diff": 0.010699514717747438,
+     "ci95_identity": [
+      0.005196610838174886,
+      0.017919635325670216
+     ]
+    },
+    "Ours (budget 51, draw 4)": {
+     "diff": -0.00030085856791983723,
+     "ci95_identity": [
+      -0.0007714205980301064,
+      0.0
+     ]
+    },
+    "Agglomerative (avg) [fine grid]": {
+     "diff": 0.005812196387081414,
+     "ci95_identity": [
+      0.003098429739475278,
+      0.010327460318803806
+     ]
+    },
+    "First-Leader [fine grid]": {
+     "diff": 0.020347183691997395,
+     "ci95_identity": [
+      0.01429355253775918,
+      0.02443951040506354
+     ]
+    },
+    "Two-stage [fine grid]": {
+     "diff": 0.005122346715431214,
+     "ci95_identity": [
+      0.002667193561792419,
+      0.008585164199272731
+     ]
+    },
+    "First-Leader [coarse grid]": {
+     "diff": 0.016450832222651535,
+     "ci95_identity": [
+      0.011196146110693592,
+      0.019016756167014457
+     ]
+    },
+    "Ours (budget 51, draw 2)": {
+     "diff": 0.0008428089758829582,
+     "ci95_identity": [
+      -0.00029161786039672564,
+      0.0019177377720673821
+     ]
+    },
+    "Single linkage [fine grid]": {
+     "diff": 0.011121683115470682,
+     "ci95_identity": [
+      0.0053813409805297694,
+      0.01824005131920178
+     ]
+    },
+    "Two-stage [coarse grid]": {
+     "diff": 0.005122346715431214,
+     "ci95_identity": [
+      0.002667193561792419,
+      0.008585164199272731
+     ]
+    },
+    "DBSCAN [fine grid]": {
+     "diff": 0.011121683115470682,
+     "ci95_identity": [
+      0.0053813409805297694,
+      0.01824005131920178
+     ]
+    },
+    "HDBSCAN [coarse grid]": {
+     "diff": 0.0015705361257791761,
+     "ci95_identity": [
+      0.0003342241545517655,
+      0.0034264353414376713
+     ]
+    },
+    "HDBSCAN [fine grid]": {
+     "diff": 0.0022132498418341306,
+     "ci95_identity": [
+      0.0008517839014530404,
+      0.004111665089925159
+     ]
+    }
+   },
+   "clean": {
+    "Ours, no attach": {
+     "diff": 0.007275166118105525,
+     "ci95_identity": [
+      0.0028880191842715094,
+      0.013200705945491777
+     ]
+    },
+    "Ours (budget 51, draw 3)": {
+     "diff": -0.0037829904198166675,
+     "ci95_identity": [
+      -0.009487403084834468,
+      0.0
+     ]
+    },
+    "Agglomerative (avg) [coarse grid]": {
+     "diff": 0.0020771234296175223,
+     "ci95_identity": [
+      0.0015773380796114457,
+      0.003054456363121677
+     ]
+    },
+    "Ours (budget 51, draw 1)": {
+     "diff": 0.00043666041977996617,
+     "ci95_identity": [
+      0.0002643394966919982,
+      0.0006838019688924445
+     ]
+    },
+    "Ours": {
+     "diff": -0.0037829904198166675,
+     "ci95_identity": [
+      -0.009487403084834468,
+      0.0
+     ]
+    },
+    "DBSCAN [coarse grid]": {
+     "diff": 0.00019291804957144443,
+     "ci95_identity": [
+      -0.00018283824125919223,
+      0.0009973774353663116
+     ]
+    },
+    "Single linkage [coarse grid]": {
+     "diff": 0.00016601722410525266,
+     "ci95_identity": [
+      -0.0002196721235910165,
+      0.000955339272816963
+     ]
+    },
+    "Ours (budget 51, draw 4)": {
+     "diff": -0.0037829904198166675,
+     "ci95_identity": [
+      -0.009487403084834468,
+      0.0
+     ]
+    },
+    "Agglomerative (avg) [fine grid]": {
+     "diff": 0.00284316653127914,
+     "ci95_identity": [
+      0.002189132223526566,
+      0.004080499261617609
+     ]
+    },
+    "First-Leader [fine grid]": {
+     "diff": 0.00697399341339755,
+     "ci95_identity": [
+      0.005693117380142307,
+      0.012831045240163803
+     ]
+    },
+    "Two-stage [fine grid]": {
+     "diff": 0.008510020904929583,
+     "ci95_identity": [
+      0.00533846259117135,
+      0.012929557909568094
+     ]
+    },
+    "First-Leader [coarse grid]": {
+     "diff": 0.002100424731308226,
+     "ci95_identity": [
+      -0.0004557575285435294,
+      0.006610465794801747
+     ]
+    },
+    "Ours (budget 51, draw 2)": {
+     "diff": -0.0033487835711538683,
+     "ci95_identity": [
+      -0.00904184038440387,
+      0.0005502637724081965
+     ]
+    },
+    "Single linkage [fine grid]": {
+     "diff": 0.00016601722410525266,
+     "ci95_identity": [
+      -0.0002196721235910165,
+      0.000955339272816963
+     ]
+    },
+    "Two-stage [coarse grid]": {
+     "diff": 0.008510020904929583,
+     "ci95_identity": [
+      0.00533846259117135,
+      0.012929557909568094
+     ]
+    },
+    "DBSCAN [fine grid]": {
+     "diff": 0.00016601722410525266,
+     "ci95_identity": [
+      -0.0002196721235910165,
+      0.000955339272816963
+     ]
+    },
+    "HDBSCAN [coarse grid]": {
+     "diff": -0.0016491702736356473,
+     "ci95_identity": [
+      -0.007148275574048346,
+      0.002284060269594193
+     ]
+    },
+    "HDBSCAN [fine grid]": {
+     "diff": -0.0005291857882732121,
+     "ci95_identity": [
+      -0.005961971928675936,
+      0.0036430141329765985
+     ]
+    }
+   },
+   "dark": {
+    "Ours, no attach": {
+     "diff": 0.005387396868617111,
+     "ci95_identity": [
+      0.0022902079919974506,
+      0.009066550334294585
+     ]
+    },
+    "Ours (budget 51, draw 3)": {
+     "diff": -0.003591753035947609,
+     "ci95_identity": [
+      -0.008968941718339984,
+      0.0
+     ]
+    },
+    "Agglomerative (avg) [coarse grid]": {
+     "diff": -0.0013891421567979734,
+     "ci95_identity": [
+      -0.0066604129970073925,
+      0.002764371534188531
+     ]
+    },
+    "Ours (budget 51, draw 1)": {
+     "diff": 0.00040519850242415334,
+     "ci95_identity": [
+      -0.0004840983450411868,
+      0.0011634480456511247
+     ]
+    },
+    "Ours": {
+     "diff": -0.003591753035947609,
+     "ci95_identity": [
+      -0.008968941718339984,
+      0.0
+     ]
+    },
+    "DBSCAN [coarse grid]": {
+     "diff": 0.0004778636993664209,
+     "ci95_identity": [
+      -0.00011215766270954442,
+      0.00152453934152916
+     ]
+    },
+    "Single linkage [coarse grid]": {
+     "diff": 0.0004508728343826096,
+     "ci95_identity": [
+      -0.0001379919548830266,
+      0.0014711207151412024
+     ]
+    },
+    "Ours (budget 51, draw 4)": {
+     "diff": -0.0029203798444606965,
+     "ci95_identity": [
+      -0.008584612508614845,
+      0.0014158473908901707
+     ]
+    },
+    "Agglomerative (avg) [fine grid]": {
+     "diff": -0.0008995200661181535,
+     "ci95_identity": [
+      -0.006973016957441994,
+      0.003851007173458822
+     ]
+    },
+    "First-Leader [fine grid]": {
+     "diff": 0.008709456496327483,
+     "ci95_identity": [
+      0.00367920254667605,
+      0.01486748754978182
+     ]
+    },
+    "Two-stage [fine grid]": {
+     "diff": 0.00100917056076133,
+     "ci95_identity": [
+      -0.0026003589729467758,
+      0.005879779060681654
+     ]
+    },
+    "First-Leader [coarse grid]": {
+     "diff": 0.0046324457085077375,
+     "ci95_identity": [
+      0.0019283349812031086,
+      0.010244482755661016
+     ]
+    },
+    "Ours (budget 51, draw 2)": {
+     "diff": -0.003212868192634777,
+     "ci95_identity": [
+      -0.009429879337549152,
+      0.00103503540158269
+     ]
+    },
+    "Single linkage [fine grid]": {
+     "diff": 0.001186453202450477,
+     "ci95_identity": [
+      -1.1890381574652935e-05,
+      0.002767893175284147
+     ]
+    },
+    "Two-stage [coarse grid]": {
+     "diff": 0.00100917056076133,
+     "ci95_identity": [
+      -0.0026003589729467758,
+      0.005879779060681654
+     ]
+    },
+    "DBSCAN [fine grid]": {
+     "diff": 0.001186453202450477,
+     "ci95_identity": [
+      -1.1890381574652935e-05,
+      0.002767893175284147
+     ]
+    },
+    "HDBSCAN [coarse grid]": {
+     "diff": 0.000673451797230884,
+     "ci95_identity": [
+      -0.000997600654760991,
+      0.0026254294812680067
+     ]
+    },
+    "HDBSCAN [fine grid]": {
+     "diff": 0.0001414778637269798,
+     "ci95_identity": [
+      -0.0034375069042046234,
+      0.002797440886497426
+     ]
+    }
+   },
+   "jpeg": {
+    "Ours, no attach": {
+     "diff": 0.008857147484695349,
+     "ci95_identity": [
+      0.003807050287723554,
+      0.01457732523481048
+     ]
+    },
+    "Ours (budget 51, draw 3)": {
+     "diff": 0.0011544797665893336,
+     "ci95_identity": [
+      3.244097034129923e-05,
+      0.0027115202446778897
+     ]
+    },
+    "Agglomerative (avg) [coarse grid]": {
+     "diff": 0.0006141591569823746,
+     "ci95_identity": [
+      -0.0015422968069712605,
+      0.002604365597168612
+     ]
+    },
+    "Ours (budget 51, draw 1)": {
+     "diff": -0.0006641546698861189,
+     "ci95_identity": [
+      -0.003001536726951637,
+      0.0011616423726081178
+     ]
+    },
+    "Ours": {
+     "diff": 0.0011544797665893336,
+     "ci95_identity": [
+      3.244097034129923e-05,
+      0.0027115202446778897
+     ]
+    },
+    "DBSCAN [coarse grid]": {
+     "diff": 0.014726006283515392,
+     "ci95_identity": [
+      0.00811996613939595,
+      0.022596481591463137
+     ]
+    },
+    "Single linkage [coarse grid]": {
+     "diff": 0.014698476935465554,
+     "ci95_identity": [
+      0.008119657735029776,
+      0.022563657661279057
+     ]
+    },
+    "Ours (budget 51, draw 4)": {
+     "diff": 0.0014930720259624941,
+     "ci95_identity": [
+      0.00034309446811665867,
+      0.003268404553333924
+     ]
+    },
+    "Agglomerative (avg) [fine grid]": {
+     "diff": 0.0008382786331834202,
+     "ci95_identity": [
+      -0.0015204404791196557,
+      0.003268485615650843
+     ]
+    },
+    "First-Leader [fine grid]": {
+     "diff": 0.029790027086911364,
+     "ci95_identity": [
+      0.02388281683127083,
+      0.038443272461493816
+     ]
+    },
+    "Two-stage [fine grid]": {
+     "diff": 0.000600212295135627,
+     "ci95_identity": [
+      -0.0015072960158189013,
+      0.002624134471019051
+     ]
+    },
+    "First-Leader [coarse grid]": {
+     "diff": 0.03286372938124771,
+     "ci95_identity": [
+      0.024431536495685587,
+      0.039356909344593696
+     ]
+    },
+    "Ours (budget 51, draw 2)": {
+     "diff": -0.0006897017549792883,
+     "ci95_identity": [
+      -0.003205186724662751,
+      0.0014070043961207923
+     ]
+    },
+    "Single linkage [fine grid]": {
+     "diff": 0.01865650613435177,
+     "ci95_identity": [
+      0.011977165093024544,
+      0.02780090947945907
+     ]
+    },
+    "Two-stage [coarse grid]": {
+     "diff": 0.000600212295135627,
+     "ci95_identity": [
+      -0.0015072960158189013,
+      0.002624134471019051
+     ]
+    },
+    "DBSCAN [fine grid]": {
+     "diff": 0.01865650613435177,
+     "ci95_identity": [
+      0.011977165093024544,
+      0.02780090947945907
+     ]
+    },
+    "HDBSCAN [coarse grid]": {
+     "diff": 0.0030024130435359897,
+     "ci95_identity": [
+      -0.0008278694252174062,
+      0.007514806091785439
+     ]
+    },
+    "HDBSCAN [fine grid]": {
+     "diff": 0.0001076384120728413,
+     "ci95_identity": [
+      -0.002580133179823557,
+      0.0025939969221750727
+     ]
+    }
+   },
+   "lookalike": {
+    "Ours, no attach": {
+     "diff": 0.0018518518518518823,
+     "ci95_identity": [
+      0.0,
+      0.005263157685597711
+     ]
+    },
+    "Ours (budget 51, draw 3)": {
+     "diff": -0.0037458096782384542,
+     "ci95_identity": [
+      -0.01038222670555122,
+      0.0
+     ]
+    },
+    "Agglomerative (avg) [coarse grid]": {
+     "diff": 0.0,
+     "ci95_identity": [
+      0.0,
+      0.0
+     ]
+    },
+    "Ours (budget 51, draw 1)": {
+     "diff": 0.0,
+     "ci95_identity": [
+      0.0,
+      0.0
+     ]
+    },
+    "Ours": {
+     "diff": -0.0037458096782384542,
+     "ci95_identity": [
+      -0.01038222670555122,
+      0.0
+     ]
+    },
+    "DBSCAN [coarse grid]": {
+     "diff": 0.001040018013032551,
+     "ci95_identity": [
+      0.0,
+      0.004118762761354475
+     ]
+    },
+    "Single linkage [coarse grid]": {
+     "diff": 0.0010353814052805888,
+     "ci95_identity": [
+      0.0,
+      0.004118657161792147
+     ]
+    },
+    "Ours (budget 51, draw 4)": {
+     "diff": -0.0037458096782384542,
+     "ci95_identity": [
+      -0.01038222670555122,
+      0.0
+     ]
+    },
+    "Agglomerative (avg) [fine grid]": {
+     "diff": 0.0,
+     "ci95_identity": [
+      0.0,
+      0.0
+     ]
+    },
+    "First-Leader [fine grid]": {
+     "diff": 0.002422002233312348,
+     "ci95_identity": [
+      0.0021551368137200737,
+      0.011291109919547997
+     ]
+    },
+    "Two-stage [fine grid]": {
+     "diff": 0.009504853507483646,
+     "ci95_identity": [
+      0.0027179268499215067,
+      0.015259441882371981
+     ]
+    },
+    "First-Leader [coarse grid]": {
+     "diff": 0.0008919135319490623,
+     "ci95_identity": [
+      0.0006720807651678791,
+      0.008472633113463806
+     ]
+    },
+    "Ours (budget 51, draw 2)": {
+     "diff": -0.0037458096782384542,
+     "ci95_identity": [
+      -0.01038222670555122,
+      0.0
+     ]
+    },
+    "Single linkage [fine grid]": {
+     "diff": 0.0010353814052805888,
+     "ci95_identity": [
+      0.0,
+      0.004118657161792147
+     ]
+    },
+    "Two-stage [coarse grid]": {
+     "diff": 0.009504853507483646,
+     "ci95_identity": [
+      0.0027179268499215067,
+      0.015259441882371981
+     ]
+    },
+    "DBSCAN [fine grid]": {
+     "diff": 0.0010353814052805888,
+     "ci95_identity": [
+      0.0,
+      0.004118657161792147
+     ]
+    },
+    "HDBSCAN [coarse grid]": {
+     "diff": -0.0034725572167321195,
+     "ci95_identity": [
+      -0.009593584338823869,
+      1.0001957416586048e-05
+     ]
+    },
+    "HDBSCAN [fine grid]": {
+     "diff": -0.0034725572167321195,
+     "ci95_identity": [
+      -0.009593584338823869,
+      1.0001957416586048e-05
+     ]
+    }
+   },
+   "lowres": {
+    "Ours, no attach": {
+     "diff": 0.004068835938730531,
+     "ci95_identity": [
+      -0.0016225205361843546,
+      0.009887567907571773
+     ]
+    },
+    "Ours (budget 51, draw 3)": {
+     "diff": 0.0019092781788704327,
+     "ci95_identity": [
+      -0.0009822570284208187,
+      0.004908489932616558
+     ]
+    },
+    "Agglomerative (avg) [coarse grid]": {
+     "diff": -0.00423861433239936,
+     "ci95_identity": [
+      -0.011284742901722678,
+      0.00045976276199025004
+     ]
+    },
+    "Ours (budget 51, draw 1)": {
+     "diff": -0.0008437233035802905,
+     "ci95_identity": [
+      -0.007780911972125298,
+      0.007331904371579534
+     ]
+    },
+    "Ours": {
+     "diff": 0.0019092781788704327,
+     "ci95_identity": [
+      -0.0009822570284208187,
+      0.004908489932616558
+     ]
+    },
+    "DBSCAN [coarse grid]": {
+     "diff": 0.02328995105336229,
+     "ci95_identity": [
+      0.015113720049460658,
+      0.03620459482073779
+     ]
+    },
+    "Single linkage [coarse grid]": {
+     "diff": 0.018509416007827295,
+     "ci95_identity": [
+      0.011553710897763548,
+      0.02924374853571258
+     ]
+    },
+    "Ours (budget 51, draw 4)": {
+     "diff": 0.0072971230674800935,
+     "ci95_identity": [
+      0.003414188325405157,
+      0.013040276120106428
+     ]
+    },
+    "Agglomerative (avg) [fine grid]": {
+     "diff": -0.005155542649327383,
+     "ci95_identity": [
+      -0.011967268288135508,
+      -0.0006386708219845451
+     ]
+    },
+    "First-Leader [fine grid]": {
+     "diff": 0.058848164448331075,
+     "ci95_identity": [
+      0.049585203081369385,
+      0.0752201446394126
+     ]
+    },
+    "Two-stage [fine grid]": {
+     "diff": -0.004528295489548584,
+     "ci95_identity": [
+      -0.011109777539968505,
+      -0.00033281778295829337
+     ]
+    },
+    "First-Leader [coarse grid]": {
+     "diff": 0.06426019452223519,
+     "ci95_identity": [
+      0.05200369596481318,
+      0.085076615512371
+     ]
+    },
+    "Ours (budget 51, draw 2)": {
+     "diff": -0.005010032806408549,
+     "ci95_identity": [
+      -0.010838980674743712,
+      -0.001238761246204362
+     ]
+    },
+    "Single linkage [fine grid]": {
+     "diff": 0.028684395732723966,
+     "ci95_identity": [
+      0.019527061929305364,
+      0.0418175521492958
+     ]
+    },
+    "Two-stage [coarse grid]": {
+     "diff": -0.004528295489548584,
+     "ci95_identity": [
+      -0.011109777539968505,
+      -0.00033281778295829337
+     ]
+    },
+    "DBSCAN [fine grid]": {
+     "diff": 0.028684395732723966,
+     "ci95_identity": [
+      0.019527061929305364,
+      0.0418175521492958
+     ]
+    },
+    "HDBSCAN [coarse grid]": {
+     "diff": 0.007133143130997777,
+     "ci95_identity": [
+      -0.0001435178021590293,
+      0.014762141058842403
+     ]
+    },
+    "HDBSCAN [fine grid]": {
+     "diff": 0.0009605278067352785,
+     "ci95_identity": [
+      -0.006139978468418122,
+      0.007410234709580759
+     ]
+    }
+   },
+   "mixed": {
+    "Ours, no attach": {
+     "diff": 0.0021875630002887725,
+     "ci95_identity": [
+      -0.0013008288045724876,
+      0.005273192177216217
+     ]
+    },
+    "Ours (budget 51, draw 3)": {
+     "diff": 0.0015096922882587016,
+     "ci95_identity": [
+      -0.0002329058945178763,
+      0.0030622234443823857
+     ]
+    },
+    "Agglomerative (avg) [coarse grid]": {
+     "diff": -0.001039039612464543,
+     "ci95_identity": [
+      -0.004497030625740708,
+      0.0016511060794194453
+     ]
+    },
+    "Ours (budget 51, draw 1)": {
+     "diff": -0.0008537697133715882,
+     "ci95_identity": [
+      -0.003557280749082595,
+      0.0012934346497058876
+     ]
+    },
+    "Ours": {
+     "diff": 0.0015096922882587016,
+     "ci95_identity": [
+      -0.0002329058945178763,
+      0.0030622234443823857
+     ]
+    },
+    "DBSCAN [coarse grid]": {
+     "diff": 0.024529528847483828,
+     "ci95_identity": [
+      0.019898549268642967,
+      0.030718424816926358
+     ]
+    },
+    "Single linkage [coarse grid]": {
+     "diff": 0.023967069651088524,
+     "ci95_identity": [
+      0.019460763682921715,
+      0.029651730904976574
+     ]
+    },
+    "Ours (budget 51, draw 4)": {
+     "diff": 0.005956556348496789,
+     "ci95_identity": [
+      0.003558608094851154,
+      0.009076865414778338
+     ]
+    },
+    "Agglomerative (avg) [fine grid]": {
+     "diff": -0.0018682527603945953,
+     "ci95_identity": [
+      -0.005438084552685412,
+      0.001013404627641027
+     ]
+    },
+    "First-Leader [fine grid]": {
+     "diff": 0.06951266666671985,
+     "ci95_identity": [
+      0.05438976079225542,
+      0.08138266846537592
+     ]
+    },
+    "Two-stage [fine grid]": {
+     "diff": -0.0013119848390721334,
+     "ci95_identity": [
+      -0.004268169005711917,
+      0.0015975233415762371
+     ]
+    },
+    "First-Leader [coarse grid]": {
+     "diff": 0.07767811688095072,
+     "ci95_identity": [
+      0.059446931481361404,
+      0.09114884793758396
+     ]
+    },
+    "Ours (budget 51, draw 2)": {
+     "diff": -0.0028461736719362918,
+     "ci95_identity": [
+      -0.005937041193246798,
+      -0.0007027175525824578
+     ]
+    },
+    "Single linkage [fine grid]": {
+     "diff": 0.029031459159649553,
+     "ci95_identity": [
+      0.023728975256284115,
+      0.03667268012960746
+     ]
+    },
+    "Two-stage [coarse grid]": {
+     "diff": -0.0013119848390721334,
+     "ci95_identity": [
+      -0.004268169005711917,
+      0.0015975233415762371
+     ]
+    },
+    "DBSCAN [fine grid]": {
+     "diff": 0.029031459159649553,
+     "ci95_identity": [
+      0.023728975256284115,
+      0.03667268012960746
+     ]
+    },
+    "HDBSCAN [coarse grid]": {
+     "diff": 0.03250645576122291,
+     "ci95_identity": [
+      0.01325527663032216,
+      0.04677002216378854
+     ]
+    },
+    "HDBSCAN [fine grid]": {
+     "diff": 0.03465046684331208,
+     "ci95_identity": [
+      0.010197645475467018,
+      0.05438235993186637
+     ]
+    }
+   },
+   "occlude": {
+    "Ours, no attach": {
+     "diff": 0.015078318853447237,
+     "ci95_identity": [
+      0.008642601569493582,
+      0.023672462801138567
+     ]
+    },
+    "Ours (budget 51, draw 3)": {
+     "diff": -0.020801938471053827,
+     "ci95_identity": [
+      -0.03337702845533695,
+      -0.006986519048611303
+     ]
+    },
+    "Agglomerative (avg) [coarse grid]": {
+     "diff": -0.02966887857028111,
+     "ci95_identity": [
+      -0.047031696786483085,
+      -0.006842120786508018
+     ]
+    },
+    "Ours (budget 51, draw 1)": {
+     "diff": 0.008881001799276755,
+     "ci95_identity": [
+      0.005023479710022602,
+      0.01328281491994857
+     ]
+    },
+    "Ours": {
+     "diff": -0.020801938471053827,
+     "ci95_identity": [
+      -0.03337702845533695,
+      -0.006986519048611303
+     ]
+    },
+    "DBSCAN [coarse grid]": {
+     "diff": 0.11780514553181554,
+     "ci95_identity": [
+      0.073148812999328,
+      0.15696222831805545
+     ]
+    },
+    "Single linkage [coarse grid]": {
+     "diff": 0.12235814829182412,
+     "ci95_identity": [
+      0.07731527854998907,
+      0.16140746663014094
+     ]
+    },
+    "Ours (budget 51, draw 4)": {
+     "diff": -0.022265566730366615,
+     "ci95_identity": [
+      -0.03531247253219282,
+      -0.008367340266704592
+     ]
+    },
+    "Agglomerative (avg) [fine grid]": {
+     "diff": -0.025277462025302122,
+     "ci95_identity": [
+      -0.04320894221464788,
+      -0.0015162192285060182
+     ]
+    },
+    "First-Leader [fine grid]": {
+     "diff": 0.08242415017896221,
+     "ci95_identity": [
+      0.07170128325621289,
+      0.1179064001142978
+     ]
+    },
+    "Two-stage [fine grid]": {
+     "diff": -0.02965828482451982,
+     "ci95_identity": [
+      -0.046077293058236504,
+      -0.004157939354578666
+     ]
+    },
+    "First-Leader [coarse grid]": {
+     "diff": 0.0704815593878545,
+     "ci95_identity": [
+      0.05857493599255882,
+      0.09630856990814206
+     ]
+    },
+    "Ours (budget 51, draw 2)": {
+     "diff": -0.012067490630902955,
+     "ci95_identity": [
+      -0.02418947289387383,
+      0.0015284783641496837
+     ]
+    },
+    "Single linkage [fine grid]": {
+     "diff": 0.08618383747879299,
+     "ci95_identity": [
+      0.0545872608820597,
+      0.11320077642798426
+     ]
+    },
+    "Two-stage [coarse grid]": {
+     "diff": -0.02965828482451982,
+     "ci95_identity": [
+      -0.046077293058236504,
+      -0.004157939354578666
+     ]
+    },
+    "DBSCAN [fine grid]": {
+     "diff": 0.08618383747879299,
+     "ci95_identity": [
+      0.0545872608820597,
+      0.11320077642798426
+     ]
+    },
+    "HDBSCAN [coarse grid]": {
+     "diff": -0.002608305302467695,
+     "ci95_identity": [
+      -0.017102212061484663,
+      0.015109601467847802
+     ]
+    },
+    "HDBSCAN [fine grid]": {
+     "diff": -0.013749934520238094,
+     "ci95_identity": [
+      -0.028134758671124763,
+      0.0027535317838192058
+     ]
+    }
+   }
+  },
+  "Ours (budget 51, draw 2)": {
+   "blur": {
+    "Ours, no attach": {
+     "diff": 0.005625173952301776,
+     "ci95_identity": [
+      0.0016832943757375235,
+      0.011100534349679924
+     ]
+    },
+    "Ours (budget 51, draw 3)": {
+     "diff": -0.0011436675438027954,
+     "ci95_identity": [
+      -0.0020785660545031086,
+      -0.00011799479524298177
+     ]
+    },
+    "Agglomerative (avg) [coarse grid]": {
+     "diff": 0.00263473637146161,
+     "ci95_identity": [
+      0.0014823583265145684,
+      0.004730116824309102
+     ]
+    },
+    "Ours (budget 51, draw 1)": {
+     "diff": 0.00030142805543820206,
+     "ci95_identity": [
+      0.0,
+      0.0007723308602969131
+     ]
+    },
+    "Ours": {
+     "diff": -0.0011436675438027954,
+     "ci95_identity": [
+      -0.0020785660545031086,
+      -0.00011799479524298177
+     ]
+    },
+    "DBSCAN [coarse grid]": {
+     "diff": 0.00988343399767655,
+     "ci95_identity": [
+      0.0037299281358718073,
+      0.017112022936344135
+     ]
+    },
+    "Single linkage [coarse grid]": {
+     "diff": 0.00985670574186448,
+     "ci95_identity": [
+      0.003706648101409293,
+      0.0170769745111466
+     ]
+    },
+    "Ours (budget 51, draw 4)": {
+     "diff": -0.0011436675438027954,
+     "ci95_identity": [
+      -0.0020785660545031086,
+      -0.00011799479524298177
+     ]
+    },
+    "Agglomerative (avg) [fine grid]": {
+     "diff": 0.004969387411198456,
+     "ci95_identity": [
+      0.0024143874645233153,
+      0.009222906579573963
+     ]
+    },
+    "Ours (budget 51, draw 0)": {
+     "diff": -0.0008428089758829582,
+     "ci95_identity": [
+      -0.0019177377720673821,
+      0.00029161786039672564
+     ]
+    },
+    "First-Leader [fine grid]": {
+     "diff": 0.019504374716114437,
+     "ci95_identity": [
+      0.013521538029114433,
+      0.023486193666855462
+     ]
+    },
+    "Two-stage [fine grid]": {
+     "diff": 0.004279537739548256,
+     "ci95_identity": [
+      0.0020738297700882034,
+      0.00760787457227704
+     ]
+    },
+    "First-Leader [coarse grid]": {
+     "diff": 0.015608023246768576,
+     "ci95_identity": [
+      0.010359520862499822,
+      0.01803502887487409
+     ]
+    },
+    "Single linkage [fine grid]": {
+     "diff": 0.010278874139587724,
+     "ci95_identity": [
+      0.0041574150820574115,
+      0.01754422778884567
+     ]
+    },
+    "Two-stage [coarse grid]": {
+     "diff": 0.004279537739548256,
+     "ci95_identity": [
+      0.0020738297700882034,
+      0.00760787457227704
+     ]
+    },
+    "DBSCAN [fine grid]": {
+     "diff": 0.010278874139587724,
+     "ci95_identity": [
+      0.0041574150820574115,
+      0.01754422778884567
+     ]
+    },
+    "HDBSCAN [coarse grid]": {
+     "diff": 0.0007277271498962179,
+     "ci95_identity": [
+      -0.0007234679162502282,
+      0.0027460337678590846
+     ]
+    },
+    "HDBSCAN [fine grid]": {
+     "diff": 0.0013704408659511724,
+     "ci95_identity": [
+      1.8346259991428038e-05,
+      0.003200135082006461
+     ]
+    }
+   },
+   "clean": {
+    "Ours, no attach": {
+     "diff": 0.010623949689259393,
+     "ci95_identity": [
+      0.0044055839876334215,
+      0.01842383657892549
+     ]
+    },
+    "Ours (budget 51, draw 3)": {
+     "diff": -0.00043420684866279924,
+     "ci95_identity": [
+      -0.0006792324781417974,
+      -0.0002628700435162029
+     ]
+    },
+    "Agglomerative (avg) [coarse grid]": {
+     "diff": 0.0054259070007713905,
+     "ci95_identity": [
+      0.0015367160737513985,
+      0.011457554151614454
+     ]
+    },
+    "Ours (budget 51, draw 1)": {
+     "diff": 0.0037854439909338344,
+     "ci95_identity": [
+      0.0,
+      0.009492792089780192
+     ]
+    },
+    "Ours": {
+     "diff": -0.00043420684866279924,
+     "ci95_identity": [
+      -0.0006792324781417974,
+      -0.0002628700435162029
+     ]
+    },
+    "DBSCAN [coarse grid]": {
+     "diff": 0.0035417016207253127,
+     "ci95_identity": [
+      -0.0005852738022804283,
+      0.00926830813288688
+     ]
+    },
+    "Single linkage [coarse grid]": {
+     "diff": 0.003514800795259121,
+     "ci95_identity": [
+      -0.000617191741863865,
+      0.009220768511295318
+     ]
+    },
+    "Ours (budget 51, draw 4)": {
+     "diff": -0.00043420684866279924,
+     "ci95_identity": [
+      -0.0006792324781417974,
+      -0.0002628700435162029
+     ]
+    },
+    "Agglomerative (avg) [fine grid]": {
+     "diff": 0.006191950102433008,
+     "ci95_identity": [
+      0.0023001172145207804,
+      0.012282614310582392
+     ]
+    },
+    "Ours (budget 51, draw 0)": {
+     "diff": 0.0033487835711538683,
+     "ci95_identity": [
+      -0.0005502637724081966,
+      0.009041840384403869
+     ]
+    },
+    "First-Leader [fine grid]": {
+     "diff": 0.010322776984551418,
+     "ci95_identity": [
+      0.009116608848174399,
+      0.01670013283689821
+     ]
+    },
+    "Two-stage [fine grid]": {
+     "diff": 0.011858804476083451,
+     "ci95_identity": [
+      0.006697867214679676,
+      0.019116916507482512
+     ]
+    },
+    "First-Leader [coarse grid]": {
+     "diff": 0.005449208302462094,
+     "ci95_identity": [
+      0.004384594360987387,
+      0.009600560963153853
+     ]
+    },
+    "Single linkage [fine grid]": {
+     "diff": 0.003514800795259121,
+     "ci95_identity": [
+      -0.000617191741863865,
+      0.009220768511295318
+     ]
+    },
+    "Two-stage [coarse grid]": {
+     "diff": 0.011858804476083451,
+     "ci95_identity": [
+      0.006697867214679676,
+      0.019116916507482512
+     ]
+    },
+    "DBSCAN [fine grid]": {
+     "diff": 0.003514800795259121,
+     "ci95_identity": [
+      -0.000617191741863865,
+      0.009220768511295318
+     ]
+    },
+    "HDBSCAN [coarse grid]": {
+     "diff": 0.001699613297518221,
+     "ci95_identity": [
+      0.001024693499008794,
+      0.0027272324264049517
+     ]
+    },
+    "HDBSCAN [fine grid]": {
+     "diff": 0.002819597782880656,
+     "ci95_identity": [
+      0.0019275202850500745,
+      0.004239278088013346
+     ]
+    }
+   },
+   "dark": {
+    "Ours, no attach": {
+     "diff": 0.008600265061251888,
+     "ci95_identity": [
+      0.0030623553693294005,
+      0.01552672003706289
+     ]
+    },
+    "Ours (budget 51, draw 3)": {
+     "diff": -0.00037888484331283223,
+     "ci95_identity": [
+      -0.001156396170457205,
+      0.0005751468737919678
+     ]
+    },
+    "Agglomerative (avg) [coarse grid]": {
+     "diff": 0.0018237260358368035,
+     "ci95_identity": [
+      0.0010709217687447452,
+      0.0031683069964249847
+     ]
+    },
+    "Ours (budget 51, draw 1)": {
+     "diff": 0.00361806669505893,
+     "ci95_identity": [
+      0.0,
+      0.00907283713420235
+     ]
+    },
+    "Ours": {
+     "diff": -0.00037888484331283223,
+     "ci95_identity": [
+      -0.001156396170457205,
+      0.0005751468737919678
+     ]
+    },
+    "DBSCAN [coarse grid]": {
+     "diff": 0.0036907318920011978,
+     "ci95_identity": [
+      -0.0007723053793112806,
+      0.00976693277557693
+     ]
+    },
+    "Single linkage [coarse grid]": {
+     "diff": 0.0036637410270173865,
+     "ci95_identity": [
+      -0.0008041948080063144,
+      0.009720662285884226
+     ]
+    },
+    "Ours (budget 51, draw 4)": {
+     "diff": 0.0002924883481740803,
+     "ci95_identity": [
+      -0.001026813040176977,
+      0.0021108541886011994
+     ]
+    },
+    "Agglomerative (avg) [fine grid]": {
+     "diff": 0.0023133481265166234,
+     "ci95_identity": [
+      0.0016669780512651444,
+      0.0035846198101838643
+     ]
+    },
+    "Ours (budget 51, draw 0)": {
+     "diff": 0.003212868192634777,
+     "ci95_identity": [
+      -0.0010350354015826902,
+      0.009429879337549152
+     ]
+    },
+    "First-Leader [fine grid]": {
+     "diff": 0.01192232468896226,
+     "ci95_identity": [
+      0.009060825556516655,
+      0.016399272978305804
+     ]
+    },
+    "Two-stage [fine grid]": {
+     "diff": 0.004222038753396107,
+     "ci95_identity": [
+      0.0023356354733309187,
+      0.00860862602790196
+     ]
+    },
+    "First-Leader [coarse grid]": {
+     "diff": 0.007845313901142514,
+     "ci95_identity": [
+      0.006061704953511629,
+      0.013036150336265658
+     ]
+    },
+    "Single linkage [fine grid]": {
+     "diff": 0.004399321395085254,
+     "ci95_identity": [
+      -0.000595501561959605,
+      0.010944637755552935
+     ]
+    },
+    "Two-stage [coarse grid]": {
+     "diff": 0.004222038753396107,
+     "ci95_identity": [
+      0.0023356354733309187,
+      0.00860862602790196
+     ]
+    },
+    "DBSCAN [fine grid]": {
+     "diff": 0.004399321395085254,
+     "ci95_identity": [
+      -0.000595501561959605,
+      0.010944637755552935
+     ]
+    },
+    "HDBSCAN [coarse grid]": {
+     "diff": 0.003886319989865661,
+     "ci95_identity": [
+      0.0008709397415319148,
+      0.008516514549652807
+     ]
+    },
+    "HDBSCAN [fine grid]": {
+     "diff": 0.0033543460563617566,
+     "ci95_identity": [
+      0.001074384301900827,
+      0.006216897765795381
+     ]
+    }
+   },
+   "jpeg": {
+    "Ours, no attach": {
+     "diff": 0.009546849239674637,
+     "ci95_identity": [
+      0.004406521519025144,
+      0.015233140190442323
+     ]
+    },
+    "Ours (budget 51, draw 3)": {
+     "diff": 0.001844181521568622,
+     "ci95_identity": [
+      -0.00014842356244721682,
+      0.004631090263525674
+     ]
+    },
+    "Agglomerative (avg) [coarse grid]": {
+     "diff": 0.0013038609119616629,
+     "ci95_identity": [
+      -0.0003593193491300161,
+      0.003270149677991796
+     ]
+    },
+    "Ours (budget 51, draw 1)": {
+     "diff": 2.5547085093169386e-05,
+     "ci95_identity": [
+      -0.0010173844297727218,
+      0.0009644337991873362
+     ]
+    },
+    "Ours": {
+     "diff": 0.001844181521568622,
+     "ci95_identity": [
+      -0.00014842356244721682,
+      0.004631090263525674
+     ]
+    },
+    "DBSCAN [coarse grid]": {
+     "diff": 0.01541570803849468,
+     "ci95_identity": [
+      0.008519323319196687,
+      0.02397655884424849
+     ]
+    },
+    "Single linkage [coarse grid]": {
+     "diff": 0.015388178690444843,
+     "ci95_identity": [
+      0.008482753535111803,
+      0.023914098987976702
+     ]
+    },
+    "Ours (budget 51, draw 4)": {
+     "diff": 0.0021827737809417824,
+     "ci95_identity": [
+      0.00010979687174164922,
+      0.004855293432871499
+     ]
+    },
+    "Agglomerative (avg) [fine grid]": {
+     "diff": 0.0015279803881627085,
+     "ci95_identity": [
+      -0.0005993156135082028,
+      0.0038518745700518576
+     ]
+    },
+    "Ours (budget 51, draw 0)": {
+     "diff": 0.0006897017549792883,
+     "ci95_identity": [
+      -0.0014070043961207923,
+      0.003205186724662751
+     ]
+    },
+    "First-Leader [fine grid]": {
+     "diff": 0.030479728841890652,
+     "ci95_identity": [
+      0.024479204068581322,
+      0.03891347741087287
+     ]
+    },
+    "Two-stage [fine grid]": {
+     "diff": 0.0012899140501149153,
+     "ci95_identity": [
+      -0.00032540475328761697,
+      0.0032920070489248
+     ]
+    },
+    "First-Leader [coarse grid]": {
+     "diff": 0.033553431136227,
+     "ci95_identity": [
+      0.024943079998095766,
+      0.039564727445443475
+     ]
+    },
+    "Single linkage [fine grid]": {
+     "diff": 0.019346207889331057,
+     "ci95_identity": [
+      0.012241147756576618,
+      0.029236208746830587
+     ]
+    },
+    "Two-stage [coarse grid]": {
+     "diff": 0.0012899140501149153,
+     "ci95_identity": [
+      -0.00032540475328761697,
+      0.0032920070489248
+     ]
+    },
+    "DBSCAN [fine grid]": {
+     "diff": 0.019346207889331057,
+     "ci95_identity": [
+      0.012241147756576618,
+      0.029236208746830587
+     ]
+    },
+    "HDBSCAN [coarse grid]": {
+     "diff": 0.003692114798515278,
+     "ci95_identity": [
+      0.00010586306452756715,
+      0.0083081784844399
+     ]
+    },
+    "HDBSCAN [fine grid]": {
+     "diff": 0.0007973401670521296,
+     "ci95_identity": [
+      -0.001342200636863794,
+      0.0030137131611506353
+     ]
+    }
+   },
+   "lookalike": {
+    "Ours, no attach": {
+     "diff": 0.0055976615300903365,
+     "ci95_identity": [
+      0.0008011333147685013,
+      0.012701448450485894
+     ]
+    },
+    "Ours (budget 51, draw 3)": {
+     "diff": 0.0,
+     "ci95_identity": [
+      0.0,
+      0.0
+     ]
+    },
+    "Agglomerative (avg) [coarse grid]": {
+     "diff": 0.0037458096782384542,
+     "ci95_identity": [
+      0.0,
+      0.01038222670555122
+     ]
+    },
+    "Ours (budget 51, draw 1)": {
+     "diff": 0.0037458096782384542,
+     "ci95_identity": [
+      0.0,
+      0.01038222670555122
+     ]
+    },
+    "Ours": {
+     "diff": 0.0,
+     "ci95_identity": [
+      0.0,
+      0.0
+     ]
+    },
+    "DBSCAN [coarse grid]": {
+     "diff": 0.004785827691271005,
+     "ci95_identity": [
+      0.0,
+      0.01167745520671212
+     ]
+    },
+    "Single linkage [coarse grid]": {
+     "diff": 0.004781191083519043,
+     "ci95_identity": [
+      0.0,
+      0.011677288711071048
+     ]
+    },
+    "Ours (budget 51, draw 4)": {
+     "diff": 0.0,
+     "ci95_identity": [
+      0.0,
+      0.0
+     ]
+    },
+    "Agglomerative (avg) [fine grid]": {
+     "diff": 0.0037458096782384542,
+     "ci95_identity": [
+      0.0,
+      0.01038222670555122
+     ]
+    },
+    "Ours (budget 51, draw 0)": {
+     "diff": 0.0037458096782384542,
+     "ci95_identity": [
+      0.0,
+      0.01038222670555122
+     ]
+    },
+    "First-Leader [fine grid]": {
+     "diff": 0.006167811911550802,
+     "ci95_identity": [
+      0.004934057195981382,
+      0.01670904273788133
+     ]
+    },
+    "Two-stage [fine grid]": {
+     "diff": 0.0132506631857221,
+     "ci95_identity": [
+      0.0050146956245104264,
+      0.02177275190750756
+     ]
+    },
+    "First-Leader [coarse grid]": {
+     "diff": 0.0046377232101875165,
+     "ci95_identity": [
+      0.0031582095722357097,
+      0.014061145434776942
+     ]
+    },
+    "Single linkage [fine grid]": {
+     "diff": 0.004781191083519043,
+     "ci95_identity": [
+      0.0,
+      0.011677288711071048
+     ]
+    },
+    "Two-stage [coarse grid]": {
+     "diff": 0.0132506631857221,
+     "ci95_identity": [
+      0.0050146956245104264,
+      0.02177275190750756
+     ]
+    },
+    "DBSCAN [fine grid]": {
+     "diff": 0.004781191083519043,
+     "ci95_identity": [
+      0.0,
+      0.011677288711071048
+     ]
+    },
+    "HDBSCAN [coarse grid]": {
+     "diff": 0.00027325246150633475,
+     "ci95_identity": [
+      0.0,
+      0.0009864390393098637
+     ]
+    },
+    "HDBSCAN [fine grid]": {
+     "diff": 0.00027325246150633475,
+     "ci95_identity": [
+      0.0,
+      0.0009864390393098637
+     ]
+    }
+   },
+   "lowres": {
+    "Ours, no attach": {
+     "diff": 0.00907886874513908,
+     "ci95_identity": [
+      0.003651267786820672,
+      0.01529653906822204
+     ]
+    },
+    "Ours (budget 51, draw 3)": {
+     "diff": 0.006919310985278981,
+     "ci95_identity": [
+      0.002950392911831479,
+      0.012868072440226915
+     ]
+    },
+    "Agglomerative (avg) [coarse grid]": {
+     "diff": 0.000771418474009189,
+     "ci95_identity": [
+      -0.0027472518881161505,
+      0.004035930236180659
+     ]
+    },
+    "Ours (budget 51, draw 1)": {
+     "diff": 0.004166309502828258,
+     "ci95_identity": [
+      -0.0016275619963804083,
+      0.013761773109436094
+     ]
+    },
+    "Ours": {
+     "diff": 0.006919310985278981,
+     "ci95_identity": [
+      0.002950392911831479,
+      0.012868072440226915
+     ]
+    },
+    "DBSCAN [coarse grid]": {
+     "diff": 0.02829998385977084,
+     "ci95_identity": [
+      0.018653230120738325,
+      0.04427220051487282
+     ]
+    },
+    "Single linkage [coarse grid]": {
+     "diff": 0.023519448814235844,
+     "ci95_identity": [
+      0.01488709722956029,
+      0.03722583234310158
+     ]
+    },
+    "Ours (budget 51, draw 4)": {
+     "diff": 0.012307155873888642,
+     "ci95_identity": [
+      0.006616053829590465,
+      0.021559919615586523
+     ]
+    },
+    "Agglomerative (avg) [fine grid]": {
+     "diff": -0.00014550984291883395,
+     "ci95_identity": [
+      -0.0026439508299032325,
+      0.0021502815683682617
+     ]
+    },
+    "Ours (budget 51, draw 0)": {
+     "diff": 0.005010032806408549,
+     "ci95_identity": [
+      0.0012387612462043617,
+      0.010838980674743712
+     ]
+    },
+    "First-Leader [fine grid]": {
+     "diff": 0.06385819725473962,
+     "ci95_identity": [
+      0.05489483167727789,
+      0.08067893917361893
+     ]
+    },
+    "Two-stage [fine grid]": {
+     "diff": 0.0004817373168599648,
+     "ci95_identity": [
+      -0.0024337556958198836,
+      0.0029122726122538826
+     ]
+    },
+    "First-Leader [coarse grid]": {
+     "diff": 0.06927022732864374,
+     "ci95_identity": [
+      0.05701485400398566,
+      0.09110108976562822
+     ]
+    },
+    "Single linkage [fine grid]": {
+     "diff": 0.033694428539132515,
+     "ci95_identity": [
+      0.022343547989924772,
+      0.05101677184303597
+     ]
+    },
+    "Two-stage [coarse grid]": {
+     "diff": 0.0004817373168599648,
+     "ci95_identity": [
+      -0.0024337556958198836,
+      0.0029122726122538826
+     ]
+    },
+    "DBSCAN [fine grid]": {
+     "diff": 0.033694428539132515,
+     "ci95_identity": [
+      0.022343547989924772,
+      0.05101677184303597
+     ]
+    },
+    "HDBSCAN [coarse grid]": {
+     "diff": 0.012143175937406325,
+     "ci95_identity": [
+      0.00608296136061349,
+      0.020270675569772693
+     ]
+    },
+    "HDBSCAN [fine grid]": {
+     "diff": 0.005970560613143827,
+     "ci95_identity": [
+      0.00019593596458425684,
+      0.01241502026716868
+     ]
+    }
+   },
+   "mixed": {
+    "Ours, no attach": {
+     "diff": 0.005033736672225064,
+     "ci95_identity": [
+      0.001717179516951231,
+      0.008894109924634264
+     ]
+    },
+    "Ours (budget 51, draw 3)": {
+     "diff": 0.004355865960194993,
+     "ci95_identity": [
+      0.0023510326445102397,
+      0.007015953709681813
+     ]
+    },
+    "Agglomerative (avg) [coarse grid]": {
+     "diff": 0.0018071340594717489,
+     "ci95_identity": [
+      -0.0003836607933044661,
+      0.0038082712888717865
+     ]
+    },
+    "Ours (budget 51, draw 1)": {
+     "diff": 0.0019924039585647035,
+     "ci95_identity": [
+      9.070023894312276e-05,
+      0.004334722012281455
+     ]
+    },
+    "Ours": {
+     "diff": 0.004355865960194993,
+     "ci95_identity": [
+      0.0023510326445102397,
+      0.007015953709681813
+     ]
+    },
+    "DBSCAN [coarse grid]": {
+     "diff": 0.02737570251942012,
+     "ci95_identity": [
+      0.021799930334091146,
+      0.03565090889732041
+     ]
+    },
+    "Single linkage [coarse grid]": {
+     "diff": 0.026813243323024816,
+     "ci95_identity": [
+      0.021448899308840377,
+      0.0342453043659528
+     ]
+    },
+    "Ours (budget 51, draw 4)": {
+     "diff": 0.00880273002043308,
+     "ci95_identity": [
+      0.005715108364820437,
+      0.013051182130972505
+     ]
+    },
+    "Agglomerative (avg) [fine grid]": {
+     "diff": 0.0009779209115416965,
+     "ci95_identity": [
+      -0.0011141220728556665,
+      0.003181749035914722
+     ]
+    },
+    "Ours (budget 51, draw 0)": {
+     "diff": 0.0028461736719362918,
+     "ci95_identity": [
+      0.0007027175525824575,
+      0.005937041193246796
+     ]
+    },
+    "First-Leader [fine grid]": {
+     "diff": 0.07235884033865614,
+     "ci95_identity": [
+      0.05833191022276874,
+      0.08455860689282417
+     ]
+    },
+    "Two-stage [fine grid]": {
+     "diff": 0.0015341888328641584,
+     "ci95_identity": [
+      -0.00020708655317622224,
+      0.004222658028205209
+     ]
+    },
+    "First-Leader [coarse grid]": {
+     "diff": 0.08052429055288701,
+     "ci95_identity": [
+      0.06303230514129005,
+      0.09360298077265422
+     ]
+    },
+    "Single linkage [fine grid]": {
+     "diff": 0.031877632831585845,
+     "ci95_identity": [
+      0.025117261707782782,
+      0.04127104197939242
+     ]
+    },
+    "Two-stage [coarse grid]": {
+     "diff": 0.0015341888328641584,
+     "ci95_identity": [
+      -0.00020708655317622224,
+      0.004222658028205209
+     ]
+    },
+    "DBSCAN [fine grid]": {
+     "diff": 0.031877632831585845,
+     "ci95_identity": [
+      0.025117261707782782,
+      0.04127104197939242
+     ]
+    },
+    "HDBSCAN [coarse grid]": {
+     "diff": 0.0353526294331592,
+     "ci95_identity": [
+      0.017108581662178032,
+      0.048887148201465634
+     ]
+    },
+    "HDBSCAN [fine grid]": {
+     "diff": 0.03749664051524837,
+     "ci95_identity": [
+      0.014377987285455118,
+      0.05683855548501015
+     ]
+    }
+   },
+   "occlude": {
+    "Ours, no attach": {
+     "diff": 0.027145809484350192,
+     "ci95_identity": [
+      0.013355153550704348,
+      0.04072269881765042
+     ]
+    },
+    "Ours (budget 51, draw 3)": {
+     "diff": -0.008734447840150872,
+     "ci95_identity": [
+      -0.013374591122070947,
+      -0.00411229958136877
+     ]
+    },
+    "Agglomerative (avg) [coarse grid]": {
+     "diff": -0.017601387939378155,
+     "ci95_identity": [
+      -0.030037840853134726,
+      -0.002901686678330098
+     ]
+    },
+    "Ours (budget 51, draw 1)": {
+     "diff": 0.02094849243017971,
+     "ci95_identity": [
+      0.00769908145070076,
+      0.03346240585048999
+     ]
+    },
+    "Ours": {
+     "diff": -0.008734447840150872,
+     "ci95_identity": [
+      -0.013374591122070947,
+      -0.00411229958136877
+     ]
+    },
+    "DBSCAN [coarse grid]": {
+     "diff": 0.1298726361627185,
+     "ci95_identity": [
+      0.07933326462904616,
+      0.17129322315255796
+     ]
+    },
+    "Single linkage [coarse grid]": {
+     "diff": 0.13442563892272708,
+     "ci95_identity": [
+      0.08267223969101904,
+      0.1768247216443221
+     ]
+    },
+    "Ours (budget 51, draw 4)": {
+     "diff": -0.01019807609946366,
+     "ci95_identity": [
+      -0.01599794139464695,
+      -0.00513990819454189
+     ]
+    },
+    "Agglomerative (avg) [fine grid]": {
+     "diff": -0.013209971394399167,
+     "ci95_identity": [
+      -0.025753027796745293,
+      0.001303160240252861
+     ]
+    },
+    "Ours (budget 51, draw 0)": {
+     "diff": 0.012067490630902955,
+     "ci95_identity": [
+      -0.0015284783641496876,
+      0.02418947289387383
+     ]
+    },
+    "First-Leader [fine grid]": {
+     "diff": 0.09449164080986516,
+     "ci95_identity": [
+      0.08438756893078489,
+      0.12685259754459055
+     ]
+    },
+    "Two-stage [fine grid]": {
+     "diff": -0.017590794193616865,
+     "ci95_identity": [
+      -0.028930121213197758,
+      -0.0007856364051501129
+     ]
+    },
+    "First-Leader [coarse grid]": {
+     "diff": 0.08254905001875745,
+     "ci95_identity": [
+      0.07097034508983302,
+      0.10622203494111698
+     ]
+    },
+    "Single linkage [fine grid]": {
+     "diff": 0.09825132810969595,
+     "ci95_identity": [
+      0.0596188202997048,
+      0.12915587951739632
+     ]
+    },
+    "Two-stage [coarse grid]": {
+     "diff": -0.017590794193616865,
+     "ci95_identity": [
+      -0.028930121213197758,
+      -0.0007856364051501129
+     ]
+    },
+    "DBSCAN [fine grid]": {
+     "diff": 0.09825132810969595,
+     "ci95_identity": [
+      0.0596188202997048,
+      0.12915587951739632
+     ]
+    },
+    "HDBSCAN [coarse grid]": {
+     "diff": 0.00945918532843526,
+     "ci95_identity": [
+      -0.0026676817238330567,
+      0.02339133575558661
+     ]
+    },
+    "HDBSCAN [fine grid]": {
+     "diff": -0.001682443889335139,
+     "ci95_identity": [
+      -0.013225918263197004,
+      0.010571521371603084
+     ]
+    }
+   }
+  }
+ },
+ "worst_library_F1": {
+  "Ours, no attach": 0.7559050749492094,
+  "Ours (budget 51, draw 3)": 0.8584479029033429,
+  "Agglomerative (avg) [coarse grid]": 0.9168994972858261,
+  "Ours (budget 51, draw 1)": 0.7384662342150419,
+  "Ours": 0.8584479029033429,
+  "DBSCAN [coarse grid]": 0.6384761711275609,
+  "Single linkage [coarse grid]": 0.6389379399285491,
+  "Ours (budget 51, draw 4)": 0.8655598916981985,
+  "Agglomerative (avg) [fine grid]": 0.8973397140595418,
+  "Ours (budget 51, draw 0)": 0.7454467047347175,
+  "First-Leader [fine grid]": 0.7795012154200363,
+  "Two-stage [fine grid]": 0.9042208617997314,
+  "First-Leader [coarse grid]": 0.7975766724679072,
+  "Ours (budget 51, draw 2)": 0.8457640557276955,
+  "Single linkage [fine grid]": 0.6878445589359171,
+  "Two-stage [coarse grid]": 0.9042208617997314,
+  "DBSCAN [fine grid]": 0.6878445589359171,
+  "HDBSCAN [coarse grid]": 0.8711655430039172,
+  "HDBSCAN [fine grid]": 0.8605033968048847
+ },
+ "seconds": 288.97524976730347,
+ "n_identities": 1571,
+ "bootstrap_resamples": 1000
+}
