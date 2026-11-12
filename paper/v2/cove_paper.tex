@@ -40,9 +40,9 @@ by 7 points, on profile ones). With corrections it is within 0.003 F1 of constra
 every consistent correction across the next import, where plain re-clustering keeps 20\% and re-applying them keeps 73--96\%,
 and its read step is roughly an order of magnitude faster than constrained average linkage on synthetic libraries of up to
 50{,}000 faces. Recomputing the groups from the two sets, as any such design would, gives in simulation two devices with
-identical people (53\% for a frozen-label rule of our design), exact retraction of a wrong correction, exact handling of
+identical people (53\% and 31\% with two recognisers for a frozen-label rule of our design), exact retraction of a wrong correction, exact handling of
 deleted photos, and corrections that keep about half their gain under a different recogniser. The gain from corrections is
-largest when clicks are right and is gone by about one wrong click in twenty, so a review-and-undo view should accompany them.
+largest when clicks are right and is gone by about one wrong click in twenty, so a review-and-undo view is advisable.
 Only the clusterer is part of the application; corrections, devices and users are simulated from public benchmarks.
 \end{abstract}
 
@@ -52,7 +52,7 @@ face clustering, constrained clustering, incremental clustering, user correction
 
 % ---------------------------------------------------------------------------------------------------------------------
 \section{Introduction}
-People most often search a personal photo collection by person. Local-first managers such as
+People most often search a personal photo collection by person. Self-hosted, local-first managers such as
 Immich~\cite{immich}, PhotoPrism~\cite{photoprism}, FaceCluster~\cite{filonenko2025facecluster} and the Cove system
 studied here group faces on hardware the user controls. On such a device the library is never complete: photos arrive in
 batches, and users merge and split people by hand. Two problems follow that a one-off benchmark does not show:
@@ -61,11 +61,11 @@ result depends on import order; and (2) \textbf{lost corrections}: re-clustering
 earlier fixes as input, so the same mistakes return.
 
 Constrained clustering~\cite{wagstaff2001copkmeans,davidson2005agglomerative}, its incremental
-form~\cite{davidson2007incremental}, order-independent incremental clustering~\cite{bandyopadhyay2016axioms} and
+form~\cite{davidson2007incremental}, axioms for incremental clustering~\cite{bandyopadhyay2016axioms} and
 interactive face annotation~\cite{tian2007face,cui2007easyalbum} are established, and we claim none of them. This is an
 application-and-measurement study. Its contributions are:
 \begin{itemize}
-\item a clusterer from known parts whose output, including corrections, does not depend on the order or batching of
+\item a clusterer from known parts whose output, including corrections, does not depend (up to exact ties) on the order or batching of
 insertions or on deletions, with a short argument and an exact, faster read step (Sec.~\ref{sec:method});
 \item a comparison of four ways to keep corrections when photos arrive, with three simulated users and a sweep of the
 error rate (Sec.~\ref{sec:corr}), and of what recomputing from the sets buys, against a frozen-label baseline we designed
@@ -155,14 +155,9 @@ entries that name deleted faces. So the neighbour lists are those of the final s
 and are recomputed after a deletion. In steps (1)--(3) every union is decided by the neighbour lists and a total order on
 pairs by similarity, so the groups depend only on the lists and on the corrections; attachment and the centroid merge are
 deterministic functions of the groups. Core-link ties are broken by face id, which depends on insertion order, so the statement
-holds up to exact ties; none changed a result in our runs (order agreement 1.000 in all 3--5 orders), and a unit test checks
+holds up to exact ties; none changed a result in our runs (order agreement 1.000 in every order tested), and a unit test checks
 that deleting faces gives the same labels as never having added them.
 \end{proof}
-\textbf{Consequences.} Because labels are a function of the two sets, devices that exchange both agree, removing a correction
-gives the never-made result even after new photos, and corrections (which name faces) apply to another recogniser's
-embeddings. These hold for any method that recomputes labels from the sets, not for a store that keeps and edits labels
-(Sec.~\ref{sec:conseq}).
-
 % ---------------------------------------------------------------------------------------------------------------------
 \section{Experimental Protocol}\label{sec:protocol}
 The main protocol was fixed before any test number was computed; the later checks (finer grids, identity bootstrap,
@@ -240,12 +235,12 @@ Our method is not clearly ahead on degraded photos. \emph{Fairer tuning.} Re-tun
 (581 configurations) did not help them: average linkage scored 0.9849 overall against 0.9857 with the coarse grid, and none
 moved by more than 0.0021. Giving ours only 51 random grid points (5 draws) scores 0.9809 to 0.9857 (mean 0.9836) against
 0.9854 for its full grid. Resampling people
-instead of libraries widens the intervals (eight conditions; no multiplicity correction). Against average linkage, the strongest baseline, ours is better on clean
+instead of libraries widens the intervals (eight library conditions; no multiplicity correction). Against average linkage, the strongest baseline, ours is better on clean
 ($+0.0059$, $[+0.0020,+0.0119]$), blur ($+0.0038$) and dark photos ($+0.0022$), worse on low-res ($-0.0061$,
 $[-0.0139,-0.0008]$), and not distinguishable on JPEG (0.993 for both), mixed ($-0.0025$, $[-0.0060,+0.0002]$), occluded ($-0.0089$,
 $[-0.0219,+0.0072]$) and look-alike libraries. Against single linkage ours is better on every condition by 0.2 to 14 points,
 except CPLFW, where it is 0.5 points worse (0.841 vs.\ 0.846); the gain is the attach threshold, whose removal costs up to
-3.6 points on libraries but gains 5.2 on CPLFW. With MBF the pattern is similar, but on occluded faces ours is worse (0.928
+3.6 points on libraries but gains about 5 on CPLFW. With MBF the pattern is similar, but on occluded faces ours is worse (0.928
 against 0.954).
 
 On whole sets ours trades recall for precision: best on CALFW (0.947), about 7 points below average linkage on CPLFW (0.841 vs.\
@@ -264,16 +259,8 @@ precise user; $-0.0057$ error-prone), so the two are tied, not ours ahead. The \
 it cannot revisit earlier groupings. \emph{Re-applying} works for the precise user (96\% hold) but only 73\% for the casual user.
 
 \emph{Wrong corrections are sticky.} With the error-prone user (162 of 1{,}528 corrections wrong), ours ends at 0.985, no
-better than discarding the corrections, and constrained average linkage at 0.988; re-applying is more forgiving (0.989). This agrees with the sweep (Fig.~\ref{fig:sweep}), where the gain of ours over discarding corrections is $+0.0065$ at $p=0$, $+0.0034$ at 0.02, $+0.0009$ at 0.05 and
+better than discarding the corrections, and constrained average linkage at 0.988; re-applying is more forgiving (0.989). This agrees with the error-rate sweep (casual user, wrong ``same person'' clicks with probability $p$, 95\% paired-bootstrap intervals), where the gain of ours over discarding corrections is $+0.0065$ at $p=0$, $+0.0034$ at 0.02, $+0.0009$ at 0.05 and
 $+0.0010$ at 0.10 (intervals include zero), and $-0.0057$ at 0.20 ($[-0.0085,-0.0030]$); re-applying stays positive. A system with hard constraints must therefore show corrections and let the user remove one.
-
-\begin{figure}[t]
-\centering
-\includegraphics[width=0.88\columnwidth]{figs/wrong_click_sweep.pdf}
-\caption{F1 gain over discarding the corrections as the share of wrong ``same person'' clicks grows (casual user, 95\%
-paired-bootstrap bands).}
-\label{fig:sweep}
-\end{figure}
 
 \begin{table}[t]
 \caption{Keeping corrections, EdgeFace-S, 240 test library--condition pairs. ``Now'': F1 on the ``now'' photos after the precise user's
@@ -319,24 +306,24 @@ centroid merge and 0.5\,s with the exact read step; with 10 and 50 corrections 4
 a random 10\% of the faces took 0.59\,s plus 0.5\,s to read the labels, against 7.0\,s to rebuild, with identical labels.
 
 Larger libraries are synthetic: the 8{,}290 embeddings are copied up to six times, each under its own random rotation, so
-copies are unrelated; this tests cost, not accuracy.
-At 49{,}740 faces our read step took 15\,s without and 20\,s with ten corrections. Constrained average linkage, split per
-component and with a best-partner cache (same labels as our first NumPy version, which needed 293\,s at 8{,}290 faces;
-checked at 1{,}658 and 3{,}316 faces), took 234 and 212\,s, and compiled SciPy average linkage with no constraints, a lower
-bound for a constrained version, took 174\,s. Our read step is therefore 9 to 15 times faster at 49{,}740 faces, and 16 to 69
-times at 8{,}290 faces (0.44 and 1.25\,s for ours without and with ten corrections against 30.4 and 19.6\,s): the lead narrows as libraries grow, and single timings of the same step vary by up to a factor of two
-on this laptop (our 8{,}290-face read took 0.3--0.6\,s across runs). Adding all faces to the flat FAISS index in batches of 64 (the ten-batch run above used larger ones) took 8\,s at 8{,}290 and 316\,s at
-49{,}740 faces (quadratic, not optimised; a single timing, and longer than any baseline's read), so at this size the build, not the read, dominates; an incremental or approximate index would replace it.
+copies are unrelated; this tests cost, not accuracy. At 49{,}740 faces our read step took 15\,s without and 20\,s with ten
+corrections; constrained average linkage (split per component, with a best-partner cache; same labels as our first version, checked at
+1{,}658 and 3{,}316 faces) took 234 and 212\,s; compiled SciPy average linkage without constraints, a lower bound for a
+constrained version, took 174\,s. That is 9 to 15 times faster at 49{,}740 faces and 16 to 69 times at 8{,}290 (a separate run:
+0.44 and 1.25\,s for ours without and with ten corrections against 30.4 and 19.6\,s), so the lead narrows as libraries grow; single
+timings vary up to twofold on this laptop. Adding all faces to the clusterer (flat FAISS index) in batches of 64 took 8\,s at
+8{,}290 and 316\,s at 49{,}740 faces, longer than any baseline's read, so at this size the quadratic index build, not the read,
+dominates and an incremental or approximate index would replace it.
 
 % ---------------------------------------------------------------------------------------------------------------------
 \section{Discussion}
-\textbf{What the results show.} A clusterer built from well-understood parts gives order-invariant people, accepts the user's
-corrections and keeps them across imports, within 0.003 F1 of constrained average linkage on EdgeFace-S. Over it, ours adds a
-much cheaper read step (9 to 15 times at 50{,}000 synthetic faces); over the frozen rule it adds device agreement, exact
-retraction and the freedom to revise earlier groupings. These properties follow from recomputing the groups from the sets, so
-they carry over to any such design; the measurements size them. The gain from corrections is clear up to about two wrong
-clicks in a hundred, small at five to ten (intervals include zero) and negative at twenty, which makes a review-and-undo view
-(cheap, since retraction is exact) the natural companion to hard corrections.
+\textbf{What the results show.} Order-invariant people, corrections that persist across imports and accuracy within 0.003 F1 of
+constrained average linkage (EdgeFace-S) come from well-understood parts, with a much cheaper read step (9 to 15 times at
+50{,}000 synthetic faces) and, over the frozen rule, device agreement, exact retraction and freedom to revise earlier
+groupings. These properties follow from recomputing the groups from the sets, so any such design shares them. All accuracy
+differences are small because most methods already score about 0.99. The gain from corrections is clear up to about two wrong
+clicks in a hundred, small at five to ten (intervals include zero) and negative at twenty, so a review-and-undo view (cheap,
+since retraction is exact) is the natural companion to hard corrections.
 
 \textbf{Scope and next steps.} Only the clusterer is part of the application. Libraries, users, wrong clicks and devices are
 simulated from public benchmarks; the three consequences of Sec.~\ref{sec:conseq} are measured against a frozen-label store of our
@@ -360,7 +347,7 @@ clusterer, the experiment scripts and the text of this paper, ran the experiment
 simulated peer reviews. The authors directed the work and take full responsibility for the content; reported numbers were
 checked against the released per-run results with a script (\texttt{evaluation/verify\_paper\_numbers.py}).
 \textbf{Data and code:} LFW, CALFW and CPLFW are public; code, splits, grids and per-run results are in the repository
-(\texttt{evaluation/}; URL to be added). \textbf{Ethics:} public benchmark data only. \textbf{Funding, conflicts:} none.
+(\texttt{evaluation/}; URL to be added). \textbf{Ethics:} public benchmark data only (web-collected celebrity photos; no new data collected). \textbf{Funding, conflicts:} none.
 \textbf{Author contributions:} to be completed. \textbf{Licences:} InsightFace models are for non-commercial research;
 EdgeFace weights are CC BY-NC-SA 4.0.
 
