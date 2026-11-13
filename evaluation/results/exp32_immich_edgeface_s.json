@@ -1,0 +1,77 @@
+{
+ "protocol": "Experiment 32 - what does Immich (self-hosted photo manager, default face grouping) score on the same LFW test libraries?\n\nThree of our 30 identity-disjoint test libraries (the smallest: indices 12, 6, 1; 543, 585, 642 photos, clean condition) are uploaded to a\nlocal Immich server (one user per library, so each is clustered separately, as in our protocol). After Immich's face detection, recognition and\nclustering jobs finish, every photo is mapped to the Immich \"person\" of its faces. A photo may hold several faces (LFW crops have background\nfaces); we score the photo-level assignment of the face that sits at the image centre (largest bounding box nearest the centre), which is\nthe labelled LFW face. Photos without a detected face are counted as misses and excluded from F1 (their number is reported).\nWe report B-Cubed F1 against the identity labels, next to our clusterer (EdgeFace-S, shipped setting) on exactly the same photos.\nNothing is tuned; Immich runs with its default settings (no rename, no merges, no corrections).\nRun: python evaluation/exp32_immich.py  (Immich on http://localhost:2283, see D:/wincode/immich_run)\n",
+ "rows": [
+  {
+   "library": 12,
+   "photos": 543,
+   "scored": 396,
+   "no_person_assigned": 147,
+   "immich_people": 20,
+   "true_people": 19,
+   "immich": {
+    "F1": 0.9954606141522029,
+    "P": 1.0,
+    "R": 0.9909622541201489
+   },
+   "ours_all_photos": {
+    "F1": 0.9982165918455199,
+    "P": 1.0,
+    "R": 0.9964395334561079
+   },
+   "ours_same_photos_as_immich": {
+    "F1": 1.0,
+    "P": 1.0,
+    "R": 1.0
+   }
+  },
+  {
+   "library": 6,
+   "photos": 585,
+   "scored": 491,
+   "no_person_assigned": 94,
+   "immich_people": 25,
+   "true_people": 25,
+   "immich": {
+    "F1": 1.0,
+    "P": 1.0,
+    "R": 1.0
+   },
+   "ours_all_photos": {
+    "F1": 1.0,
+    "P": 1.0,
+    "R": 1.0
+   },
+   "ours_same_photos_as_immich": {
+    "F1": 1.0,
+    "P": 1.0,
+    "R": 1.0
+   }
+  },
+  {
+   "library": 1,
+   "photos": 642,
+   "scored": 565,
+   "no_person_assigned": 77,
+   "immich_people": 20,
+   "true_people": 20,
+   "immich": {
+    "F1": 1.0,
+    "P": 1.0,
+    "R": 1.0
+   },
+   "ours_all_photos": {
+    "F1": 1.0,
+    "P": 1.0,
+    "R": 1.0
+   },
+   "ours_same_photos_as_immich": {
+    "F1": 1.0,
+    "P": 1.0,
+    "R": 1.0
+   }
+  }
+ ],
+ "mean_immich_F1": 0.9984868713840677,
+ "mean_ours_F1": 0.9994055306151733,
+ "mean_ours_same_photos_F1": 1.0
+}
