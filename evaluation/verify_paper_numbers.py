@@ -292,4 +292,9 @@ chk("exp25 c-avg p=0.05", 0.0028, t["0.05|c-avg"]["gain_over_discarding"], 4)
 chk("exp25 c-avg p=0.1", 0.0027, t["0.1|c-avg"]["gain_over_discarding"], 4)
 chk("exp31 FIW ours no-attach F1", 0.783, At["table"]["Ours, no attach"]["B3_F1"], 3)
 
+# ---- exp30b deletion over seeds
+d30 = J("exp30b_deletion_seeds_edgeface_s.json")
+chk("exp30b identical runs", 15, d30["identical_runs"], 0)
+chk("exp30b runs", 15, d30["runs"], 0)
+
 print(f"\n{n_ok} ok, {bad} mismatch")

@@ -1,0 +1,112 @@
+{
+ "protocol": "Experiment 30b - deletion exactness over several random deletions, with corrections present (round-9 review: 'exact' rested on one run).\n\nOn the 8,290 clean LFW faces (EdgeFace-S, shipped setting): for 5 seeds x deleted share {1%, 10%, 30%}, make 10 random corrections\n(5 same-person from true labels, 5 cannot-link from true labels), delete the random share, and compare the labels with a clusterer built\nonly from the remaining faces and only the corrections whose faces remain. Counts identical partitions.\nRun: COVE_FACE_MODEL=edgeface_s python evaluation/exp30b_deletion_seeds.py\n",
+ "rows": [
+  {
+   "share": 0.01,
+   "seed": 0,
+   "corrections_kept": 10,
+   "identical": true,
+   "seconds": 1.7042718000002424
+  },
+  {
+   "share": 0.01,
+   "seed": 1,
+   "corrections_kept": 10,
+   "identical": true,
+   "seconds": 2.0471231999999873
+  },
+  {
+   "share": 0.01,
+   "seed": 2,
+   "corrections_kept": 10,
+   "identical": true,
+   "seconds": 1.6039608000000953
+  },
+  {
+   "share": 0.01,
+   "seed": 3,
+   "corrections_kept": 10,
+   "identical": true,
+   "seconds": 2.188261400000556
+  },
+  {
+   "share": 0.01,
+   "seed": 4,
+   "corrections_kept": 10,
+   "identical": true,
+   "seconds": 1.9005317000001014
+  },
+  {
+   "share": 0.1,
+   "seed": 0,
+   "corrections_kept": 9,
+   "identical": true,
+   "seconds": 1.4721423000000868
+  },
+  {
+   "share": 0.1,
+   "seed": 1,
+   "corrections_kept": 8,
+   "identical": true,
+   "seconds": 1.4993039999999382
+  },
+  {
+   "share": 0.1,
+   "seed": 2,
+   "corrections_kept": 9,
+   "identical": true,
+   "seconds": 1.4251147000004494
+  },
+  {
+   "share": 0.1,
+   "seed": 3,
+   "corrections_kept": 6,
+   "identical": true,
+   "seconds": 1.5199217999997927
+  },
+  {
+   "share": 0.1,
+   "seed": 4,
+   "corrections_kept": 9,
+   "identical": true,
+   "seconds": 1.579746299999897
+  },
+  {
+   "share": 0.3,
+   "seed": 0,
+   "corrections_kept": 4,
+   "identical": true,
+   "seconds": 0.9650277000000642
+  },
+  {
+   "share": 0.3,
+   "seed": 1,
+   "corrections_kept": 5,
+   "identical": true,
+   "seconds": 1.0380583999994997
+  },
+  {
+   "share": 0.3,
+   "seed": 2,
+   "corrections_kept": 4,
+   "identical": true,
+   "seconds": 0.93904670000029
+  },
+  {
+   "share": 0.3,
+   "seed": 3,
+   "corrections_kept": 5,
+   "identical": true,
+   "seconds": 0.9308817999999519
+  },
+  {
+   "share": 0.3,
+   "seed": 4,
+   "corrections_kept": 6,
+   "identical": true,
+   "seconds": 1.0511370000003808
+  }
+ ],
+ "identical_runs": 15,
+ "runs": 15
+}
