@@ -35,7 +35,7 @@ by hand. Greedy incremental clustering makes the people found depend on import o
 undoes the corrections. We study the face clusterer of Cove, a local-first photo manager, whose output is a function of the
 set of faces and the set of must-link and cannot-link corrections: single linkage over core faces, an attach step and a
 centroid merge. On simulated libraries whose people are disjoint from the tuning data, its accuracy without corrections is
-within about one point of average linkage overall (ahead on clean photos, behind on low-resolution photos and, by 7 points,
+within about one point of average linkage, averaged over the library conditions (ahead on clean photos, behind on low-resolution photos and, by 7 points,
 on profile ones), and on web family photos (FIW) with no retuning it again ties average linkage. With corrections (three
 simulated users, EdgeFace-S) it is within 0.003 F1 of constrained average linkage. It keeps every consistent correction
 across the next import, where plain re-clustering keeps 20\% and re-applying keeps 73--96\%, and its read step is roughly an
@@ -194,7 +194,7 @@ two people; the \emph{error-prone} user is casual, but with probability 0.1 each
 between look-alike clusters. After the ``later'' photos arrive we compare: \emph{ours}; \emph{constrained average
 linkage} (our implementation after~\cite{davidson2005agglomerative}); \emph{re-apply} (cluster without corrections, then
 repair each violated pair); and \emph{frozen} (earlier people kept, each new face joins its most similar face's person at
-cosine $\ge0.5$, Immich's default threshold~\cite{immich}). We report F1 and the share of corrections still true. No parameter is tuned here.
+cosine $\ge0.5$, inside the 0.3--0.7 cosine-distance range that Immich's documentation recommends~\cite{immichdocs}). We report F1 and the share of corrections still true. No parameter is tuned here.
 \emph{Error rate}: the casual user with wrong-click probability $p\in\{0,0.02,0.05,0.1,0.2\}$.
 \emph{Two devices}: a synced 50\% base, then 25\% more faces per device in its own order and up to five precise corrections,
 then an exchange of faces and corrections. \emph{Retraction}: for libraries where the error-prone user made a wrong ``same
@@ -257,7 +257,7 @@ difference $+0.0006$, $[-0.0046,+0.0061]$) and above single linkage ($+0.011$), 
 First-Leader ($+0.031$), whose order agreement is 0.64 against 1.000 for ours; the DBSCAN and HDBSCAN gaps are $+0.011$ and
 $+0.016$ when every method is re-tuned on the tuning families, which also leaves ours tied with average linkage (0.785 against
 0.788, $-0.0024$, $[-0.0082,+0.0036]$). Without the attach step ours scores 0.783. MobileFaceNet agrees (ours 0.783, average linkage 0.782; re-tuned
-$-0.0042$, $[-0.0092,+0.0010]$). The 30 libraries share families, so the intervals are probably
+$-0.0042$, $[-0.0092,+0.0010]$). The 30 libraries use 344 family slots over 247 of the 490 test families, so the intervals are probably
 too narrow. Scores are far below LFW's, probably because the faces are small (6.7\% were resized, not aligned) and relatives look alike.
 
 \subsection{Keeping corrections when new photos arrive}\label{sec:corr}
@@ -327,7 +327,8 @@ the gain of corrections made under EdgeFace-S itself. The other direction gives 
 We added 8{,}290 clean LFW faces in ten batches on one thread of an Intel Core i5-8250U laptop (12\,GB RAM, CPU only). Adding
 them and updating links took 0.9\,s in total (0.15\,s for the last batch). Reading the labels took 3.4--4.9\,s with the original
 centroid merge and 0.5\,s with the exact read step; with 10 and 50 corrections 4.5 and 5.1\,s against 1.9 and 2.2\,s. Deleting
-a random 10\% of the faces took 0.59\,s plus 0.5\,s to read the labels, against 7.0\,s to rebuild, with identical labels.
+a random 10\% of the faces took 0.59\,s plus 0.5\,s to read the labels, against 7.0\,s to rebuild, with identical labels. In 15 further random deletions (5 seeds each of 1, 10 and 30\% of the faces, with 10 random
+corrections present) the labels were identical to a rebuild on the remaining faces in all 15.
 
 Larger libraries are synthetic: the 8{,}290 embeddings are copied up to six times, each under its own random rotation, so
 copies are unrelated; this tests cost, not accuracy. At 49{,}740 faces our read step took 15\,s without and 20\,s with ten
@@ -353,9 +354,10 @@ not test one.
 \textbf{Scope and next steps.} Only the clusterer is part of the application. Libraries, users, wrong clicks and devices are
 simulated from public benchmarks (FIW's photos are web images, mostly of public figures, not private albums); the three consequences of Sec.~\ref{sec:conseq} are measured against a frozen-label store of our
 design; intervals for corrections resample library--condition pairs that share 79 test people; and scaling uses synthetic
-copies. A deployment needs a correction and undo interface, corrections keyed by photo hash and face box, tombstones so that a
+copies. A deployment needs a correction and undo interface, corrections keyed by photo hash and face box, records of retracted corrections (tombstones), so that a
 retraction on one device meets a new correction on another (not tested), and a study with real albums, which also needs the
-owners' consent because exchanging faces means exchanging biometric embeddings.
+owners' consent because exchanging faces means exchanging biometric embeddings; embeddings are themselves biometric data,
+so they should stay on the owner's devices or be encrypted in transit.
 
 \section{Conclusion}
 A face clusterer whose output is a function of the set of faces and corrections gives the same people for every import order
