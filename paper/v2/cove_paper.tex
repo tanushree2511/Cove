@@ -16,11 +16,10 @@
 
 % AUTHORS (5): replace the bracketed fields with the real details before submission (do NOT submit placeholders).
 \author{\small\setlength{\tabcolsep}{2pt}\begin{tabular}{*{5}{>{\centering\arraybackslash}p{0.19\textwidth}}}
-Anugrah Singh & Yadriksha Uprety & [Author 3 name] & [Author 4 name] & [Author 5 name] \\
-\textit{Dept. of CSE} & \textit{Dept. of CSE} & \textit{Dept. of CSE} & \textit{Dept. of CSE} & \textit{Dept. of CSE} \\
-\textit{[College name]} & \textit{[College name]} & \textit{[College name]} & \textit{[College name]} & \textit{[College name]} \\
-[City], India & [City], India & [City], India & [City], India & [City], India \\
-[email] & [email] & [email] & [email] & [email]\end{tabular}}
+Anugrah Singh & Yadriksha Uprety & {[Author 3 name]} & {[Author 4 name]} & {[Author 5 name]} \\
+\textit{Dept. of CSE, {[College name]}} & \textit{Dept. of CSE, {[College name]}} & \textit{Dept. of CSE, {[College name]}} & \textit{Dept. of CSE, {[College name]}} & \textit{Dept. of CSE, {[College name]}} \\
+{[City]}, India & {[City]}, India & {[City]}, India & {[City]}, India & {[City]}, India \\
+{[email]} & {[email]} & {[email]} & {[email]} & {[email]}\end{tabular}}
 
 \maketitle
 
@@ -32,10 +31,10 @@ step and a centroid merge. On simulated libraries whose people are disjoint from
 corrections ties average linkage on average over the library conditions (7 points lower on profile photos), and on web family
 photos (FIW) it again ties with no retuning. With corrections (three simulated users, EdgeFace-S) it is within 0.003 F1 of
 constrained average linkage on all faces, keeps every consistent correction across the next import, and reads about an order of
-magnitude faster on synthetic libraries of up to 50{,}000 faces. By construction, recomputing from the two sets gives identical
-people on two devices (an edit-log baseline of ours: 53\% and 31\%, mean ARI 0.997) and exact retraction and deletion. For our clusterer the gain from corrections is no longer
+magnitude faster on synthetic libraries of up to 50{,}000 faces. By construction, recomputing from the two sets gives, for identical embeddings, identical
+people on two devices (an edit-log baseline of ours: 53\% and 31\%) and exact retraction and deletion. For our clusterer the gain from corrections is no longer
 distinguishable from zero at about one wrong same-person click in twenty, while re-applying and constrained average linkage degrade more
-gently, so a review-and-undo view would be needed (untested). Only the clusterer is in the application; corrections, devices
+gently, so a review-and-undo view would be needed. Only the clusterer is in the application; corrections, devices
 and users are simulated.
 \end{abstract}
 
@@ -87,7 +86,7 @@ for face streams.
 \textbf{Sets, replicas and upgrades.} Computing state from the set of inputs so that replicas that exchange inputs agree is
 the idea of conflict-free replicated data types~\cite{shapiro2011crdt} and local-first software~\cite{kleppmann2019local}.
 Splitting a linkage clustering at the components of a threshold graph is classical for single
-linkage~\cite{gower1969mst,sibson1973slink}. Backward-compatible embeddings~\cite{shen2020backward} address upgrades for the
+linkage~\cite{gower1969mst}. Backward-compatible embeddings~\cite{shen2020backward} address upgrades for the
 embeddings themselves. In sources searched on 2026-11-10 (SciSpace, Consensus, web search, mostly abstracts) we did not find a
 measurement of whether face-grouping corrections survive re-clustering, agree across devices, can be retracted exactly, or
 survive a change of recogniser; this is bounded to those sources.
@@ -180,7 +179,7 @@ cosine $\ge0.5$, inside the 0.3--0.7 cosine-distance range that Immich's documen
 \emph{Two devices}: a synced 50\% base, then 25\% more faces per device in its own order and up to five precise corrections,
 then an exchange of faces and corrections. \emph{Retraction}: for libraries where the error-prone user made a wrong ``same
 person'', retract the first after the ``later'' photos arrive. \emph{Upgrade}: the 210 libraries whose faces are identical
-under both recognisers, corrections made under one and clustering run with the other. In the first two the alternative is
+under both recognisers, corrections made under one and clustering run with the other. In the two-device and retraction tests the alternative is
 a frozen-label store whose corrections are label edits and whose second device replays the other's edits in received order.
 This baseline is our own design, not any product's sync.
 
@@ -188,14 +187,14 @@ This baseline is our own design, not any product's sync.
 \section{Results}
 \subsection{Order dependence and accuracy without corrections}\label{sec:acc}
 First-Leader (a greedy leader pass) reaches an order agreement of 0.56 and its F1 differs by 5.9 points between orders on average in the worst condition (11.7 on one library); adding a centroid
-merge (Two-stage) still reaches 0.76 (Table~\ref{tab:acc}). Ours gave identical partitions in every order and batch split.
+merge (Two-stage) still reaches 0.76 (Table~\ref{tab:acc}). Ours gave identical partitions in every shuffled order tested (batch splits: unit tests).
 Single and average linkage are also invariant, and DBSCAN nearly so, but these batch methods are re-run on the whole library
 after each import.
 
 \begin{table*}[t]
 \caption{B-Cubed F1 on identity-disjoint test data, EdgeFace-S (mean over 30 libraries; whole sets for CALFW/CPLFW; FIW: 30 libraries of web family photos,
 LFW-tuned settings, no retuning; four methods are within 0.004). JPEG (q8), mixed and look-alike omitted (ours 0.993, 0.978, 0.998; average linkage 0.993, 0.981, 0.994); the eight-condition mean is 0.9854 for ours and 0.9857 for average linkage. First-Leader: greedy leader pass; Two-stage: leader pass plus centroid merge; no attach: ours with
-$\tau_a=\tau_\ell$. Bold: best. Last row: lowest ARI between two orders.}
+$\tau_a=\tau_\ell$. Last row: lowest ARI between two orders.}
 \label{tab:acc}
 \centering\small
 \setlength{\tabcolsep}{5pt}
@@ -221,7 +220,7 @@ Our method is not clearly ahead on degraded photos. \emph{Fairer tuning.} Re-tun
 moved their mean F1 by $-0.0012$ to $+0.0021$, and giving ours only 51 random grid points scores 0.9809 to 0.9857 against 0.9854.
 Resampling people instead of libraries widens the intervals (no multiplicity correction). Against average linkage, the strongest baseline, ours is better on clean
 ($+0.0059$, $[+0.0020,+0.0119]$), and blur ($+0.0038$) photos, worse on low-res ($-0.0061$,
-$[-0.0139,-0.0008]$), and not distinguishable on dark ($+0.0022$), JPEG (0.993 for both) and occluded ($-0.0089$,
+$[-0.0139,-0.0008]$), and not distinguishable on dark ($+0.0022$), JPEG (0.993 for both), mixed ($-0.0025$), look-alike ($+0.0037$) and occluded ($-0.0089$,
 $[-0.0219,+0.0072]$) photos. Against single linkage ours is better on every condition by 0.2 to 14 points,
 except CPLFW, where it is 0.5 points worse (0.841 vs.\ 0.846); the large gains (occluded, low-res) come mostly from the centroid merge, and the CPLFW gap is the attach threshold, whose removal costs up to
 3.6 points on libraries but gains about 5 on CPLFW. With MBF ours is also behind average linkage on CALFW (0.937 against 0.955), on occluded
@@ -235,10 +234,12 @@ ones.
 $+0.0006$, $[-0.0046,+0.0061]$) and above single linkage ($+0.011$), DBSCAN ($+0.040$), HDBSCAN ($+0.057$) and
 First-Leader ($+0.031$; order agreement 0.64). Re-tuned on the tuning families, ours is still ahead of DBSCAN and HDBSCAN
 ($+0.011$, $+0.016$) and tied with average linkage ($-0.0024$, $[-0.0082,+0.0036]$). Without the attach step ours scores
-0.783; MobileFaceNet agrees (0.783 against 0.782). The 30 libraries use 344 family slots over 247 of the 490 test families, so the intervals are
-probably too narrow. Scores are far below LFW's, probably because the faces are small (6.7\% were resized, not aligned) and relatives look alike.
+0.783. The 30 libraries use 344 family slots over 247 of the 490 test families, so the intervals are
+probably too narrow. Scores are far below LFW's, probably because faces are small (6.7\% resized) and relatives look alike.
 
-\emph{Immich.} Immich v3.4.1 with default settings on the three smallest clean test libraries (543 to 642 photos, one user each) scores F1 0.998 on the photos it assigns to a person, against 1.000 for ours on the same photos (0.999 on all photos). It leaves 12--27\% of the photos without a person, 95\% of them photos of people who appear once in the library; the three libraries are easy and say nothing about corrections, order or scale.
+\emph{Immich.} Immich v3.4.1 (default settings, one user per library) on the three smallest clean test libraries (543 to 642 photos) scores F1 0.998 on the
+photos it assigns to a person, against 1.000 for ours on the same photos (0.999 on all). It leaves 12--27\% of the photos without a person, 95\% of them
+people who appear once; these easy libraries say nothing about corrections, order or scale.
 
 \subsection{Keeping corrections when new photos arrive}\label{sec:corr}
 For the precise user, 207 of 240 library--condition pairs needed a correction (6.3 on average among them, 5.4 over all).
@@ -258,7 +259,7 @@ intervals): the gain of ours over discarding corrections is $+0.0065$ at $p=0$, 
 $+0.0009$ and $+0.0010$ at 0.05 and 0.10 (intervals include zero), and $-0.0057$ at 0.20 ($[-0.0085,-0.0030]$). Re-applying stays
 positive up to 0.20 ($+0.0025$ there) and constrained average linkage up to 0.10 ($+0.0027$; $-0.0009$ at 0.20, interval
 includes zero), so our hard constraints are the least forgiving, probably because one
-wrong merge joins whole groups of faces. For our clusterer, corrections should therefore be shown and removable.
+wrong merge joins whole groups of faces. Corrections should therefore be shown and removable (we did not test such a view).
 
 \emph{Web family photos (FIW).} With LFW settings ours keeps all ten corrections of the precise user, where plain re-clustering
 keeps 26\%, and gains $+0.0089$ ($[+0.0049,+0.0133]$) over discarding them; re-applying holds 86\% (precise) and 40\% (casual) and constrained average linkage ties
@@ -266,7 +267,7 @@ keeps 26\%, and gains $+0.0089$ ($[+0.0049,+0.0133]$) over discarding them; re-a
 
 \begin{table}[t]
 \caption{Keeping corrections, EdgeFace-S, 240 test library--condition pairs. ``Now'': F1 on the ``now'' photos after the precise user's
-corrections (each row's simulated user corrects that row's own clustering, so the correction sets differ). ``--'': the frozen rule was run for the precise user only. ``Later'': F1 after 20\% new photos, for the precise, casual and error-prone user. ``Held'': corrections
+corrections (each row's user corrects that row's own clustering). ``--'': frozen rule run for the precise user only. ``Later'': F1 after 20\% new photos. ``Held'': corrections
 still true after the new photos (precise\,/\,casual user, pooled over corrections).}
 \label{tab:corr}
 \centering\footnotesize
@@ -288,13 +289,13 @@ Constr.\ avg.\ link. & \textbf{0.9945} & 0.9914 & 0.9917 & 0.9878 & 100\,/\,100 
 \subsection{What recomputing from the sets buys}\label{sec:conseq}
 \emph{Two devices.} After exchanging faces and corrections, ours gave identical people on both devices in all 240
 library--condition pairs for both recognisers. So did constrained average linkage, which also recomputes from the sets. The
-frozen store with replayed edits agreed in 127 (EdgeFace-S) and 74 (MBF) of 240 pairs, i.e.\ 53\% and 31\% (mean ARI between devices 0.997 and 0.996, lowest 0.89 and 0.91; mean F1 gap about 0.001--0.002). The property
+frozen store with replayed edits agreed in 127 (EdgeFace-S) and 74 (MBF) of 240 pairs, i.e.\ 53\% and 31\% (mean ARI 0.997 and 0.996, mean F1 gap about 0.001--0.002). The property
 is not unique to our clusterer; it is what a plain edit log lacks, and 53\% describes this edit-log baseline (edits without
 timestamps, replayed in received order), not a deployed sync.
 
 \emph{Retraction.} In the 104 (EdgeFace-S) and 98 (MBF) libraries where the error-prone user made a wrong ``same person'',
 removing it after the ``later'' photos arrived gave exactly the never-made partition (ARI 1; F1 $0.970\to0.980$); the inverse split
-edit in the frozen store matched in 5\% (9\%) and ended at F1 0.974 (0.963) against 0.980 (0.969) had the click never been made. Constrained average linkage would match as well; we did not run it.
+edit in the frozen store matched in 5\% (9\%). Constrained average linkage would match as well; we did not run it.
 
 \emph{Recogniser upgrade.} Corrections made under MBF and applied after an upgrade to EdgeFace-S raised later F1 from
 0.9837 to 0.9873 ($+0.0036$, $[+0.0030,+0.0043]$) over discarding them, and, as expected, all 1{,}372 held; this is 47\% ($[38,57]$) of
@@ -310,16 +311,12 @@ Larger libraries are synthetic: the 8{,}290 embeddings are copied up to six time
 copies are unrelated; this tests cost, not accuracy, and fixes the component sizes. At 49{,}740 faces our read step took 15\,s without and 20\,s
 with ten corrections; constrained average linkage (split per component, with a best-partner cache; same labels as our first version
 at 1{,}658 and 3{,}316 faces) took 234 and 212\,s, and unconstrained compiled SciPy average linkage, a lower bound for it, 174\,s.
-That is 9 to 15 times faster at 49{,}740 faces and 14 to 69 times at 8{,}290 (30 and 20 s against 0.44 and 1.25 s), so the lead narrows as libraries grow (our read is
-superlinear: 0.44 to 15\,s for six times the faces). Adding the faces to the flat FAISS index took 316\,s at 49{,}740 faces, so there the build dominates.
+That is 9 to 15 times faster at 49{,}740 faces and 16 to 69 times at 8{,}290 (30 and 20 s against 0.44 and 1.25 s; 14 times against SciPy), so the lead
+narrows as libraries grow (our read is superlinear: 0.44 to 15\,s for six times the faces). Baseline times include their all-pairs similarity pass;
+adding the faces to our clusterer in batches of 64 took 316\,s at 49{,}740 faces, so from scratch ours is slower there.
 
 % ---------------------------------------------------------------------------------------------------------------------
 \section{Discussion}
-\textbf{What the results show.} The set-based properties (device agreement, exact retraction, freedom to revise earlier groupings)
-follow, given identical embeddings, from recomputing from the sets, so any such design shares them. For our clusterer, corrections should be shown and removable:
-their gain is positive up to about two wrong clicks in a hundred (intervals probably too narrow, since the eight conditions share photos) and indistinguishable from zero by one in twenty, while re-applying and constrained average
-linkage stay positive to ten; we did not test a review-and-undo view.
-
 \textbf{Scope and next steps.} Only the clusterer is part of the application. Libraries, users, wrong clicks and devices are
 simulated from public benchmarks (FIW's photos are web images, mostly of public figures, not private albums); the consequences
 of Sec.~\ref{sec:conseq} are measured against a frozen-label store of our design; intervals for corrections resample
@@ -344,7 +341,7 @@ clusterer, the experiment scripts and the text, ran the experiments, searched th
 The authors directed the work and take full responsibility for the content; reported numbers were checked against the
 per-run results with a script (\texttt{evaluation/verify\_paper\_numbers.py}).
 \textbf{Data and code:} LFW, CALFW and CPLFW are public, FIW is obtained from its authors under its terms; code, splits, grids and per-run results will be in the repository
-(\texttt{evaluation/}; URL to be added). \textbf{Ethics:} public benchmark data only (web-collected celebrity photos; FIW used after accepting its non-commercial, no-redistribution terms; no FIW image is shown or shared and the released files hold only scores and anonymous indices; no new data collected). \textbf{Funding, conflicts:} none.
+(\texttt{evaluation/}; URL to be added). \textbf{Ethics:} public benchmark data only (web-collected celebrity photos; FIW used after accepting its non-commercial, no-redistribution terms; no FIW image is shown or shared; no new data collected). \textbf{Funding, conflicts:} none.
 \textbf{Author contributions:} to be completed. \textbf{Licences:} InsightFace models are for non-commercial research;
 EdgeFace weights are CC BY-NC-SA 4.0.
 
