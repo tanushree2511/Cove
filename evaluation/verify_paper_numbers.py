@@ -297,4 +297,17 @@ d30 = J("exp30b_deletion_seeds_edgeface_s.json")
 chk("exp30b identical runs", 15, d30["identical_runs"], 0)
 chk("exp30b runs", 15, d30["runs"], 0)
 
+d30c = J("exp30c_deletion_binding_edgeface_s.json")
+chk("exp30c identical runs", 15, d30c["identical_runs"], 0)
+chk("exp30c binding runs", 15, d30c["binding_runs"], 0)
+chk("exp30c min corrections made", 7, min(r["corrections_made"] for r in d30c["rows"]), 0)
+chk("exp30c max corrections made", 10, max(r["corrections_made"] for r in d30c["rows"]), 0)
+chk("exp30c min corrections kept", 2, min(r["corrections_kept"] for r in d30c["rows"]), 0)
+chk("exp30c max corrections kept", 10, max(r["corrections_kept"] for r in d30c["rows"]), 0)
+
+for m_, v_ in (("edgeface_s", 0.997), ("mbf", 0.996)):
+    chk(f"exp21 {m_} frozen mean ARI", v_, J(f"exp21_replicas_{m_}.json")["table"]["frozen+log"]["mean_ari_between"], 3)
+chk("exp21 edgeface frozen F1 gap (about 0.001)", 0.001, J("exp21_replicas_edgeface_s.json")["table"]["frozen+log"]["F1_gap_between_replicas"], 3)
+chk("exp21 mbf frozen F1 gap (about 0.002)", 0.002, J("exp21_replicas_mbf.json")["table"]["frozen+log"]["F1_gap_between_replicas"], 3)
+
 print(f"\n{n_ok} ok, {bad} mismatch")

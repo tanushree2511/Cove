@@ -1,0 +1,143 @@
+{
+ "protocol": "Experiment 30c - deletion exactness over several random deletions, with BINDING corrections (round-10 review: the random corrections of 30b never changed a label).\n\nOn the 8,290 clean LFW faces (EdgeFace-S, shipped setting): for 5 seeds x deleted share {1%, 10%, 30%}, make up to 10 corrections that bind\n(5 same-person pairs the unconstrained clusterer left in different clusters, 5 cannot-link pairs it put in one cluster; only pairs it got wrong), delete the random share, and compare the labels with a clusterer built\nonly from the remaining faces and only the corrections whose faces remain. Counts identical partitions.\nRun: COVE_FACE_MODEL=edgeface_s python evaluation/exp30c_deletion_binding.py\n",
+ "rows": [
+  {
+   "share": 0.01,
+   "seed": 0,
+   "corrections_made": 7,
+   "corrections_kept": 7,
+   "corrections_change_labels": true,
+   "identical": true,
+   "seconds": 1.5926485999998476
+  },
+  {
+   "share": 0.01,
+   "seed": 1,
+   "corrections_made": 8,
+   "corrections_kept": 8,
+   "corrections_change_labels": true,
+   "identical": true,
+   "seconds": 1.5842712000003303
+  },
+  {
+   "share": 0.01,
+   "seed": 2,
+   "corrections_made": 10,
+   "corrections_kept": 10,
+   "corrections_change_labels": true,
+   "identical": true,
+   "seconds": 1.664040699999532
+  },
+  {
+   "share": 0.01,
+   "seed": 3,
+   "corrections_made": 8,
+   "corrections_kept": 8,
+   "corrections_change_labels": true,
+   "identical": true,
+   "seconds": 1.6418809999995574
+  },
+  {
+   "share": 0.01,
+   "seed": 4,
+   "corrections_made": 9,
+   "corrections_kept": 9,
+   "corrections_change_labels": true,
+   "identical": true,
+   "seconds": 1.8098155000006955
+  },
+  {
+   "share": 0.1,
+   "seed": 0,
+   "corrections_made": 7,
+   "corrections_kept": 5,
+   "corrections_change_labels": true,
+   "identical": true,
+   "seconds": 1.385878000000048
+  },
+  {
+   "share": 0.1,
+   "seed": 1,
+   "corrections_made": 9,
+   "corrections_kept": 6,
+   "corrections_change_labels": true,
+   "identical": true,
+   "seconds": 1.4347019000006185
+  },
+  {
+   "share": 0.1,
+   "seed": 2,
+   "corrections_made": 8,
+   "corrections_kept": 7,
+   "corrections_change_labels": true,
+   "identical": true,
+   "seconds": 1.6584678999997777
+  },
+  {
+   "share": 0.1,
+   "seed": 3,
+   "corrections_made": 7,
+   "corrections_kept": 6,
+   "corrections_change_labels": true,
+   "identical": true,
+   "seconds": 1.4088937000005899
+  },
+  {
+   "share": 0.1,
+   "seed": 4,
+   "corrections_made": 10,
+   "corrections_kept": 5,
+   "corrections_change_labels": true,
+   "identical": true,
+   "seconds": 1.413486099999318
+  },
+  {
+   "share": 0.3,
+   "seed": 0,
+   "corrections_made": 9,
+   "corrections_kept": 4,
+   "corrections_change_labels": true,
+   "identical": true,
+   "seconds": 0.9247987999997349
+  },
+  {
+   "share": 0.3,
+   "seed": 1,
+   "corrections_made": 9,
+   "corrections_kept": 2,
+   "corrections_change_labels": true,
+   "identical": true,
+   "seconds": 0.9692747000008239
+  },
+  {
+   "share": 0.3,
+   "seed": 2,
+   "corrections_made": 10,
+   "corrections_kept": 3,
+   "corrections_change_labels": true,
+   "identical": true,
+   "seconds": 1.0766176999995878
+  },
+  {
+   "share": 0.3,
+   "seed": 3,
+   "corrections_made": 7,
+   "corrections_kept": 3,
+   "corrections_change_labels": true,
+   "identical": true,
+   "seconds": 1.0458342999991146
+  },
+  {
+   "share": 0.3,
+   "seed": 4,
+   "corrections_made": 8,
+   "corrections_kept": 5,
+   "corrections_change_labels": true,
+   "identical": true,
+   "seconds": 0.95381610000004
+  }
+ ],
+ "identical_runs": 15,
+ "runs": 15,
+ "binding_runs": 15
+}
