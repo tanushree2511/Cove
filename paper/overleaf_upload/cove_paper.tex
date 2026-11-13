@@ -36,7 +36,7 @@ undoes the corrections. We study the face clusterer of Cove, a local-first photo
 set of faces and the set of must-link and cannot-link corrections, assembled from single linkage over core faces, an attach
 step and a centroid merge. On simulated libraries whose people are disjoint from the tuning data, its accuracy without
 corrections is within about one point of average linkage overall (ahead on clean photos, behind on low-resolution photos and,
-by 7 points, on profile ones). With corrections it is within 0.003 F1 of constrained average linkage on EdgeFace-S. It keeps
+by 7 points, on profile ones), and on real family photos (FIW) with no retuning it again ties average linkage. With corrections it is within 0.003 F1 of constrained average linkage on EdgeFace-S. It keeps
 every consistent correction across the next import, where plain re-clustering keeps 20\% and re-applying them keeps 73--96\%,
 and its read step is roughly an order of magnitude faster than constrained average linkage on synthetic libraries of up to
 50{,}000 faces. Recomputing the groups from the two sets, as any such design would, gives in simulation two devices with
@@ -71,7 +71,7 @@ insertions or on deletions, with a short argument and an exact, faster read step
 error rate (Sec.~\ref{sec:corr}), and of what recomputing from the sets buys, against a frozen-label baseline we designed
 (Sec.~\ref{sec:conseq});
 \item an identity-disjoint accuracy evaluation with fairer tuning that reports where our method is worse (Sec.~\ref{sec:acc}),
-and a scale test to 50{,}000 faces (Sec.~\ref{sec:time}).
+an outside test on real family photos (FIW), and a scale test to 50{,}000 faces (Sec.~\ref{sec:time}).
 \end{itemize}
 Only the clusterer is part of the application; the corrections, devices and users in the evaluation are simulated from public
 benchmarks. Code and per-run results are released.
@@ -169,6 +169,10 @@ photos each) and 50--150 strangers (one photo each) from one half: 30 tuning and
 \emph{Look-alike} libraries add the 7--14 test people most similar to one person. CALFW~\cite{zheng2017calfw} (age) and
 CPLFW~\cite{zheng2018cplfw} (pose) are clustered whole on test identities (8{,}212 and 7{,}718 faces). Photos are re-embedded
 after degradation (low-res, blur, JPEG, dark, occluded, mixed).
+\emph{Real family photos:} FIW~\cite{robinson2016fiw,robinson2018fiw} has 34{,}692 face crops of 5{,}773 people in 980 families. We split
+the families into two halves (no relatives shared), build 20 tuning and 30 test libraries of 8--16 families, and use the same
+detector (no face was found in 2{,}320 crops, which were resized instead of dropped), recogniser, methods and metrics. FIW is used
+under its terms (non-commercial research, images not redistributed).
 
 \textbf{Tuning.} Every method gets a grid over the same similarity range (0.20--0.70, step 0.05) and is tuned on the
 same tuning libraries and conditions to maximise the adjusted Rand index (ARI)~\cite{hubert1985ari}; we report B-Cubed F1. The recogniser (EdgeFace-S) was
@@ -208,7 +212,7 @@ after each import.
 
 \begin{table*}[t]
 \caption{B-Cubed F1 on identity-disjoint test data, EdgeFace-S embeddings (mean over 30 libraries; whole test-half sets
-for CALFW/CPLFW). Every method tuned on the same grid range and tuning libraries. First-Leader: greedy leader pass; Two-stage: leader pass plus centroid merge; no attach: ours with $\tau_a=\tau_\ell$. JPEG (q8) row omitted (0.993 for ours and average linkage). Bold: best. Last row: lowest order
+for CALFW/CPLFW; FIW: 30 libraries of real family photos with the LFW-tuned settings, no retuning). Every method tuned on the same grid range and tuning libraries. First-Leader: greedy leader pass; Two-stage: leader pass plus centroid merge; no attach: ours with $\tau_a=\tau_\ell$. JPEG (q8) row omitted (0.993 for ours and average linkage). Bold: best. Last row: lowest order
 agreement (ARI between two orders) over all library conditions.}
 \label{tab:acc}
 \centering\small
@@ -225,6 +229,7 @@ Mixed      & 0.902 & \textbf{0.981} & 0.956 & 0.955 & 0.948 & \textbf{0.981} & 0
 Occluded   & 0.852 & \textbf{0.952} & 0.800 & 0.805 & 0.925 & \textbf{0.952} & 0.907 & 0.943 \\
 CALFW (age)  & 0.681 & 0.902 & 0.945 & 0.793 & 0.358 & 0.940 & 0.919 & \textbf{0.947} \\
 CPLFW (pose) & 0.600 & 0.897 & 0.846 & 0.516 & 0.520 & \textbf{0.909} & 0.892 & 0.841 \\
+FIW (family photos) & 0.755 & 0.782 & 0.774 & 0.745 & 0.729 & 0.785 & 0.783 & \textbf{0.786} \\
 \midrule
 Order agreement (min) & 0.562 & 0.758 & 1.000 & 0.997 & 0.983 & 1.000 & 1.000 & 1.000 \\
 \bottomrule
@@ -247,6 +252,12 @@ On whole sets ours trades recall for precision: best on CALFW (0.947), about 7 p
 0.909; precision 0.985 vs.\ 0.912, recall 0.733 vs.\ 0.906), because single-linkage cores split profile photos from frontal
 ones.
 
+\emph{Real family photos.} On FIW we changed nothing (Table~\ref{tab:acc}). Ours scores 0.786, tied with average linkage (0.785;
+difference $+0.0006$, $[-0.0046,+0.0061]$) and above single linkage ($+0.011$), DBSCAN ($+0.040$), HDBSCAN ($+0.057$) and
+First-Leader ($+0.031$), whose order agreement is 0.64 against 1.000 for ours. Re-tuning every method on the tuning families gives
+the same picture (ours 0.785, average linkage 0.788, $-0.0024$, $[-0.0082,+0.0036]$). Scores are far below LFW's because the faces are
+small and relatives look alike.
+
 \subsection{Keeping corrections when new photos arrive}\label{sec:corr}
 For the precise user, 207 of 240 library--condition pairs needed a correction (6.3 on average among them, 5.4 over all).
 They raised F1 on the ``now'' photos from 0.984 to 0.994 (gain $+0.010$, $[+0.008,+0.011]$). Table~\ref{tab:corr} shows
@@ -261,6 +272,13 @@ it cannot revisit earlier groupings. \emph{Re-applying} works for the precise us
 \emph{Wrong corrections are sticky.} With the error-prone user (162 of 1{,}528 corrections wrong), ours ends at 0.985, no
 better than discarding the corrections, and constrained average linkage at 0.988; re-applying is more forgiving (0.989). This agrees with the error-rate sweep (casual user, wrong ``same person'' clicks with probability $p$, 95\% paired-bootstrap intervals), where the gain of ours over discarding corrections is $+0.0065$ at $p=0$, $+0.0034$ at 0.02, $+0.0009$ at 0.05 and
 $+0.0010$ at 0.10 (intervals include zero), and $-0.0057$ at 0.20 ($[-0.0085,-0.0030]$); re-applying stays positive. A system with hard constraints must therefore show corrections and let the user remove one.
+
+\emph{Real family photos.} On the FIW libraries (LFW settings) the precise user's ten corrections raised F1 from 0.787 to 0.801.
+After the later photos arrive, ours keeps all of them where plain re-clustering keeps 26\%, and scores 0.794 against 0.786 without
+them ($+0.0089$, $[+0.0049,+0.0133]$; casual user $+0.0069$, $[+0.0027,+0.0115]$). Re-applying holds only 86\% (precise) and 40\%
+(casual) of the corrections, and ours is better by $+0.0045$ ($[+0.0016,+0.0077]$) and $+0.0094$ ($[+0.0061,+0.0130]$);
+constrained average linkage again ties ($+0.0030$, $[-0.0025,+0.0084]$). For the error-prone user (29 of 300 corrections wrong)
+the gain is $+0.0004$ ($[-0.0030,+0.0039]$).
 
 \begin{table}[t]
 \caption{Keeping corrections, EdgeFace-S, 240 test library--condition pairs. ``Now'': F1 on the ``now'' photos after the precise user's
@@ -326,7 +344,7 @@ clicks in a hundred, small at five to ten (intervals include zero) and negative 
 since retraction is exact) is the natural companion to hard corrections.
 
 \textbf{Scope and next steps.} Only the clusterer is part of the application. Libraries, users, wrong clicks and devices are
-simulated from public benchmarks; the three consequences of Sec.~\ref{sec:conseq} are measured against a frozen-label store of our
+simulated from public benchmarks (FIW's photos are web images of public figures, not private albums); the three consequences of Sec.~\ref{sec:conseq} are measured against a frozen-label store of our
 design; intervals for corrections resample library--condition pairs that share 79 test people; and scaling uses synthetic
 copies. A deployment needs a correction and undo interface, corrections keyed by photo hash and face box, tombstones so that a
 retraction on one device meets a new correction on another (not tested), and a study with real albums, which also needs the
@@ -347,7 +365,7 @@ clusterer, the experiment scripts and the text of this paper, ran the experiment
 simulated peer reviews. The authors directed the work and take full responsibility for the content; reported numbers were
 checked against the released per-run results with a script (\texttt{evaluation/verify\_paper\_numbers.py}).
 \textbf{Data and code:} LFW, CALFW and CPLFW are public; code, splits, grids and per-run results are in the repository
-(\texttt{evaluation/}; URL to be added). \textbf{Ethics:} public benchmark data only (web-collected celebrity photos; no new data collected). \textbf{Funding, conflicts:} none.
+(\texttt{evaluation/}; URL to be added). \textbf{Ethics:} public benchmark data only (web-collected celebrity photos; FIW used under its non-commercial, no-redistribution terms; no new data collected). \textbf{Funding, conflicts:} none.
 \textbf{Author contributions:} to be completed. \textbf{Licences:} InsightFace models are for non-commercial research;
 EdgeFace weights are CC BY-NC-SA 4.0.
 

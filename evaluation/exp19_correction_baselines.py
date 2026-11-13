@@ -43,8 +43,9 @@ from exp15_corrections import pick_correction  # noqa: E402
 
 MODEL = os.environ.get("COVE_FACE_MODEL")
 assert MODEL in ("mbf", "edgeface_s"), "set COVE_FACE_MODEL=mbf or edgeface_s"
-SHARED = os.path.join(CACHE, f"exp14_shared_{MODEL}")
-TUNED = os.path.join(os.path.dirname(__file__), "results", f"exp14_tuned_{MODEL}.json")
+TAG = os.environ.get("COVE_TAG", "")                     # "" = the paper's LFW run; "_fiw" = exp31 outside-data run
+SHARED = os.path.join(CACHE, f"exp14_shared_{MODEL}{TAG}")
+TUNED = os.environ.get("COVE_TUNED") or os.path.join(os.path.dirname(__file__), "results", f"exp14_tuned_{MODEL}.json")
 MAXK = 10
 USERS = ("oracle", "casual", "noisy")
 SESSIONS = ("ours", "ours+reapply", "avg+reapply", "c-avg")
@@ -339,7 +340,7 @@ def main():
                   + (f" | order {e['order_agreement_min']:.4f}" if "order_agreement_min" in e else ""), flush=True)
     if len(sys.argv) > 1:
         return
-    save_json(f"exp19_correction_baselines_{MODEL}.json", {
+    save_json(f"exp19_correction_baselines_{MODEL}{TAG}.json", {
         "model": MODEL, "protocol": __doc__, "config": {"ours": _cfg(), "avg_thr": _thr()},
         "table": table, "per_library": rows, "seconds": time.time() - t0})
     print(f"DONE in {time.time() - t0:.0f}s", flush=True)

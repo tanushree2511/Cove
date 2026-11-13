@@ -37,7 +37,8 @@ assert MODEL in ("mbf", "edgeface_s"), "set COVE_FACE_MODEL=mbf or edgeface_s"
 DEGR = ("clean", "lowres", "blur", "jpeg", "dark", "occlude")
 CONDS = DEGR + ("mixed",)
 N_LIB, SPLIT_SEED = 30, 2026
-SHARED = os.path.join(CACHE, f"exp14_shared_{MODEL}")
+TAG = os.environ.get("COVE_TAG", "")                     # "" = the paper's LFW run; "_fiw" = exp31 outside-data run
+SHARED = os.path.join(CACHE, f"exp14_shared_{MODEL}{TAG}")
 
 T = [float(round(x, 2)) for x in np.arange(0.20, 0.701, 0.05)]                   # common similarity range for baselines
 GRIDS = {
