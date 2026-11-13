@@ -61,7 +61,7 @@ Video adds a second, harder problem: video has no compact "one label" ground tru
 - FastAPI backend (`videoModules/api.py`) with endpoints for single/bulk video indexing, background job progress tracking with cancellation, semantic search, face clustering (HDBSCAN), label correction (feedback capture), audio extraction, identity/person management, duplicate/blur cleanup, and bulk deletion utilities.
 - Representative-frame extraction with a custom near-duplicate filtering heuristic (`core/video_processor.py`).
 - CLIP-based (PyTorch/HuggingFace `transformers`) frame and video embedding generation, with batched inference (`core/embedder.py`).
-- A genuinely novel hierarchical, Bayesian-gated, zero-shot CLIP video classifier with exemplar-based few-shot adaptation from user feedback (`core/classifier.py`) — see §6 for full analysis.
+- A hierarchical, Bayesian-gated, zero-shot CLIP video classifier with exemplar-based few-shot adaptation from user feedback (`core/classifier.py`); it combines standard parts and has not been evaluated or checked for novelty — see §6 for full analysis.
 - InsightFace-based (`buffalo_l`) face detection with a four-stage quality filter (confidence, pose/yaw, size, blur) and per-video identity de-duplication via nearest-neighbor cosine matching (`core/face_processor.py`).
 - Global HDBSCAN-based face re-clustering as a maintenance operation, independent from per-video incremental identity linking.
 - SQLite schema for videos, persons, faces, and user feedback (`core/database.py`).
@@ -370,7 +370,7 @@ None of these values are reported in the code as having been derived from a grid
 
 ## 6. Novelty of the Project
 
-The strongest, most defensible novelty claim in this codebase is the **video classification algorithm** in `videoModules/core/classifier.py`. Its own docstring names it: *"Hierarchical Gated Bayesian Zero-Shot CLIP classification with Exemplar Learning."* Breaking down what is actually novel versus what is standard practice:
+The most distinctive component in this codebase (novelty not verified against the literature, and the classifier has no quantitative evaluation) is the **video classification algorithm** in `videoModules/core/classifier.py`. Its own docstring names it: *"Hierarchical Gated Bayesian Zero-Shot CLIP classification with Exemplar Learning."* Breaking down what is actually novel versus what is standard practice:
 
 **Standard practice (not novel on its own):**
 - Zero-shot classification via CLIP text/image embedding similarity is a well-established technique (CLIP's original paper demonstrates exactly this).
