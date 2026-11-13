@@ -112,7 +112,7 @@ application has no sync).}
 \label{fig:pipeline}
 \end{figure}
 \textbf{Pipeline} (Fig.~\ref{fig:pipeline}). Faces are detected with SCRFD-500M~\cite{guo2022scrfd}, aligned to $112\times112$
-and embedded with EdgeFace-S~\cite{george2024edgeface} (MobileFaceNet \texttt{w600k\_mbf}, ``MBF'', is also evaluated); unit vectors give
+and embedded with EdgeFace-S~\cite{george2024edgeface} (MobileFaceNet~\cite{chen2018mobilefacenets} with ArcFace loss~\cite{deng2019arcface}, \texttt{w600k\_mbf}, ``MBF'', is also evaluated); unit vectors give
 cosine similarity $s(i,j)$ and go into a FAISS flat index~\cite{johnson2021faiss}.
 
 \textbf{Clusterer.} Fix thresholds $\tau_\ell\ge\tau_a$, a neighbour count $m$ and a merge threshold $\tau_g$. Face $i$ is
