@@ -282,4 +282,14 @@ chk("exp31 MBF plain re-clustering holds (%)", 21, cm["table"]["ALL"]["oracle|ou
 chk("exp31 MBF re-apply holds precise (%)", 87, cm["table"]["ALL"]["oracle|ours+reapply"]["held_share"], 0, 100)
 chk("exp31 MBF re-apply holds casual (%)", 45, cm["table"]["ALL"]["casual|ours+reapply"]["held_share"], 0, 100)
 
+
+chk("exp25 ours gain CI lo p=0.02", 0.0015, t["0.02|ours"]["gain_ci95"][0], 4)
+chk("exp25 ours gain CI hi p=0.02", 0.0054, t["0.02|ours"]["gain_ci95"][1], 4)
+chk("exp25 reapply p=0.05", 0.0039, t["0.05|ours+reapply"]["gain_over_discarding"], 4)
+chk("exp25 reapply p=0.1", 0.0037, t["0.1|ours+reapply"]["gain_over_discarding"], 4)
+chk("exp25 reapply p=0.2", 0.0025, t["0.2|ours+reapply"]["gain_over_discarding"], 4)
+chk("exp25 c-avg p=0.05", 0.0028, t["0.05|c-avg"]["gain_over_discarding"], 4)
+chk("exp25 c-avg p=0.1", 0.0027, t["0.1|c-avg"]["gain_over_discarding"], 4)
+chk("exp31 FIW ours no-attach F1", 0.783, At["table"]["Ours, no attach"]["B3_F1"], 3)
+
 print(f"\n{n_ok} ok, {bad} mismatch")
