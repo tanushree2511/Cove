@@ -310,4 +310,10 @@ for m_, v_ in (("edgeface_s", 0.997), ("mbf", 0.996)):
 chk("exp21 edgeface frozen F1 gap (about 0.001)", 0.001, J("exp21_replicas_edgeface_s.json")["table"]["frozen+log"]["F1_gap_between_replicas"], 3)
 chk("exp21 mbf frozen F1 gap (about 0.002)", 0.002, J("exp21_replicas_mbf.json")["table"]["frozen+log"]["F1_gap_between_replicas"], 3)
 
+d32 = J("exp32_immich_edgeface_s.json")
+chk("exp32 Immich mean F1", 0.998, d32["mean_immich_F1"], 3)
+chk("exp32 ours same photos F1", 1.000, d32["mean_ours_same_photos_F1"], 3)
+chk("exp32 unassigned min share (%)", 12, min(r["no_person_assigned"]/r["photos"] for r in d32["rows"]), 0, 100)
+chk("exp32 unassigned max share (%)", 27, max(r["no_person_assigned"]/r["photos"] for r in d32["rows"]), 0, 100)
+
 print(f"\n{n_ok} ok, {bad} mismatch")

@@ -254,6 +254,7 @@ First-Leader ($+0.031$; order agreement 0.64). Re-tuned on the tuning families, 
 ($+0.011$, $+0.016$) and tied with average linkage ($-0.0024$, $[-0.0082,+0.0036]$). Without the attach step ours scores
 0.783; MobileFaceNet agrees (0.783 against 0.782). The 30 libraries use 344 family slots over 247 of the 490 test families, so the intervals are
 probably too narrow. Scores are far below LFW's, probably because the faces are small (6.7\% were resized, not aligned) and relatives look alike.
+Immich's default grouping~\cite{immich} on three of the test libraries (543 to 642 photos) scores F1 0.998 on the photos it assigns to a person, against 1.000 for ours on the same photos, but leaves 13--27\% of the photos without a person.
 
 \subsection{Keeping corrections when new photos arrive}\label{sec:corr}
 For the precise user, 207 of 240 library--condition pairs needed a correction (6.3 on average among them, 5.4 over all).
