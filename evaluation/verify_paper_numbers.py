@@ -257,4 +257,29 @@ chk("exp31 ours minus precise c-avg CI hi", 0.0084, tb["oracle|c-avg"]["ours_min
 chk("exp31 wrong corrections (error-prone)", 29, tb["noisy|ours"]["wrong_corrections"], 0)
 chk("exp31 corrections (error-prone)", 300, tb["noisy|ours"]["corrections"], 0)
 
+
+# ---- exp31 MobileFaceNet and retuned gaps
+m31 = J("exp31_fiw_transfer_mbf.json")
+chk("exp31 MBF ours F1", 0.783, m31["A_transfer_LFW_tuned"]["table"]["Ours"]["B3_F1"], 3)
+chk("exp31 MBF avg F1", 0.782, m31["A_transfer_LFW_tuned"]["table"]["Agglomerative (avg)"]["B3_F1"], 3)
+b_ = m31["A_transfer_LFW_tuned"]["bootstrap_ours_minus"]["Agglomerative (avg)"]
+chk("exp31 MBF ours-minus avg", 0.0014, b_["diff"], 4)
+chk("exp31 MBF ours-minus avg CI lo", -0.0020, b_["ci95"][0], 4)
+chk("exp31 MBF ours-minus avg CI hi", 0.0048, b_["ci95"][1], 4)
+b_ = m31["B_tuned_on_FIW"]["bootstrap_ours_minus"]["Agglomerative (avg)"]
+chk("exp31 MBF retuned ours-minus avg", -0.0042, b_["diff"], 4)
+chk("exp31 MBF retuned CI lo", -0.0092, b_["ci95"][0], 4)
+chk("exp31 MBF retuned CI hi", 0.0010, b_["ci95"][1], 4)
+chk("exp31 retuned ours-minus dbscan", 0.011, Bt["bootstrap_ours_minus"]["DBSCAN"]["diff"], 3)
+chk("exp31 retuned ours-minus hdbscan", 0.016, Bt["bootstrap_ours_minus"]["HDBSCAN"]["diff"], 3)
+cm = J("exp19_correction_baselines_mbf_fiw.json")
+rm = cm["per_library"]
+g = _boot([r["oracle|ours"]["later_F1"] - r["oracle|ours"]["lost_F1"] for r in rm.values()])
+chk("exp31 MBF corr gain precise", 0.0125, g[0], 4)
+chk("exp31 MBF corr gain precise CI lo", 0.0066, g[1], 4)
+chk("exp31 MBF corr gain precise CI hi", 0.0186, g[2], 4)
+chk("exp31 MBF plain re-clustering holds (%)", 21, cm["table"]["ALL"]["oracle|ours"]["lost_held_share"], 0, 100)
+chk("exp31 MBF re-apply holds precise (%)", 87, cm["table"]["ALL"]["oracle|ours+reapply"]["held_share"], 0, 100)
+chk("exp31 MBF re-apply holds casual (%)", 45, cm["table"]["ALL"]["casual|ours+reapply"]["held_share"], 0, 100)
+
 print(f"\n{n_ok} ok, {bad} mismatch")

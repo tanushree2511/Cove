@@ -161,7 +161,7 @@ that deleting faces gives the same labels as never having added them.
 % ---------------------------------------------------------------------------------------------------------------------
 \section{Experimental Protocol}\label{sec:protocol}
 The main protocol was fixed before any test number was computed; the later checks (finer grids, identity bootstrap,
-error-rate sweep, scale and deletion tests) are reported as additions.
+error-rate sweep, scale and deletion tests, FIW) are reported as additions.
 
 \textbf{Libraries.} LFW~\cite{huang2007lfw} identities are split once (seed 2026) into a tuning and a test half, for ``family''
 identities ($\ge$10 photos; 79 per half) and ``strangers'' (1{,}844 per half). A library draws 15--40 family people (up to 200
@@ -212,7 +212,7 @@ after each import.
 
 \begin{table*}[t]
 \caption{B-Cubed F1 on identity-disjoint test data, EdgeFace-S embeddings (mean over 30 libraries; whole test-half sets
-for CALFW/CPLFW; FIW: 30 libraries of real family photos with the LFW-tuned settings, no retuning). Every method tuned on the same grid range and tuning libraries. First-Leader: greedy leader pass; Two-stage: leader pass plus centroid merge; no attach: ours with $\tau_a=\tau_\ell$. JPEG (q8) row omitted (0.993 for ours and average linkage). Bold: best. Last row: lowest order
+for CALFW/CPLFW; FIW: 30 libraries of real family photos with the LFW-tuned settings, no retuning; four methods are within 0.004). Every method tuned on the same grid range and tuning libraries. First-Leader: greedy leader pass; Two-stage: leader pass plus centroid merge; no attach: ours with $\tau_a=\tau_\ell$. JPEG (q8) row omitted (0.993 for ours and average linkage). Bold: best. Last row: lowest order
 agreement (ARI between two orders) over all library conditions.}
 \label{tab:acc}
 \centering\small
@@ -229,7 +229,7 @@ Mixed      & 0.902 & \textbf{0.981} & 0.956 & 0.955 & 0.948 & \textbf{0.981} & 0
 Occluded   & 0.852 & \textbf{0.952} & 0.800 & 0.805 & 0.925 & \textbf{0.952} & 0.907 & 0.943 \\
 CALFW (age)  & 0.681 & 0.902 & 0.945 & 0.793 & 0.358 & 0.940 & 0.919 & \textbf{0.947} \\
 CPLFW (pose) & 0.600 & 0.897 & 0.846 & 0.516 & 0.520 & \textbf{0.909} & 0.892 & 0.841 \\
-FIW (family photos) & 0.755 & 0.782 & 0.774 & 0.745 & 0.729 & 0.785 & 0.783 & \textbf{0.786} \\
+FIW (family photos) & 0.755 & 0.782 & 0.774 & 0.745 & 0.729 & 0.785 & 0.783 & 0.786 \\
 \midrule
 Order agreement (min) & 0.562 & 0.758 & 1.000 & 0.997 & 0.983 & 1.000 & 1.000 & 1.000 \\
 \bottomrule
@@ -254,9 +254,11 @@ ones.
 
 \emph{Real family photos.} On FIW we changed nothing (Table~\ref{tab:acc}). Ours scores 0.786, tied with average linkage (0.785;
 difference $+0.0006$, $[-0.0046,+0.0061]$) and above single linkage ($+0.011$), DBSCAN ($+0.040$), HDBSCAN ($+0.057$) and
-First-Leader ($+0.031$), whose order agreement is 0.64 against 1.000 for ours. Re-tuning every method on the tuning families gives
-the same picture (ours 0.785, average linkage 0.788, $-0.0024$, $[-0.0082,+0.0036]$). Scores are far below LFW's because the faces are
-small and relatives look alike.
+First-Leader ($+0.031$), whose order agreement is 0.64 against 1.000 for ours; the DBSCAN and HDBSCAN gaps are $+0.011$ and
+$+0.016$ when every method is re-tuned on the tuning families, which also leaves ours tied with average linkage (0.785 against
+0.788, $-0.0024$, $[-0.0082,+0.0036]$). MobileFaceNet gives the same picture (ours 0.783, average linkage 0.782, $+0.0014$,
+$[-0.0020,+0.0048]$; re-tuned $-0.0042$, $[-0.0092,+0.0010]$). The 30 libraries share families, so the intervals are probably
+too narrow. Scores are far below LFW's, probably because the faces are small (6.7\% were resized, not aligned) and relatives look alike.
 
 \subsection{Keeping corrections when new photos arrive}\label{sec:corr}
 For the precise user, 207 of 240 library--condition pairs needed a correction (6.3 on average among them, 5.4 over all).
@@ -278,7 +280,7 @@ After the later photos arrive, ours keeps all of them where plain re-clustering 
 them ($+0.0089$, $[+0.0049,+0.0133]$; casual user $+0.0069$, $[+0.0027,+0.0115]$). Re-applying holds only 86\% (precise) and 40\%
 (casual) of the corrections, and ours is better by $+0.0045$ ($[+0.0016,+0.0077]$) and $+0.0094$ ($[+0.0061,+0.0130]$);
 constrained average linkage again ties ($+0.0030$, $[-0.0025,+0.0084]$). For the error-prone user (29 of 300 corrections wrong)
-the gain is $+0.0004$ ($[-0.0030,+0.0039]$).
+the gain is $+0.0004$ ($[-0.0030,+0.0039]$). With MobileFaceNet the precise user's gain is $+0.0125$ ($[+0.0066,+0.0186]$); ours keeps all corrections, plain re-clustering 21\%, and re-applying 87\% (precise) and 45\% (casual).
 
 \begin{table}[t]
 \caption{Keeping corrections, EdgeFace-S, 240 test library--condition pairs. ``Now'': F1 on the ``now'' photos after the precise user's
@@ -338,13 +340,13 @@ dominates and an incremental or approximate index would replace it.
 \textbf{What the results show.} Order-invariant people, corrections that persist across imports and accuracy within 0.003 F1 of
 constrained average linkage (EdgeFace-S) come from well-understood parts, with a much cheaper read step (9 to 15 times at
 50{,}000 synthetic faces) and, over the frozen rule, device agreement, exact retraction and freedom to revise earlier
-groupings. These properties follow from recomputing the groups from the sets, so any such design shares them. All accuracy
-differences are small because most methods already score about 0.99. The gain from corrections is clear up to about two wrong
+groupings. These properties follow from recomputing the groups from the sets, so any such design shares them. On the LFW libraries all accuracy
+differences are small because most methods already score about 0.99; on FIW, at about 0.78, ours still only ties average linkage. The gain from corrections is clear up to about two wrong
 clicks in a hundred, small at five to ten (intervals include zero) and negative at twenty, so a review-and-undo view (cheap,
 since retraction is exact) is the natural companion to hard corrections.
 
 \textbf{Scope and next steps.} Only the clusterer is part of the application. Libraries, users, wrong clicks and devices are
-simulated from public benchmarks (FIW's photos are web images of public figures, not private albums); the three consequences of Sec.~\ref{sec:conseq} are measured against a frozen-label store of our
+simulated from public benchmarks (FIW's photos are web images, mostly of public figures, not private albums); the three consequences of Sec.~\ref{sec:conseq} are measured against a frozen-label store of our
 design; intervals for corrections resample library--condition pairs that share 79 test people; and scaling uses synthetic
 copies. A deployment needs a correction and undo interface, corrections keyed by photo hash and face box, tombstones so that a
 retraction on one device meets a new correction on another (not tested), and a study with real albums, which also needs the
