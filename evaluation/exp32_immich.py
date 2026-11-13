@@ -131,22 +131,26 @@ def main():
         for aid, f in ids.items():
             fcs = call("GET", f"/faces?id={aid}", key=key)
             best = None
-            for fc in fcs:
-                if not fc.get("person"):
-                    continue
+            for fc in fcs:   # the labelled LFW face is the one nearest the centre, whether or not Immich gave it a person
                 w = fc["boundingBoxX2"] - fc["boundingBoxX1"]
                 h = fc["boundingBoxY2"] - fc["boundingBoxY1"]
                 cx = (fc["boundingBoxX1"] + fc["boundingBoxX2"]) / 2 / max(fc["imageWidth"], 1)
                 cy = (fc["boundingBoxY1"] + fc["boundingBoxY2"]) / 2 / max(fc["imageHeight"], 1)
                 score = (w * h) / max(fc["imageWidth"] * fc["imageHeight"], 1) - 2 * ((cx - .5) ** 2 + (cy - .5) ** 2)
                 if best is None or score > best[0]:
-                    best = (score, fc["person"]["id"])
+                    best = (score, fc["person"]["id"] if fc.get("person") else None)
+            if best is not None and best[1] is None:
+                best = None
             if best is None:
                 missed += 1
                 continue
             pred.append(best[1])
             scored_files.append(f)
             true.append(f.split("/")[0])
+        from collections import Counter
+        cnt = Counter(f.split('/')[0] for f in files)
+        unassigned = [f for f in files if f not in set(scored_files)]
+        singleton_unassigned = sum(1 for f in unassigned if cnt[f.split('/')[0]] == 1)
         f1, pr, rc = bcubed(pred, true)
         # ours on the same photos
         keep = [pos[f] for f in files if f in pos]
@@ -156,7 +160,7 @@ def main():
         o_f1, o_p, o_r = bcubed(lab, yy)
         idx = [files.index(f) for f in scored_files]
         s_f1, s_p, s_r = bcubed(np.asarray(lab)[idx], [yy[j] for j in idx])
-        rows.append({"library": li, "photos": len(files), "scored": len(pred), "no_person_assigned": missed,
+        rows.append({"library": li, "photos": len(files), "scored": len(pred), "no_person_assigned": missed, "unassigned_one_photo_identities": singleton_unassigned, "immich_version": call("GET", "/server/version", key=key),
                      "immich_people": len(set(pred)), "true_people": len(set(true)),
                      "immich": {"F1": f1, "P": pr, "R": rc}, "ours_all_photos": {"F1": o_f1, "P": o_p, "R": o_r}, "ours_same_photos_as_immich": {"F1": s_f1, "P": s_p, "R": s_r}})
         print(rows[-1], flush=True)

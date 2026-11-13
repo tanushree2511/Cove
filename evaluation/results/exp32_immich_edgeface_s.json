@@ -6,6 +6,14 @@
    "photos": 543,
    "scored": 396,
    "no_person_assigned": 147,
+   "unassigned_one_photo_identities": 139,
+   "immich_version": {
+    "major": 3,
+    "minor": 4,
+    "patch": 1,
+    "prerelease": null,
+    "featureLevel": 2
+   },
    "immich_people": 20,
    "true_people": 19,
    "immich": {
@@ -29,6 +37,14 @@
    "photos": 585,
    "scored": 491,
    "no_person_assigned": 94,
+   "unassigned_one_photo_identities": 91,
+   "immich_version": {
+    "major": 3,
+    "minor": 4,
+    "patch": 1,
+    "prerelease": null,
+    "featureLevel": 2
+   },
    "immich_people": 25,
    "true_people": 25,
    "immich": {
@@ -52,6 +68,14 @@
    "photos": 642,
    "scored": 565,
    "no_person_assigned": 77,
+   "unassigned_one_photo_identities": 72,
+   "immich_version": {
+    "major": 3,
+    "minor": 4,
+    "patch": 1,
+    "prerelease": null,
+    "featureLevel": 2
+   },
    "immich_people": 20,
    "true_people": 20,
    "immich": {

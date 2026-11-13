@@ -316,4 +316,7 @@ chk("exp32 ours same photos F1", 1.000, d32["mean_ours_same_photos_F1"], 3)
 chk("exp32 unassigned min share (%)", 12, min(r["no_person_assigned"]/r["photos"] for r in d32["rows"]), 0, 100)
 chk("exp32 unassigned max share (%)", 27, max(r["no_person_assigned"]/r["photos"] for r in d32["rows"]), 0, 100)
 
+chk("exp32 singleton share of unassigned (%)", 95, sum(r["unassigned_one_photo_identities"] for r in d32["rows"]) / sum(r["no_person_assigned"] for r in d32["rows"]), 0, 100)
+chk("exp32 ours all photos F1", 0.999, d32["mean_ours_F1"], 3)
+
 print(f"\n{n_ok} ok, {bad} mismatch")
